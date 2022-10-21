@@ -9,9 +9,10 @@
 }
 
 .topbar-item {
-  min-width: 80px;
+  min-width: 120px;
   text-decoration: none;
   color: darkgrey;
+  text-align: center;
 
   &:hover,
   &.active {

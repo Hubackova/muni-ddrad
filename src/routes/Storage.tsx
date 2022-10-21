@@ -173,7 +173,7 @@ const Storage: React.FC = () => {
                 {row.cells.map((cell) => {
                   return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
                 })}
-                <td>
+                <td className="sample-list">
                   {samples.map((sample) => (
                     <span className="sample">{sample.isolateCode}</span>
                   ))}

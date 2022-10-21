@@ -80,13 +80,33 @@ const PcrGenomicLoci: React.FC = () => {
   );
 
   const importData = (data) => {
-    setExtractions(data);
-    data.map((row) => {
-      console.log(row);
-      return set(ref(db, "extractions/" + row.key), {
-        ...row,
+    const finalData = data.map((row) => {
+      const { altitude, collector, dateCollection, habitat, latitude, longitude, ...rest } = row;
+      const location = locations.find((i) => i.localityCode === row.localityCode);
+      const storageData = storage.find((i) => i.box === row.box);
+      set(ref(db, "extractions/" + rest.key), {
+        ...rest,
+        localityCode: location.key,
+        box: storageData.key,
+      });
+      console.log(storageData);
+      return { ...rest, location };
+    });
+
+    // setExtractions(finalData);
+
+    extractions.map((ex) => {
+      set(ref(db, "extractions/" + ex.key), {
+        ...ex,
       });
     });
+    // finalData.map((row) => {
+    //   console.log(row);
+    //   return set(ref(db, "extractions/" + row.key), {
+    //     ...row,
+    //   });
+    // });
+    window.location.reload(true);
   };
 
   const addColumn = (name) => {
@@ -334,6 +354,15 @@ const PcrGenomicLoci: React.FC = () => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, selectedFlatRows, prepareRow } =
     tableInstance;
 
+  const selectedData = selectedFlatRows.map((d) => {
+    const location = locations.find((i) => {
+      console.log(i, d.original);
+      return i.localityName === d.original.localityName;
+    });
+    console.log(location, d.original);
+    return { ...d.original, ...location };
+  });
+
   return (
     <>
       <table className="table" {...getTableProps()}>
@@ -378,7 +407,7 @@ const PcrGenomicLoci: React.FC = () => {
         <button onClick={() => addColumn(newColumn)}>Add new column</button>
       </div>
       <div className="download">
-        <CSVLink data={selectedFlatRows.map((d) => d.original)}>
+        <CSVLink data={selectedData}>
           <div className="export">
             <ExportIcon />
             export CSV
