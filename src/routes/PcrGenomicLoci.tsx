@@ -96,7 +96,7 @@ const PcrGenomicLoci: React.FC = () => {
     // setExtractions(finalData);
 
     extractions.map((ex) => {
-      set(ref(db, "extractions/" + ex.key), {
+      return set(ref(db, "extractions/" + ex.key), {
         ...ex,
       });
     });
