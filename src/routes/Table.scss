@@ -1,0 +1,88 @@
+.table {
+  display: block;
+  width: 96vw;
+  overflow-x: auto;
+  white-space: nowrap;
+  border: 2px solid grey;
+  height: 30rem;
+
+  * {
+    font-size: 13px;
+  }
+  td {
+    text-align: left;
+
+    input {
+      height: 20px;
+      max-height: 20px;
+    }
+
+    > span:not(.sample) {
+      border: 1px solid grey;
+      border-radius: 2px;
+      display: block;
+      padding: 1px 2px;
+      background-color: #eee;
+      height: 20px;
+    }
+  }
+
+  .sample {
+    border: 1px solid grey;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 2px 4px;
+  }
+}
+
+.show-form {
+  cursor: pointer;
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  label {
+    font-size: 0.8rem;
+  }
+}
+
+.export {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  width: min-content;
+  align-items: center;
+  svg {
+    width: 30px;
+  }
+}
+
+.download {
+  display: flex;
+  gap: 15px;
+  .export {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    width: min-content;
+    align-items: center;
+    svg {
+      width: 30px;
+    }
+  }
+}
+
+.add-new {
+  margin: 10px 0;
+  display: flex;
+  align-items: flex-start;
+}

@@ -1,0 +1,13 @@
+.topbar {
+  height: 80px;
+  border-bottom: 1px solid grey;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  column-gap: 20px;
+}
+
+.topbar-item {
+  min-width: 80px;
+}

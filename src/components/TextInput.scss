@@ -1,0 +1,56 @@
+:global {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+
+  .label {
+    margin-bottom: 3px;
+  }
+
+  .error-message {
+    margin-top: 8px;
+    color: red;
+  }
+
+  .input {
+    flex: 1;
+    border-radius: 4px;
+    background-color: white;
+    border: 1px solid grey;
+    color: black;
+    outline: none;
+    padding: 6px 8px;
+    margin-bottom: 0;
+    transition: border 0.2s ease-in-out;
+    line-height: 20px;
+    font-size: 16px;
+    color: hsl(0, 0%, 20%);
+
+    &:focus {
+      border: 1px solid blue;
+    }
+
+    &.disabled {
+      color: grey;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &.error {
+      border: 1px solid red;
+    }
+
+    &:-webkit-autofill::first-line {
+      font-size: 1rem;
+    }
+  }
+}

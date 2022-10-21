@@ -1,0 +1,26 @@
+.select {
+  text-align: left;
+  min-width: max-content;
+
+  .select-input {
+    text-align: left;
+
+    &.narrow {
+      * {
+        min-height: 0;
+      }
+      div > div {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      :global(.select__indicator-separator) {
+        display: none !important;
+      }
+    }
+  }
+
+  .error-message {
+    color: red;
+  }
+}
