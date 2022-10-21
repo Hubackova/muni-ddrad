@@ -1,32 +1,53 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import routes from "../routes";
 import "./TopBar.scss";
 
 const TopBar: React.FC = () => {
   return (
     <div className="topbar">
-      <Link to={routes.home} className="topbar-item">
+      <NavLink
+        to={routes.home}
+        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+      >
         Add new sample
-      </Link>
-      <Link to={routes.dnaExtractions} className="topbar-item">
+      </NavLink>
+      <NavLink
+        to={routes.dnaExtractions}
+        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+      >
         DNA extractions
-      </Link>
-      <Link to={routes.pcrGenomicLoci} className="topbar-item">
+      </NavLink>
+      <NavLink
+        to={routes.pcrGenomicLoci}
+        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+      >
         PCR Genomic Loci
-      </Link>
-      <Link to={routes.storage} className="topbar-item">
+      </NavLink>
+      <NavLink
+        to={routes.storage}
+        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+      >
         Storage
-      </Link>
-      <Link to={routes.locations} className="topbar-item">
+      </NavLink>
+      <NavLink
+        to={routes.locations}
+        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+      >
         Locations
-      </Link>
-      <Link to={routes.primers} className="topbar-item">
+      </NavLink>
+      <NavLink
+        to={routes.primers}
+        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+      >
         Primers
-      </Link>
-      <Link to={routes.pcrPrograms} className="topbar-item">
+      </NavLink>
+      <NavLink
+        to={routes.pcrPrograms}
+        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+      >
         PCR programs
-      </Link>
+      </NavLink>
     </div>
   );
 };

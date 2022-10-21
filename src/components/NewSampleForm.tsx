@@ -139,6 +139,9 @@ const NewSampleForm: React.FC = () => {
       </div>
       <div className="row">
         <TextInput label="ng/ul" name="ngul" error={errors.ngul?.message} register={register} />
+        <TextInput label="Kit" name="kit" error={errors.kit?.message} register={register} />
+      </div>
+      <div className="row">
         <Controller
           render={({ field: { onChange, value, name } }) => (
             <SelectInput
@@ -156,8 +159,7 @@ const NewSampleForm: React.FC = () => {
           control={control}
           name="box"
         />
-      </div>
-      <div className="row">
+
         <TextInput
           label="Storage Site"
           name="storageSite"
@@ -165,6 +167,8 @@ const NewSampleForm: React.FC = () => {
           register={register}
           disabled
         />
+      </div>
+      <div className="row">
         <Controller
           render={({ field: { onChange, value, name } }) => (
             <SelectInput
@@ -184,8 +188,6 @@ const NewSampleForm: React.FC = () => {
           control={control}
           name="localityCode"
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Country"
           name="country"
@@ -193,6 +195,8 @@ const NewSampleForm: React.FC = () => {
           register={register}
           disabled
         />
+      </div>
+      <div className="row">
         <TextInput
           label="State"
           name="state"
@@ -200,9 +204,6 @@ const NewSampleForm: React.FC = () => {
           register={register}
           disabled
         />
-      </div>
-      <div className="row">
-        <TextInput label="Kit" name="kit" error={errors.kit?.message} register={register} />
         <TextInput
           label="Locality name"
           name="localityName"
@@ -211,6 +212,7 @@ const NewSampleForm: React.FC = () => {
           disabled
         />
       </div>
+      <div className="row"></div>
       <button className="submit-btn" type="submit">
         Save
       </button>

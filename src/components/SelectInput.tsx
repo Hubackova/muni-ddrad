@@ -8,7 +8,7 @@ export interface DefaultOptionType {
   value: string;
 }
 
-function SelectInput<T extends {}>(
+function SelectInput(
   { label, error, isTransparent = false, isSearchable = false, ...props }: any,
   ref: React.Ref<any>
 ) {

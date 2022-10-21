@@ -17,10 +17,6 @@ const parseCSV = async (file: any) => {
   });
 };
 
-interface DropzoneSwProps {
-  importData: any;
-}
-
 const DropzonePcrGenomic: React.FC = ({ importData }) => {
   const handleDrop = async (acceptedFiles: any) => {
     const data: any = await parseCSV(acceptedFiles[0]);

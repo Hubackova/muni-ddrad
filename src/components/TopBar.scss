@@ -10,4 +10,11 @@
 
 .topbar-item {
   min-width: 80px;
+  text-decoration: none;
+  color: darkgrey;
+
+  &:hover,
+  &.active {
+    color: black;
+  }
 }

@@ -331,15 +331,8 @@ const PcrGenomicLoci: React.FC = () => {
       ]);
     }
   );
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    selectedFlatRows,
-    state: { selectedRowIds },
-    prepareRow,
-  } = tableInstance;
+  const { getTableProps, getTableBodyProps, headerGroups, rows, selectedFlatRows, prepareRow } =
+    tableInstance;
 
   return (
     <>
