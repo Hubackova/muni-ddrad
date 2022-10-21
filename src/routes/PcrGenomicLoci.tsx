@@ -80,7 +80,7 @@ const PcrGenomicLoci: React.FC = () => {
   );
 
   const importData = (data) => {
-    const finalData = data.map((row) => {
+    data.forEach((row) => {
       const { altitude, collector, dateCollection, habitat, latitude, longitude, ...rest } = row;
       const location = locations.find((i) => i.localityCode === row.localityCode);
       const storageData = storage.find((i) => i.box === row.box);
