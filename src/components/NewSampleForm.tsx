@@ -18,8 +18,11 @@ const schema = yup
     project: yup.string().required(),
     speciesOrig: yup.string().required(),
     ngul: yup.string().required(),
-    localityCode: yup.string().required(),
     kit: yup.string().required(),
+    country: yup.string().required(),
+    localityName: yup.string().required(),
+    dateCollection: yup.string().required(),
+    collector: yup.string().required(),
   })
   .required();
 
@@ -60,7 +63,7 @@ const NewSampleForm: React.FC = () => {
   }, [db]);
 
   const addItem = (data: any) => {
-    const { country, state, localityName, storageSite, ...sampleData } = data;
+    const { storageSite, ...sampleData } = data;
     writeExtractionData({ ...sampleData });
   };
 
@@ -81,11 +84,17 @@ const NewSampleForm: React.FC = () => {
   }));
 
   const localityOptions = locations.map((i) => ({
-    value: i.key,
+    value: i.localityCode,
     label: i.localityCode,
     country: i.country,
     state: i.state,
     localityName: i.localityName,
+    latitude: i.latitude,
+    longitude: i.longitude,
+    altitude: i.altitude,
+    habitat: i.habitat,
+    dateCollection: i.dateCollection,
+    collector: i.collector,
   }));
 
   const speciesOptions = Object.values(
@@ -110,7 +119,6 @@ const NewSampleForm: React.FC = () => {
               options={speciesOptions}
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
-                console.log(e);
                 onChange(e?.value);
               }}
               label="Species (original det.)"
@@ -170,15 +178,21 @@ const NewSampleForm: React.FC = () => {
       </div>
       <div className="row">
         <Controller
-          render={({ field: { onChange, value, name } }) => (
-            <SelectInput
+          render={({ field: { onChange, value } }) => (
+            <CreatableSelectInput
               options={localityOptions}
-              value={value ? { value, label: name } : null}
+              value={value ? { value, label: value } : null}
               onChange={(e: any) => {
                 onChange(e?.value);
                 setValue("country", e.country);
                 setValue("state", e.state);
                 setValue("localityName", e.localityName);
+                setValue("latitude", e.latitude);
+                setValue("longitude", e.longitude);
+                setValue("altitude", e.altitude);
+                setValue("habitat", e.habitat);
+                setValue("dateCollection", e.dateCollection);
+                setValue("collector", e.collector);
               }}
               label="Locality code"
               error={errors.localityCode?.message}
@@ -193,23 +207,63 @@ const NewSampleForm: React.FC = () => {
           name="country"
           error={errors.country?.message}
           register={register}
-          disabled
         />
       </div>
       <div className="row">
         <TextInput
-          label="State"
+          label="Latitude [°N]"
+          name="latitude"
+          error={errors.latitude?.message}
+          register={register}
+        />
+        <TextInput
+          label="Longitude [°E]"
+          name="longitude"
+          error={errors.longitude?.message}
+          register={register}
+        />
+      </div>
+      <div className="row">
+        <TextInput
+          label="Altitude [m a.s.l.]"
+          name="altitude"
+          error={errors.altitude?.message}
+          register={register}
+        />
+        <TextInput
+          label="State/province"
           name="state"
           error={errors.state?.message}
           register={register}
-          disabled
         />
+      </div>
+      <div className="row">
         <TextInput
           label="Locality name"
           name="localityName"
           error={errors.localityName?.message}
           register={register}
-          disabled
+        />
+        <TextInput
+          label="Habitat"
+          name="habitat"
+          error={errors.habitat?.message}
+          register={register}
+        />
+      </div>
+      <div className="row">
+        <TextInput
+          label="Date collection"
+          name="dateCollection"
+          error={errors.dateCollection?.message}
+          register={register}
+          type="date"
+        />
+        <TextInput
+          label="Collector"
+          name="collector"
+          error={errors.collector?.message}
+          register={register}
         />
       </div>
       <div className="row"></div>

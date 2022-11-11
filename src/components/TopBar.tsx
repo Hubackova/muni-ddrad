@@ -31,10 +31,10 @@ const TopBar: React.FC = () => {
         Storage
       </NavLink>
       <NavLink
-        to={routes.locations}
+        to={routes.all}
         className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
       >
-        Locations
+        All
       </NavLink>
       <NavLink
         to={routes.primers}

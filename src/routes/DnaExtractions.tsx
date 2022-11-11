@@ -1,12 +1,11 @@
-import { getDatabase, onValue, ref, remove, update } from "firebase/database";
+import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useTable, Column } from "react-table";
-import { DnaExtractionsType, LocationType, StorageType } from "../types";
+import { DnaExtractionsType, StorageType } from "../types";
 import SelectInput from "../components/SelectInput";
 import "./Table.scss";
 
 const DnaExtractions: React.FC = () => {
-  const [locations, setLocations] = useState<LocationType[]>([]);
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
   const db = getDatabase();
@@ -30,20 +29,7 @@ const DnaExtractions: React.FC = () => {
       });
       setStorage(items);
     });
-    onValue(ref(db, "locations/"), (snapshot) => {
-      const items: any = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setLocations(items);
-    });
   }, [db]);
-
-  const removeItem = (id: string) => {
-    remove(ref(db, "extractions/" + id));
-  };
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
@@ -65,29 +51,29 @@ const DnaExtractions: React.FC = () => {
     [storage]
   );
 
-  const localityOptions = useMemo(
-    () =>
-      locations.map((i) => ({
-        value: i.key,
-        label: i.localityCode,
-        country: i.country,
-        state: i.state,
-        localityName: i.localityName,
-      })),
-    [locations]
-  );
+  // const localityOptions = useMemo(
+  //   () =>
+  //     locations.map((i) => ({
+  //       value: i.key,
+  //       label: i.localityCode,
+  //       country: i.country,
+  //       state: i.state,
+  //       localityName: i.localityName,
+  //     })),
+  //   [locations]
+  // );
   const columns: Column<any>[] = useMemo(
     () => [
       {
         Header: "Isolate code",
         accessor: "isolateCode",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => (original.isolateCode = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "isolateCode")}
-            defaultValue={[original.isolateCode] || ""}
-          ></input>
-        ),
+        // Cell: ({ row: { original } }) => (
+        //   <input
+        //     onChange={(e) => (original.isolateCode = e.target.value)}
+        //     onBlur={(e) => editItem(original.key, e.target.value, "isolateCode")}
+        //     defaultValue={[original.isolateCode] || ""}
+        //   ></input>
+        // ),
       },
       {
         Header: "Species (original det.)",
@@ -130,13 +116,13 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "ng/ul",
         accessor: "ngul",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => (original.ngul = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "ngul")}
-            defaultValue={[original.ngul] || ""}
-          ></input>
-        ),
+        // Cell: ({ row: { original } }) => (
+        //   <input
+        //     onChange={(e) => (original.ngul = e.target.value)}
+        //     onBlur={(e) => editItem(original.key, e.target.value, "ngul")}
+        //     defaultValue={[original.ngul] || ""}
+        //   ></input>
+        // ),
       },
       {
         Header: "Box name",
@@ -160,29 +146,53 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "Locality code",
         accessor: "localityCode",
-        Cell: ({ row: { original } }) => (
-          <SelectInput
-            options={localityOptions}
-            value={
-              original.localityCode
-                ? { value: original.localityCode, label: original.localityCode }
-                : null
-            }
-            onChange={(value: any) => {
-              editItem(original.key, value.value, "localityCode");
-            }}
-            isSearchable
-            className="narrow"
-          />
-        ),
+        // Cell: ({ row: { original } }) => (
+        //   <SelectInput
+        //     options={[]}
+        //     value={
+        //       original.localityCode
+        //         ? { value: original.localityCode, label: original.localityCode }
+        //         : null
+        //     }
+        //     onChange={(value: any) => {
+        //       editItem(original.key, value.value, "localityCode");
+        //     }}
+        //     isSearchable
+        //     className="narrow"
+        //   />
+        // ),
       },
       {
         Header: "Country",
         accessor: "country",
+        // Cell: ({ row: { original } }) => (
+        //   <input
+        //     onChange={(e) => {
+        //       original.country = e.target.value;
+        //     }}
+        //     onBlur={(e) => {
+        //       editItem(original.key, e.target.value, "country");
+        //       editItem(original.key, "", "localityCode");
+        //     }}
+        //     defaultValue={[original.country] || ""}
+        //   ></input>
+        // ),
       },
       {
         Header: "State/province",
         accessor: "state",
+        // Cell: ({ row: { original } }) => (
+        //   <input
+        //     onChange={(e) => {
+        //       original.state = e.target.value;
+        //     }}
+        //     onBlur={(e) => {
+        //       editItem(original.key, e.target.value, "state");
+        //       editItem(original.key, "", "localityCode");
+        //     }}
+        //     defaultValue={[original.state] || ""}
+        //   ></input>
+        // ),
       },
       {
         Header: "Kit",
@@ -199,20 +209,27 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "Locality name",
         accessor: "localityName",
+        // Cell: ({ row: { original } }) => (
+        //   <input
+        //     onChange={(e) => {
+        //       original.localityName = e.target.value;
+        //     }}
+        //     onBlur={(e) => {
+        //       editItem(original.key, e.target.value, "localityName");
+        //       editItem(original.key, "", "localityCode");
+        //     }}
+        //     defaultValue={[original.localityName] || ""}
+        //   ></input>
+        // ),
       },
     ],
-    [boxOptions, editItem, localityOptions]
+    [boxOptions, editItem]
   );
 
   const tableData = extractions.map((ex) => {
-    const location = locations.find((i) => i.key === ex.localityCode);
     const storageData = storage.find((i) => i.key === ex.box);
     return {
       ...ex,
-      localityCode: location?.localityCode,
-      country: location?.country,
-      state: location?.state,
-      localityName: location?.localityName,
       box: storageData?.box,
       storageSite: storageData?.storageSite,
     };
@@ -229,27 +246,18 @@ const DnaExtractions: React.FC = () => {
   return (
     <table className="table" {...getTableProps()}>
       <thead>
-        {
-          // Loop over the header rows
-          headerGroups.map((headerGroup) => (
-            // Apply the header row props
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              <th>Remove</th>
-              {
-                // Loop over the headers in each row
-                headerGroup.headers.map((column) => (
-                  // Apply the header cell props
-                  <th {...column.getHeaderProps()}>
-                    {
-                      // Render the header
-                      column.render("Header")
-                    }
-                  </th>
-                ))
-              }
-            </tr>
-          ))
-        }
+        {headerGroups.map((headerGroup) => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column) => (
+              <th {...column.getHeaderProps()}>
+                {
+                  // Render the header
+                  column.render("Header")
+                }
+              </th>
+            ))}
+          </tr>
+        ))}
       </thead>
 
       <tbody {...getTableBodyProps()}>
@@ -257,9 +265,6 @@ const DnaExtractions: React.FC = () => {
           prepareRow(row);
           return (
             <tr {...row.getRowProps()} key={row.original.key}>
-              <td role="cell">
-                <button onClick={() => removeItem(row.original.key)}>X</button>
-              </td>
               {row.cells.map((cell) => {
                 return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
               })}

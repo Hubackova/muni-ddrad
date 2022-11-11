@@ -3,7 +3,7 @@ const routes = {
   dnaExtractions: "/dna-extractions",
   pcrGenomicLoci: "/pcr-genomic-loci",
   storage: "/storage",
-  locations: "/locations",
+  all: "/locations",
   primers: "/primers",
   pcrPrograms: "/pcrPrograms",
 };

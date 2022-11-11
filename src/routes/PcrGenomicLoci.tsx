@@ -50,33 +50,20 @@ const PcrGenomicLoci: React.FC = () => {
       });
       setStorage(items);
     });
-    onValue(ref(db, "locations/"), (snapshot) => {
-      const items: any = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setLocations(items);
-    });
   }, [db]);
 
   const tableData = React.useMemo(
     () =>
       extractions.map((ex) => {
         const { kit, localityCode, speciesUpdated, ...data } = ex;
-        const location = locations.find((i) => i.key === ex.localityCode);
         const storageData = storage.find((i) => i.key === ex.box);
         return {
           ...data,
-          country: location?.country,
-          state: location?.state,
-          localityName: location?.localityName,
           box: storageData?.box,
           storageSite: storageData?.storageSite,
         };
       }),
-    [extractions, locations, storage]
+    [extractions, storage]
   );
 
   const importData = (data) => {
@@ -86,10 +73,8 @@ const PcrGenomicLoci: React.FC = () => {
       const storageData = storage.find((i) => i.box === row.box);
       set(ref(db, "extractions/" + rest.key), {
         ...rest,
-        localityCode: location.key,
         box: storageData.key,
       });
-      console.log(storageData);
       return { ...rest, location };
     });
 
@@ -143,11 +128,7 @@ const PcrGenomicLoci: React.FC = () => {
         Header: "Isolate code",
         accessor: "isolateCode",
         Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => (original.isolateCode = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "isolateCode")}
-            defaultValue={[original.isolateCode] || ""}
-          ></input>
+          <input defaultValue={[original.isolateCode] || ""} disabled></input>
         ),
       },
       {
@@ -182,11 +163,7 @@ const PcrGenomicLoci: React.FC = () => {
         Header: "ng/ul",
         accessor: "ngul",
         Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => (original.ngul = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "ngul")}
-            defaultValue={[original.ngul] || ""}
-          ></input>
+          <input disabled defaultValue={[original.ngul] || ""}></input>
         ),
       },
       {

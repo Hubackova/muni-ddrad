@@ -6,7 +6,7 @@ import routes from "./routes";
 import DnaExtractions from "./routes/DnaExtractions";
 import Error404 from "./routes/Error404";
 import HomePage from "./routes/HomePage";
-import Locations from "./routes/Locations";
+import All from "./routes/All";
 import PcrGenomicLoci from "./routes/PcrGenomicLoci";
 import Storage from "./routes/Storage";
 import Primers from "./routes/Primers";
@@ -22,7 +22,7 @@ const App: React.FC = () => {
           <Route path={routes.dnaExtractions} element={<DnaExtractions />} />
           <Route path={routes.pcrGenomicLoci} element={<PcrGenomicLoci />} />
           <Route path={routes.storage} element={<Storage />} />
-          <Route path={routes.locations} element={<Locations />} />
+          <Route path={routes.all} element={<All />} />
           <Route path={routes.primers} element={<Primers />} />
           <Route path={routes.pcrPrograms} element={<PcrPrograms />} />
           <Route element={<Error404 returnUrl={routes.home} />} />

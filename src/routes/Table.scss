@@ -15,6 +15,12 @@
     input {
       height: 20px;
       max-height: 20px;
+
+      &:disabled {
+        background-color: #eee;
+        border: 1px solid grey;
+        color: black;
+      }
     }
 
     > span:not(.sample) {
