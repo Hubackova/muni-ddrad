@@ -1,28 +1,29 @@
 // @ts-nocheck
-import { CSVLink } from "react-csv";
 import { getDatabase, onValue, ref, set, update } from "firebase/database";
-import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { useSortBy, useTable, useRowSelect } from "react-table";
-import { DnaExtractionsType, LocationType, StorageType } from "../types";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { CSVLink } from "react-csv";
+import { useRowSelect, useSortBy, useTable } from "react-table";
 import SelectInput from "../components/SelectInput";
-import DropzonePcrGenomic from "../components/DropzonePcrGenomic";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
+import { DnaExtractionsType, LocationType, StorageType } from "../types";
 import "./Table.scss";
 
-const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref) => {
-  const defaultRef = React.useRef();
-  const resolvedRef = ref || defaultRef;
+const IndeterminateCheckbox = React.forwardRef(
+  ({ indeterminate, ...rest }, ref) => {
+    const defaultRef = React.useRef();
+    const resolvedRef = ref || defaultRef;
 
-  React.useEffect(() => {
-    resolvedRef.current.indeterminate = indeterminate;
-  }, [resolvedRef, indeterminate]);
+    React.useEffect(() => {
+      resolvedRef.current.indeterminate = indeterminate;
+    }, [resolvedRef, indeterminate]);
 
-  return (
-    <>
-      <input type="checkbox" ref={resolvedRef} {...rest} />
-    </>
-  );
-});
+    return (
+      <>
+        <input type="checkbox" ref={resolvedRef} {...rest} />
+      </>
+    );
+  }
+);
 
 const PcrGenomicLoci: React.FC = () => {
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
@@ -68,8 +69,18 @@ const PcrGenomicLoci: React.FC = () => {
 
   const importData = (data) => {
     data.forEach((row) => {
-      const { altitude, collector, dateCollection, habitat, latitude, longitude, ...rest } = row;
-      const location = locations.find((i) => i.localityCode === row.localityCode);
+      const {
+        altitude,
+        collector,
+        dateCollection,
+        habitat,
+        latitude,
+        longitude,
+        ...rest
+      } = row;
+      const location = locations.find(
+        (i) => i.localityCode === row.localityCode
+      );
       const storageData = storage.find((i) => i.box === row.box);
       set(ref(db, "extractions/" + rest.key), {
         ...rest,
@@ -154,7 +165,9 @@ const PcrGenomicLoci: React.FC = () => {
           <input
             type="date"
             onChange={(e) => (original.dateIsolation = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "dateIsolation")}
+            onBlur={(e) =>
+              editItem(original.key, e.target.value, "dateIsolation")
+            }
             defaultValue={[original.dateIsolation] || ""}
           ></input>
         ),
@@ -172,7 +185,9 @@ const PcrGenomicLoci: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <SelectInput
             options={boxOptions}
-            value={original.box ? { value: original.box, label: original.box } : null}
+            value={
+              original.box ? { value: original.box, label: original.box } : null
+            }
             onChange={(value: any) => {
               editItem(original.key, value.value, "box");
             }}
@@ -274,7 +289,12 @@ const PcrGenomicLoci: React.FC = () => {
     [customColumns, tableData, getColumnsAccessor]
   );
   // Create an editable cell renderer
-  const EditableCell: React.FC<any> = ({ value: initialValue, row, cell, column: { id } }) => {
+  const EditableCell: React.FC<any> = ({
+    value: initialValue,
+    row,
+    cell,
+    column: { id },
+  }) => {
     // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState(initialValue);
 
@@ -284,7 +304,8 @@ const PcrGenomicLoci: React.FC = () => {
 
     // We'll only update the external data when the input is blurred
     const onBlur = (e: any) => {
-      if (e.target.value) editItem(row.original.key, e.target.value, cell.column.id);
+      if (e.target.value)
+        editItem(row.original.key, e.target.value, cell.column.id);
     };
 
     // If the initialValue is changed external, sync it up with our state
@@ -328,8 +349,14 @@ const PcrGenomicLoci: React.FC = () => {
       ]);
     }
   );
-  const { getTableProps, getTableBodyProps, headerGroups, rows, selectedFlatRows, prepareRow } =
-    tableInstance;
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    selectedFlatRows,
+    prepareRow,
+  } = tableInstance;
 
   const selectedData = selectedFlatRows.map((d) => {
     const location = locations.find((i) => {
@@ -354,10 +381,18 @@ const PcrGenomicLoci: React.FC = () => {
                   headerGroup.headers.map((column) => (
                     // Apply the header cell props
 
-                    <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                    <th
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    >
                       {column.render("Header")}
                       {/* Add a sort direction indicator */}
-                      <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
+                      <span>
+                        {column.isSorted
+                          ? column.isSortedDesc
+                            ? " 🔽"
+                            : " 🔼"
+                          : ""}
+                      </span>
                     </th>
                   ))
                 }
@@ -372,7 +407,9 @@ const PcrGenomicLoci: React.FC = () => {
             return (
               <tr {...row.getRowProps()} key={row.original.key}>
                 {row.cells.map((cell) => {
-                  return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  );
                 })}
               </tr>
             );
@@ -380,7 +417,10 @@ const PcrGenomicLoci: React.FC = () => {
         </tbody>
       </table>
       <div className="add-new">
-        <input value={newColumn} onChange={(e) => setNewColumn(e.target.value)} />
+        <input
+          value={newColumn}
+          onChange={(e) => setNewColumn(e.target.value)}
+        />
         <button onClick={() => addColumn(newColumn)}>Add new column</button>
       </div>
       <div className="download">
@@ -390,7 +430,6 @@ const PcrGenomicLoci: React.FC = () => {
             export CSV
           </div>
         </CSVLink>
-        <DropzonePcrGenomic importData={importData} />
       </div>
     </>
   );
