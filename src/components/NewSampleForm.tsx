@@ -98,7 +98,10 @@ const NewSampleForm: React.FC = () => {
   }));
 
   const speciesOptions = Object.values(
-    extractions.reduce((acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }), {})
+    extractions.reduce(
+      (acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }),
+      {}
+    )
   ).map((i: any) => ({
     value: i.speciesOrig,
     label: i.speciesOrig,
@@ -106,6 +109,7 @@ const NewSampleForm: React.FC = () => {
 
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
+      <h5>Add new sample:</h5>
       <div className="row">
         <TextInput
           label="Isolate code"
@@ -146,8 +150,18 @@ const NewSampleForm: React.FC = () => {
         />
       </div>
       <div className="row">
-        <TextInput label="ng/ul" name="ngul" error={errors.ngul?.message} register={register} />
-        <TextInput label="Kit" name="kit" error={errors.kit?.message} register={register} />
+        <TextInput
+          label="ng/ul"
+          name="ngul"
+          error={errors.ngul?.message}
+          register={register}
+        />
+        <TextInput
+          label="Kit"
+          name="kit"
+          error={errors.kit?.message}
+          register={register}
+        />
       </div>
       <div className="row">
         <Controller

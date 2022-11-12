@@ -1,21 +1,9 @@
 import { getDatabase, onValue, ref, remove, update } from "firebase/database";
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { useTable, Column } from "react-table";
-import * as yup from "yup";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Column, useTable } from "react-table";
 import CreatableSelectInput from "../components/CreatableSelectInput";
-import TextInput from "../components/TextInput";
-import { writeStorageData } from "../firebase/firebase";
 import { DnaExtractionsType, StorageType } from "../types";
 import "./Table.scss";
-import { yupResolver } from "@hookform/resolvers/yup";
-
-const schema = yup
-  .object({
-    box: yup.string().required(),
-    storageSite: yup.string().required(),
-  })
-  .required();
 
 const Storage: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
@@ -60,7 +48,10 @@ const Storage: React.FC = () => {
   const storageOptions = useMemo(
     () =>
       Object.values(
-        storage.reduce((acc, cur) => Object.assign(acc, { [cur.storageSite]: cur }), {})
+        storage.reduce(
+          (acc, cur) => Object.assign(acc, { [cur.storageSite]: cur }),
+          {}
+        )
       ).map((i: any) => ({
         value: i.storageSite,
         label: i.storageSite,
@@ -105,111 +96,43 @@ const Storage: React.FC = () => {
   );
 
   const tableInstance = useTable({ columns, data: storage });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
-
-  const addItem = (data: any) => {
-    writeStorageData(data);
-  };
-
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-
-    control,
-  } = useForm<StorageType>({
-    resolver: yupResolver(schema),
-  });
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    tableInstance;
 
   return (
-    <>
-      <table className="table" {...getTableProps()}>
-        <thead>
-          {
-            // Loop over the header rows
-            headerGroups.map((headerGroup) => (
-              // Apply the header row props
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                <th>Remove</th>
-                {
-                  // Loop over the headers in each row
-                  headerGroup.headers.map((column) => (
-                    // Apply the header cell props
-                    <th {...column.getHeaderProps()}>
-                      {
-                        // Render the header
-                        column.render("Header")
-                      }
-                    </th>
-                  ))
-                }
-                <th>List of samples in the box</th>
-              </tr>
-            ))
-          }
-        </thead>
+    <table className="table" {...getTableProps()}>
+      <thead>
+        {headerGroups.map((headerGroup) => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column) => (
+              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+            ))}
+            <th>List of samples in the box</th>
+          </tr>
+        ))}
+      </thead>
 
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            const samples = extractions.filter((i) => {
-              console.log(i, row.original);
-              return i.box === row.original.key;
-            });
-            console.log("samples", samples);
-            return (
-              /* @ts-ignore */
-              <tr {...row.getRowProps()} key={row.original.key}>
-                <td role="cell">
-                  <button
-                    onClick={
-                      /* @ts-ignore */
-                      () => removeItem(row.original.key)
-                    }
-                  >
-                    X
-                  </button>
-                </td>
-                {row.cells.map((cell) => {
-                  return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-                })}
-                <td className="sample-list">
-                  {samples.map((sample) => (
-                    <span className="sample">{sample.isolateCode}</span>
-                  ))}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
-      <form className="form" onSubmit={handleSubmit(addItem)}>
-        <div className="row">
-          <TextInput label="Box name" name="box" error={errors.box?.message} register={register} />
-          <Controller
-            render={({ field: { onChange, value } }) => (
-              <CreatableSelectInput
-                options={storageOptions}
-                value={value ? { value, label: value } : null}
-                onChange={(e: any) => {
-                  console.log(e);
-                  onChange(e?.value);
-                }}
-                label="Storage site"
-                error={errors.storageSite?.message}
-                isSearchable
-              />
-            )}
-            control={control}
-            name="storageSite"
-          />
-        </div>
-        <button className="submit-btn" type="submit">
-          Save
-        </button>
-      </form>
-    </>
+      <tbody {...getTableBodyProps()}>
+        {rows.map((row) => {
+          prepareRow(row);
+          const samples = extractions.filter((i) => {
+            return i.box === row.original.key;
+          });
+          return (
+            <tr {...row.getRowProps()} key={row.original.key}>
+              {row.cells.map((cell) => {
+                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+              })}
+              <td className="sample-list">
+                {samples.map((sample) => (
+                  <span className="sample">{sample.isolateCode}</span>
+                ))}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 };
 

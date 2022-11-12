@@ -1,11 +1,6 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-import { getDatabase, onValue, ref, remove, set } from "firebase/database";
+import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import { useTable } from "react-table";
-import * as yup from "yup";
-import TextInput from "../components/TextInput";
-import { writeLocationData } from "../firebase/firebase";
 import { LocationType } from "../types";
 import "./Table.scss";
 
@@ -13,15 +8,6 @@ interface Column {
   Header: any;
   accessor: any;
 }
-const schema = yup
-  .object({
-    localityCode: yup.string().required(),
-    country: yup.string().required(),
-    localityName: yup.string().required(),
-    dateCollection: yup.string().required(),
-    collector: yup.string().required(),
-  })
-  .required();
 
 const columns: Column[] = [
   {
@@ -110,17 +96,18 @@ const Storage: React.FC = () => {
     });
   }, [db]);
 
-  const removeItem = (id: string) => {
-    remove(ref(db, "extractions/" + id));
-  };
-
-  const editItem = (key: string, rowValues: any, newValue: string, cell: any) => {
+  /*   const editItem = (
+    key: string,
+    rowValues: any,
+    newValue: string,
+    cell: any
+  ) => {
     set(ref(db, "extractions/" + key), {
       ...rowValues,
       [cell.column.id]: newValue,
     });
   };
-
+*/
   const defaultColumn = {
     Cell: ({ value: initialValue }: any) => {
       return <span>{initialValue}</span>;
@@ -128,14 +115,14 @@ const Storage: React.FC = () => {
   };
 
   const tableInstance = useTable({ columns, data: extractions, defaultColumn });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    tableInstance;
 
   return (
     <table className="table" {...getTableProps()}>
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
-            <th>Remove</th>
             {headerGroup.headers.map((column) => (
               <th {...column.getHeaderProps()}>{column.render("Header")}</th>
             ))}
@@ -148,12 +135,12 @@ const Storage: React.FC = () => {
           prepareRow(row);
           return (
             <tr {...row.getRowProps()} key={row.original.key}>
-              <td role="cell">
-                <button onClick={() => removeItem(row.original.key)}>X</button>
-              </td>
               {row.cells.map((cell) => {
                 return (
-                  <td {...cell.getCellProps()} onClick={() => console.log(cell)}>
+                  <td
+                    {...cell.getCellProps()}
+                    onClick={() => console.log(cell)}
+                  >
                     {cell.render("Cell")}
                   </td>
                 );
