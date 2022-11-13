@@ -38,7 +38,7 @@ const PcrPrograms: React.FC = () => {
     [db]
   );
 
-  const customColumns = React.useMemo(
+  const columns = React.useMemo(
     () => [
       {
         Header: "Name",
@@ -82,30 +82,6 @@ const PcrPrograms: React.FC = () => {
       },
     ],
     []
-  );
-
-  const getColumnsAccessor = useCallback(
-    (fbData) => {
-      if (!fbData || !fbData.length) return [];
-      const customKeys = customColumns.map((i) => i.accessor);
-      const fbKeys = Object.keys(fbData[0]);
-
-      return fbKeys
-        .map((i) => {
-          if (customKeys.includes(i)) return null;
-          return {
-            Header: i,
-            accessor: i,
-          };
-        })
-        .filter((i) => i && i.accessor !== "key");
-    },
-    [customColumns]
-  );
-
-  const columns = React.useMemo(
-    () => [...customColumns, ...getColumnsAccessor(pcrPrograms)],
-    [customColumns, pcrPrograms, getColumnsAccessor]
   );
 
   const EditableCell: React.FC<any> = ({
