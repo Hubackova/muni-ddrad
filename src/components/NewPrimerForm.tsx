@@ -3,6 +3,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import * as yup from "yup";
 import TextInput from "../components/TextInput";
 import { writePrimersData } from "../firebase/firebase";
@@ -18,6 +19,7 @@ const NewPrimerForm: React.FC = () => {
 
   const addItem = (data: any) => {
     writePrimersData(data);
+    toast.success("Primer was added successfully");
   };
 
   const {

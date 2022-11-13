@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { getDatabase, onValue, ref, set, update } from "firebase/database";
+import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useRowSelect, useSortBy, useTable } from "react-table";
 import SelectInput from "../components/SelectInput";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
-import { DnaExtractionsType, LocationType, StorageType } from "../types";
+import { DnaExtractionsType, StorageType } from "../types";
 import "./Table.scss";
 
 const IndeterminateCheckbox = React.forwardRef(
@@ -27,7 +27,6 @@ const IndeterminateCheckbox = React.forwardRef(
 
 const PcrGenomicLoci: React.FC = () => {
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
-  const [locations, setLocations] = useState<LocationType[]>([]);
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [newColumn, setNewColumn] = useState("");
   const db = getDatabase();
@@ -56,7 +55,18 @@ const PcrGenomicLoci: React.FC = () => {
   const tableData = React.useMemo(
     () =>
       extractions.map((ex) => {
-        const { kit, localityCode, speciesUpdated, ...data } = ex;
+        const {
+          kit,
+          localityCode,
+          speciesUpdated,
+          altitude,
+          collector,
+          dateCollection,
+          habitat,
+          latitude,
+          longitude,
+          ...data
+        } = ex;
         const storageData = storage.find((i) => i.key === ex.box);
         return {
           ...data,
@@ -66,44 +76,6 @@ const PcrGenomicLoci: React.FC = () => {
       }),
     [extractions, storage]
   );
-
-  const importData = (data) => {
-    data.forEach((row) => {
-      const {
-        altitude,
-        collector,
-        dateCollection,
-        habitat,
-        latitude,
-        longitude,
-        ...rest
-      } = row;
-      const location = locations.find(
-        (i) => i.localityCode === row.localityCode
-      );
-      const storageData = storage.find((i) => i.box === row.box);
-      set(ref(db, "extractions/" + rest.key), {
-        ...rest,
-        box: storageData.key,
-      });
-      return { ...rest, location };
-    });
-
-    // setExtractions(finalData);
-
-    extractions.map((ex) => {
-      return set(ref(db, "extractions/" + ex.key), {
-        ...ex,
-      });
-    });
-    // finalData.map((row) => {
-    //   console.log(row);
-    //   return set(ref(db, "extractions/" + row.key), {
-    //     ...row,
-    //   });
-    // });
-    window.location.reload(true);
-  };
 
   const addColumn = (name) => {
     const obj = tableData?.length ? tableData[0] : null;
@@ -245,6 +217,12 @@ const PcrGenomicLoci: React.FC = () => {
         Header: "ELAV",
         accessor: "ELAV",
       },
+    ],
+    [boxOptions, editItem]
+  );
+
+  const customColumns2 = React.useMemo(
+    () => [
       {
         Header: "note on PCR",
         accessor: "notePCR",
@@ -262,16 +240,16 @@ const PcrGenomicLoci: React.FC = () => {
         accessor: "status",
       },
     ],
-    [boxOptions, editItem]
+    []
   );
 
   const getColumnsAccessor = useCallback(
-    (fbData) => {
-      if (!fbData || !fbData.length) return [];
+    (tableData) => {
+      if (!tableData || !tableData.length) return [];
       const customKeys = customColumns.map((i) => i.accessor);
-      const fbKeys = Object.keys(fbData[0]);
-
-      return fbKeys
+      const tableDataKeys = Object.keys(tableData[0]);
+      console.log(customKeys);
+      return tableDataKeys
         .map((i) => {
           if (customKeys.includes(i)) return null;
           return {
@@ -285,8 +263,12 @@ const PcrGenomicLoci: React.FC = () => {
   );
 
   const columns = React.useMemo(
-    () => [...customColumns, ...getColumnsAccessor(tableData)],
-    [customColumns, tableData, getColumnsAccessor]
+    () => [
+      ...customColumns,
+      ...getColumnsAccessor(tableData),
+      ...customColumns2,
+    ],
+    [customColumns, customColumns2, tableData, getColumnsAccessor]
   );
   // Create an editable cell renderer
   const EditableCell: React.FC<any> = ({
@@ -358,15 +340,6 @@ const PcrGenomicLoci: React.FC = () => {
     prepareRow,
   } = tableInstance;
 
-  const selectedData = selectedFlatRows.map((d) => {
-    const location = locations.find((i) => {
-      console.log(i, d.original);
-      return i.localityName === d.original.localityName;
-    });
-    console.log(location, d.original);
-    return { ...d.original, ...location };
-  });
-
   return (
     <>
       <table className="table" {...getTableProps()}>
@@ -424,7 +397,7 @@ const PcrGenomicLoci: React.FC = () => {
         <button onClick={() => addColumn(newColumn)}>Add new column</button>
       </div>
       <div className="download">
-        <CSVLink data={selectedData}>
+        <CSVLink data={selectedFlatRows}>
           <div className="export">
             <ExportIcon />
             export CSV

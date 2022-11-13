@@ -3,6 +3,7 @@
 import { getDatabase, onValue, ref, remove, update } from "firebase/database";
 import React, { useCallback, useEffect, useState } from "react";
 import { useSortBy, useTable } from "react-table";
+import { toast } from "react-toastify";
 import { PrimersType } from "../types";
 import "./Table.scss";
 
@@ -24,6 +25,7 @@ const Primers: React.FC = () => {
 
   const removeItem = (id: string) => {
     remove(ref(db, "primers/" + id));
+    toast.success("Primer was removed successfully");
   };
 
   const editItem = useCallback(

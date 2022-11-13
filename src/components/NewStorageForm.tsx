@@ -2,6 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import * as yup from "yup";
 import CreatableSelectInput from "../components/CreatableSelectInput";
 import TextInput from "../components/TextInput";
@@ -47,6 +48,7 @@ const NewStorageForm: React.FC = () => {
 
   const addItem = (data: any) => {
     writeStorageData(data);
+    toast.success("Box was added successfully");
   };
 
   const {

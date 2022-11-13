@@ -3,6 +3,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import * as yup from "yup";
 import TextInput from "../components/TextInput";
 import { writePcrProgramsData } from "../firebase/firebase";
@@ -24,6 +25,7 @@ const NewPcrProgramsForm: React.FC = () => {
 
   const addItem = (data: any) => {
     writePcrProgramsData(data);
+    toast.success("Pcr-Program was added successfully");
   };
 
   const {

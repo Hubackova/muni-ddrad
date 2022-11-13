@@ -2,6 +2,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import * as yup from "yup";
 import CreatableSelectInput from "../components/CreatableSelectInput";
 import { writeExtractionData } from "../firebase/firebase";
@@ -65,6 +66,7 @@ const NewSampleForm: React.FC = () => {
   const addItem = (data: any) => {
     const { storageSite, ...sampleData } = data;
     writeExtractionData({ ...sampleData });
+    toast.success("Sample was added successfully");
   };
 
   const {
