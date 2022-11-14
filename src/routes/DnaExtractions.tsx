@@ -236,14 +236,18 @@ const DnaExtractions: React.FC = () => {
     [boxOptions, editItem]
   );
 
-  const tableData = extractions.map((ex) => {
-    const storageData = storage.find((i) => i.key === ex.box);
-    return {
-      ...ex,
-      box: storageData?.box,
-      storageSite: storageData?.storageSite,
-    };
-  });
+  const tableData = React.useMemo(
+    () =>
+      extractions.map((ex) => {
+        const storageData = storage.find((i) => i.key === ex.box);
+        return {
+          ...ex,
+          box: storageData?.box,
+          storageSite: storageData?.storageSite,
+        };
+      }),
+    [extractions, storage]
+  );
 
   const defaultColumn = {
     Cell: ({ value: initialValue }: any) => {

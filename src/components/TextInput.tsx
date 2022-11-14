@@ -10,6 +10,7 @@ type InputProps = {
   disabled?: boolean;
   error?: string;
   type?: string;
+  onBlur?: any;
 };
 
 const TextInput = ({
@@ -19,6 +20,7 @@ const TextInput = ({
   register,
   required,
   error,
+  onBlur,
   type = "text",
 }: InputProps) => (
   <div className="container">
@@ -27,7 +29,7 @@ const TextInput = ({
     <input
       className="input"
       type={type}
-      {...register(name, { required, disabled })}
+      {...register(name, { required, disabled, onBlur })}
     />
 
     {!!error && <div className="error-message">{error}</div>}

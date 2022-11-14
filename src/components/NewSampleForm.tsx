@@ -55,6 +55,7 @@ const NewSampleForm: React.FC = () => {
   }, [db]);
 
   const addItem = (data: any) => {
+    console.log(data);
     const { storageSite, ...sampleData } = data;
     Object.keys(sampleData).forEach((key) => {
       if (sampleData[key] === undefined) {
@@ -73,6 +74,7 @@ const NewSampleForm: React.FC = () => {
     formState: { errors },
     setValue,
     handleSubmit,
+    watch,
   } = useForm<DnaExtractionsType>({
     resolver: yupResolver(schema),
   });
@@ -163,13 +165,8 @@ const NewSampleForm: React.FC = () => {
       <div
         className="item"
         onClick={() => {
-          setValue("speciesOrig", i.value);
+          setValue("speciesOrig", i.speciesOrig);
           setValue("project", i.country);
-          setValue("dateIsolation", i.state);
-          setValue("ngul", i.localityName);
-          setValue("kit", i.latitude);
-          setValue("box", i.longitude);
-          setValue("storageSite", i.altitude);
           setValue("habitat", i.habitat);
           setValue("dateCollection", i.dateCollection);
           setValue("collector", i.collector);
@@ -183,6 +180,7 @@ const NewSampleForm: React.FC = () => {
           setValue("habitat", i.habitat);
           setValue("dateCollection", i.dateCollection);
           setValue("collector", i.collector);
+          setValue("isolateCodeGroup", i.isolateCode);
         }}
       >
         {i.isolateCode}
@@ -193,32 +191,37 @@ const NewSampleForm: React.FC = () => {
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new sample:</h5>
       <div className="row">
-        <TextInput
-          label="Isolate code"
-          name="isolateCode"
-          error={errors.isolateCode?.message}
-          register={register}
-        />
         <div>
-          <button type="button" onClick={() => setShowModalCode(true)}>
-            Show isolate codes
-          </button>
-          {showModalCode && (
-            <div className="side-panel">
-              <div className="body">
-                <h5>Isolate codes</h5>
-                {codeItems}
+          <TextInput
+            label="Isolate code"
+            name="isolateCode"
+            error={errors.isolateCode?.message}
+            register={register}
+          />
+          <div>
+            <button type="button" onClick={() => setShowModalCode(true)}>
+              Show isolate codes
+            </button>
+            {watch("isolateCodeGroup") && (
+              <span>{`(${watch("isolateCodeGroup")})`}</span>
+            )}
+            {showModalCode && (
+              <div className="side-panel">
+                <div className="body">
+                  <h5>Isolate codes</h5>
+                  {codeItems}
 
-                <button
-                  className="btn cancel-btn"
-                  type="button"
-                  onClick={() => setShowModalCode(false)}
-                >
-                  Close
-                </button>
+                  <button
+                    className="btn cancel-btn"
+                    type="button"
+                    onClick={() => setShowModalCode(false)}
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <Controller
           render={({ field: { onChange, value } }) => (
@@ -294,56 +297,62 @@ const NewSampleForm: React.FC = () => {
         />
       </div>
       <div className="row">
-        <Controller
-          render={({ field: { onChange, value } }) => (
-            <CreatableSelectInput
-              options={localityOptions}
-              value={value ? { value, label: value } : null}
-              onChange={(e: any) => {
-                onChange(e?.value);
-                setValue("country", e.country);
-                setValue("state", e.state);
-                setValue("localityName", e.localityName);
-                setValue("latitude", e.latitude);
-                setValue("longitude", e.longitude);
-                setValue("altitude", e.altitude);
-                setValue("habitat", e.habitat);
-                setValue("dateCollection", e.dateCollection);
-                setValue("collector", e.collector);
-              }}
-              label="Locality code"
-              error={errors.localityCode?.message}
-              isSearchable
-            />
-          )}
-          control={control}
-          name="localityCode"
-        />
         <div>
-          <button type="button" onClick={() => setShowModalLoc(true)}>
-            Show localities
-          </button>
-          {showModalLoc && (
-            <div className="side-panel">
-              <div className="body">
-                <h5>Localities</h5>
-                {locItems}
+          <Controller
+            render={({ field: { onChange, value } }) => (
+              <CreatableSelectInput
+                options={localityOptions}
+                value={value ? { value, label: value } : null}
+                onChange={(e: any) => {
+                  onChange(e?.value);
+                  setValue("country", e.country);
+                  setValue("state", e.state);
+                  setValue("localityName", e.localityName);
+                  setValue("latitude", e.latitude);
+                  setValue("longitude", e.longitude);
+                  setValue("altitude", e.altitude);
+                  setValue("habitat", e.habitat);
+                  setValue("dateCollection", e.dateCollection);
+                  setValue("collector", e.collector);
+                }}
+                label="Locality code"
+                error={errors.localityCode?.message}
+                isSearchable
+              />
+            )}
+            control={control}
+            name="localityCode"
+          />
+          <div>
+            <button type="button" onClick={() => setShowModalLoc(true)}>
+              Show localities
+            </button>
+            {showModalLoc && (
+              <div className="side-panel">
+                <div className="body">
+                  <h5>Localities</h5>
+                  {locItems}
 
-                <button
-                  className="btn cancel-btn"
-                  type="button"
-                  onClick={() => setShowModalLoc(false)}
-                >
-                  Close
-                </button>
+                  <button
+                    className="btn cancel-btn"
+                    type="button"
+                    onClick={() => setShowModalLoc(false)}
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <TextInput
           label="Country"
           name="country"
           error={errors.country?.message}
+          onBlur={() => {
+            setValue("isolateCodeGroup", "");
+            setValue("localityCode", "");
+          }}
           register={register}
         />
       </div>
@@ -353,12 +362,20 @@ const NewSampleForm: React.FC = () => {
           name="latitude"
           error={errors.latitude?.message}
           register={register}
+          onBlur={() => {
+            setValue("isolateCodeGroup", "");
+            setValue("localityCode", "");
+          }}
         />
         <TextInput
           label="Longitude [°E]"
           name="longitude"
           error={errors.longitude?.message}
           register={register}
+          onBlur={() => {
+            setValue("isolateCodeGroup", "");
+            setValue("localityCode", "");
+          }}
         />
       </div>
       <div className="row">
@@ -367,12 +384,20 @@ const NewSampleForm: React.FC = () => {
           name="altitude"
           error={errors.altitude?.message}
           register={register}
+          onBlur={() => {
+            setValue("isolateCodeGroup", "");
+            setValue("localityCode", "");
+          }}
         />
         <TextInput
           label="State/province"
           name="state"
           error={errors.state?.message}
           register={register}
+          onBlur={() => {
+            setValue("isolateCodeGroup", "");
+            setValue("localityCode", "");
+          }}
         />
       </div>
       <div className="row">
@@ -381,12 +406,20 @@ const NewSampleForm: React.FC = () => {
           name="localityName"
           error={errors.localityName?.message}
           register={register}
+          onBlur={() => {
+            setValue("isolateCodeGroup", "");
+            setValue("localityCode", "");
+          }}
         />
         <TextInput
           label="Habitat"
           name="habitat"
           error={errors.habitat?.message}
           register={register}
+          onBlur={() => {
+            setValue("isolateCodeGroup", "");
+            setValue("localityCode", "");
+          }}
         />
       </div>
       <div className="row">
