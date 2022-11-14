@@ -2,14 +2,19 @@
 
 import { getDatabase, onValue, ref, remove, update } from "firebase/database";
 import React, { useCallback, useEffect, useState } from "react";
-import { useSortBy, useTable } from "react-table";
+import { CSVLink } from "react-csv";
+import { useRowSelect, useSortBy, useTable } from "react-table";
 import { toast } from "react-toastify";
+import ConfirmModal from "../components/ConfirmModal";
+import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
+import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { PcrProgramsType } from "../types";
 import "./Table.scss";
 
 const PcrPrograms: React.FC = () => {
   const [pcrPrograms, setPcrPrograms] = useState<PcrProgramsType[]>([]);
   const db = getDatabase();
+  const [showModal, setShowModal] = useState(null);
 
   useEffect(() => {
     onValue(ref(db, "pcrPrograms/"), (snapshot) => {
@@ -24,8 +29,7 @@ const PcrPrograms: React.FC = () => {
   }, [db]);
 
   const removeItem = (id: string) => {
-    remove(ref(db, "pcrPrograms/" + id));
-    toast.success("Program was removed successfully");
+    setShowModal(id);
   };
 
   const editItem = useCallback(
@@ -110,46 +114,105 @@ const PcrPrograms: React.FC = () => {
 
   const tableInstance = useTable(
     { columns, data: pcrPrograms, defaultColumn },
-    useSortBy
+    useSortBy,
+    useRowSelect,
+    (hooks) => {
+      hooks.visibleColumns.push((columns) => [
+        // Let's make a column for selection
+        {
+          id: "selection",
+          // The header can use the table's getToggleAllRowsSelectedProps method
+          // to render a checkbox
+          Header: ({ getToggleAllRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+            </div>
+          ),
+          // The cell can use the individual row's getToggleRowSelectedProps method
+          // to the render a checkbox
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...columns,
+      ]);
+    }
   );
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    selectedFlatRows,
+  } = tableInstance;
 
   return (
-    <table className="table" {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            <th>Remove</th>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                {column.render("Header")}
-                {/* Add a sort direction indicator */}
-                <span>
-                  {column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}
-                </span>
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()} key={row.original.key}>
-              <td role="cell">
-                <button onClick={() => removeItem(row.original.key)}>X</button>
-              </td>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-              })}
+    <>
+      {showModal && (
+        <ConfirmModal
+          title="Do you want to continue?"
+          onConfirm={() => {
+            setShowModal(null);
+            remove(ref(db, "pcrPrograms/" + showModal));
+            toast.success("Program was removed successfully");
+          }}
+          onHide={() => setShowModal(null)}
+        />
+      )}
+      <table className="table" {...getTableProps()}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              <th>Remove</th>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  {column.render("Header")}
+                  {/* Add a sort direction indicator */}
+                  <span>
+                    {column.isSorted
+                      ? column.isSortedDesc
+                        ? " 🔽"
+                        : " 🔼"
+                      : ""}
+                  </span>
+                </th>
+              ))}
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()} key={row.original.key}>
+                <td role="cell">
+                  <button onClick={() => removeItem(row.original.key)}>
+                    X
+                  </button>
+                </td>
+                {row.cells.map((cell) => {
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <div className="download">
+        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
+          <div className="export">
+            <ExportIcon />
+            export CSV
+          </div>
+        </CSVLink>
+      </div>
+    </>
   );
 };
 

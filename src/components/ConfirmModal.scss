@@ -1,0 +1,38 @@
+.confirm-modal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+
+  .modal-container {
+    border: 1px solid lightgrey;
+    border-radius: 4px;
+    background: white;
+    padding: 20px;
+    max-width: 480px;
+  }
+
+  .footer-container {
+    display: flex;
+    justify-content: center;
+
+    .cancel-btn {
+      margin-right: 12px;
+    }
+  }
+
+  .error {
+    text-align: center;
+    padding: 0 18px 20px;
+    color: coral;
+  }
+}
+
+.modal-dialog {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}

@@ -8,43 +8,57 @@ const TopBar: React.FC = () => {
     <div className="topbar">
       <NavLink
         to={routes.home}
-        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+        className={({ isActive }) =>
+          isActive ? "topbar-item active" : "topbar-item"
+        }
       >
-        Add new sample
+        Add new
       </NavLink>
       <NavLink
         to={routes.dnaExtractions}
-        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+        className={({ isActive }) =>
+          isActive ? "topbar-item active" : "topbar-item"
+        }
       >
         DNA extractions
       </NavLink>
       <NavLink
         to={routes.pcrGenomicLoci}
-        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+        className={({ isActive }) =>
+          isActive ? "topbar-item active" : "topbar-item"
+        }
       >
         PCR Genomic Loci
       </NavLink>
       <NavLink
         to={routes.storage}
-        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+        className={({ isActive }) =>
+          isActive ? "topbar-item active" : "topbar-item"
+        }
       >
         Storage
       </NavLink>
       <NavLink
         to={routes.all}
-        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+        className={({ isActive }) =>
+          isActive ? "topbar-item active" : "topbar-item"
+        }
       >
         All
       </NavLink>
       <NavLink
         to={routes.primers}
-        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+        className={({ isActive }) =>
+          isActive ? "topbar-item active" : "topbar-item"
+        }
       >
         Primers
       </NavLink>
       <NavLink
         to={routes.pcrPrograms}
-        className={({ isActive }) => (isActive ? "topbar-item active" : "topbar-item")}
+        className={({ isActive }) =>
+          isActive ? "topbar-item active" : "topbar-item"
+        }
       >
         PCR programs
       </NavLink>

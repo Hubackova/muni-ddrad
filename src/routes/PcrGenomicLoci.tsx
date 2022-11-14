@@ -2,29 +2,20 @@
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import { useRowSelect, useSortBy, useTable } from "react-table";
+import {
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
+} from "react-table";
+import { DefaultFilterForColumn, GlobalFilter } from "../components/Filter";
+import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
+
 import "./Table.scss";
-
-const IndeterminateCheckbox = React.forwardRef(
-  ({ indeterminate, ...rest }, ref) => {
-    const defaultRef = React.useRef();
-    const resolvedRef = ref || defaultRef;
-
-    React.useEffect(() => {
-      resolvedRef.current.indeterminate = indeterminate;
-    }, [resolvedRef, indeterminate]);
-
-    return (
-      <>
-        <input type="checkbox" ref={resolvedRef} {...rest} />
-      </>
-    );
-  }
-);
-
 const PcrGenomicLoci: React.FC = () => {
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
   const [storage, setStorage] = useState<StorageType[]>([]);
@@ -110,6 +101,7 @@ const PcrGenomicLoci: React.FC = () => {
       {
         Header: "Isolate code",
         accessor: "isolateCode",
+
         Cell: ({ row: { original } }) => (
           <input defaultValue={[original.isolateCode] || ""} disabled></input>
         ),
@@ -246,9 +238,10 @@ const PcrGenomicLoci: React.FC = () => {
   const getColumnsAccessor = useCallback(
     (tableData) => {
       if (!tableData || !tableData.length) return [];
-      const customKeys = customColumns.map((i) => i.accessor);
+      const customKeys = [...customColumns, ...customColumns2].map(
+        (i) => i.accessor
+      );
       const tableDataKeys = Object.keys(tableData[0]);
-      console.log(customKeys);
       return tableDataKeys
         .map((i) => {
           if (customKeys.includes(i)) return null;
@@ -259,7 +252,7 @@ const PcrGenomicLoci: React.FC = () => {
         })
         .filter((i) => i && i.accessor !== "key");
     },
-    [customColumns]
+    [customColumns, customColumns2]
   );
 
   const columns = React.useMemo(
@@ -298,13 +291,16 @@ const PcrGenomicLoci: React.FC = () => {
     return <input value={value} onChange={onChange} onBlur={onBlur} />;
   };
 
-  // Set our editable cell renderer as the default Cell renderer
-  const defaultColumn = {
-    Cell: EditableCell,
-  };
-
   const tableInstance = useTable(
-    { columns, data: tableData, defaultColumn },
+    {
+      columns,
+      data: tableData,
+
+      defaultColumn: { Cell: EditableCell, Filter: DefaultFilterForColumn },
+    },
+
+    useGlobalFilter,
+    useFilters,
     useSortBy,
     useRowSelect,
     (hooks) => {
@@ -335,7 +331,11 @@ const PcrGenomicLoci: React.FC = () => {
     getTableProps,
     getTableBodyProps,
     headerGroups,
+    visibleColumns,
+    state,
     rows,
+    setGlobalFilter,
+    preGlobalFilteredRows,
     selectedFlatRows,
     prepareRow,
   } = tableInstance;
@@ -344,34 +344,39 @@ const PcrGenomicLoci: React.FC = () => {
     <>
       <table className="table" {...getTableProps()}>
         <thead>
-          {
-            // Loop over the header rows
-            headerGroups.map((headerGroup) => (
-              // Apply the header row props
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {
-                  // Loop over the headers in each row
-                  headerGroup.headers.map((column) => (
-                    // Apply the header cell props
-
-                    <th
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
-                    >
-                      {column.render("Header")}
-                      {/* Add a sort direction indicator */}
-                      <span>
-                        {column.isSorted
-                          ? column.isSortedDesc
-                            ? " 🔽"
-                            : " 🔼"
-                          : ""}
-                      </span>
-                    </th>
-                  ))
-                }
-              </tr>
-            ))
-          }
+          <tr>
+            <th
+              colSpan={visibleColumns.length}
+              style={{
+                textAlign: "center",
+              }}
+            >
+              {/* Rendering Global Filter */}
+              <GlobalFilter
+                preGlobalFilteredRows={preGlobalFilteredRows}
+                globalFilter={state.globalFilter}
+                setGlobalFilter={setGlobalFilter}
+              />
+            </th>
+          </tr>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  {column.render("Header")}
+                  {/* Rendering Default Column Filter */}
+                  <div>{column.canFilter ? column.render("Filter") : null}</div>
+                  <span>
+                    {column.isSorted
+                      ? column.isSortedDesc
+                        ? " 🔽"
+                        : " 🔼"
+                      : ""}
+                  </span>
+                </th>
+              ))}
+            </tr>
+          ))}
         </thead>
 
         <tbody {...getTableBodyProps()}>
@@ -397,7 +402,7 @@ const PcrGenomicLoci: React.FC = () => {
         <button onClick={() => addColumn(newColumn)}>Add new column</button>
       </div>
       <div className="download">
-        <CSVLink data={selectedFlatRows}>
+        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
           <div className="export">
             <ExportIcon />
             export CSV

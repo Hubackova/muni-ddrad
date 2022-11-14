@@ -1,8 +1,12 @@
+// @ts-nocheck
+
 import { getDatabase, onValue, ref, update } from "firebase/database";
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useTable, Column } from "react-table";
-import { DnaExtractionsType, StorageType } from "../types";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { CSVLink } from "react-csv";
+import { Column, useTable } from "react-table";
 import SelectInput from "../components/SelectInput";
+import { ReactComponent as ExportIcon } from "../images/export.svg";
+import { DnaExtractionsType, StorageType } from "../types";
 import "./Table.scss";
 
 const DnaExtractions: React.FC = () => {
@@ -85,7 +89,9 @@ const DnaExtractions: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <input
             onChange={(e) => (original.speciesUpdated = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "speciesUpdated")}
+            onBlur={(e) =>
+              editItem(original.key, e.target.value, "speciesUpdated")
+            }
             defaultValue={[original.speciesUpdated] || ""}
           ></input>
         ),
@@ -108,7 +114,9 @@ const DnaExtractions: React.FC = () => {
           <input
             type="date"
             onChange={(e) => (original.dateIsolation = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "dateIsolation")}
+            onBlur={(e) =>
+              editItem(original.key, e.target.value, "dateIsolation")
+            }
             defaultValue={[original.dateIsolation] || ""}
           ></input>
         ),
@@ -130,7 +138,9 @@ const DnaExtractions: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <SelectInput
             options={boxOptions}
-            value={original.box ? { value: original.box, label: original.box } : null}
+            value={
+              original.box ? { value: original.box, label: original.box } : null
+            }
             onChange={(value: any) => {
               editItem(original.key, value.value, "box");
             }}
@@ -241,38 +251,84 @@ const DnaExtractions: React.FC = () => {
     },
   };
 
-  const tableInstance = useTable({ columns, data: tableData, defaultColumn });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+  const tableInstance = useTable(
+    { columns, data: tableData, defaultColumn }
+    /*     useSortBy,
+    useRowSelect,
+    (hooks) => {
+      hooks.visibleColumns.push((columns) => [
+        // Let's make a column for selection
+        {
+          id: "selection",
+          // The header can use the table's getToggleAllRowsSelectedProps method
+          // to render a checkbox
+          Header: ({ getToggleAllRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+            </div>
+          ),
+          // The cell can use the individual row's getToggleRowSelectedProps method
+          // to the render a checkbox
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...columns,
+      ]);
+    } */
+  );
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    selectedFlatRows,
+  } = tableInstance;
   return (
-    <table className="table" {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>
-                {
-                  // Render the header
-                  column.render("Header")
-                }
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()} key={row.original.key}>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-              })}
+    <>
+      <table className="table" {...getTableProps()}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps()}>
+                  {
+                    // Render the header
+                    column.render("Header")
+                  }
+                </th>
+              ))}
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()} key={row.original.key}>
+                {row.cells.map((cell) => {
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <div className="download">
+        <CSVLink data={[] /* selectedFlatRows.map((i) => i.values) */}>
+          <div className="export">
+            <ExportIcon />
+            export CSV
+          </div>
+        </CSVLink>
+      </div>
+    </>
   );
 };
 

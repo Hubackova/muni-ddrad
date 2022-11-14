@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import * as yup from "yup";
 import CreatableSelectInput from "../components/CreatableSelectInput";
 import { writeExtractionData } from "../firebase/firebase";
-import { DnaExtractionsType, LocationType, StorageType } from "../types";
+import { DnaExtractionsType, StorageType } from "../types";
 import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
@@ -22,15 +22,15 @@ const schema = yup
     kit: yup.string().required(),
     country: yup.string().required(),
     localityName: yup.string().required(),
-    dateCollection: yup.string().required(),
     collector: yup.string().required(),
   })
   .required();
 
 const NewSampleForm: React.FC = () => {
-  const [locations, setLocations] = useState<LocationType[]>([]);
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
+  const [showModalLoc, setShowModalLoc] = useState(false);
+  const [showModalCode, setShowModalCode] = useState(false);
   const db = getDatabase();
 
   useEffect(() => {
@@ -52,20 +52,18 @@ const NewSampleForm: React.FC = () => {
       });
       setStorage(items);
     });
-    onValue(ref(db, "locations/"), (snapshot) => {
-      const items: any = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setLocations(items);
-    });
   }, [db]);
 
   const addItem = (data: any) => {
     const { storageSite, ...sampleData } = data;
-    writeExtractionData({ ...sampleData });
+    Object.keys(sampleData).forEach((key) => {
+      if (sampleData[key] === undefined) {
+        delete sampleData[key];
+      }
+    });
+    writeExtractionData({
+      ...sampleData,
+    });
     toast.success("Sample was added successfully");
   };
 
@@ -85,19 +83,44 @@ const NewSampleForm: React.FC = () => {
     storageSite: i.storageSite,
   }));
 
-  const localityOptions = locations.map((i) => ({
-    value: i.localityCode,
-    label: i.localityCode,
-    country: i.country,
-    state: i.state,
-    localityName: i.localityName,
-    latitude: i.latitude,
-    longitude: i.longitude,
-    altitude: i.altitude,
-    habitat: i.habitat,
-    dateCollection: i.dateCollection,
-    collector: i.collector,
-  }));
+  const localityOpt = Object.values(
+    extractions.reduce(
+      (acc, cur) => Object.assign(acc, { [cur.localityCode]: cur }),
+      {}
+    )
+  )
+    .sort((a: any, b: any) => a.localityCode.localeCompare(b.localityCode))
+    .map((i: any) => ({
+      value: i.localityCode,
+      label: i.localityCode,
+      country: i.country,
+      state: i.state,
+      localityName: i.localityName,
+      latitude: i.latitude,
+      longitude: i.longitude,
+      altitude: i.altitude,
+      habitat: i.habitat,
+      dateCollection: i.dateCollection,
+      collector: i.collector,
+    }))
+    .filter((i) => !!i.value);
+
+  const localityOptions = [
+    ...localityOpt,
+    {
+      value: "",
+      label: "-- empty --",
+      country: "",
+      state: "",
+      localityName: "",
+      latitude: "",
+      longitude: "",
+      altitude: "",
+      habitat: "",
+      dateCollection: "",
+      collector: "",
+    },
+  ];
 
   const speciesOptions = Object.values(
     extractions.reduce(
@@ -109,6 +132,63 @@ const NewSampleForm: React.FC = () => {
     label: i.speciesOrig,
   }));
 
+  const locItems = localityOptions.map((i: any) => (
+    <div
+      className="item"
+      onClick={() => {
+        setValue("localityCode", i.value);
+        setValue("country", i.country);
+        setValue("state", i.state);
+        setValue("localityName", i.localityName);
+        setValue("latitude", i.latitude);
+        setValue("longitude", i.longitude);
+        setValue("altitude", i.altitude);
+        setValue("habitat", i.habitat);
+        setValue("dateCollection", i.dateCollection);
+        setValue("collector", i.collector);
+      }}
+    >
+      {i.value}
+    </div>
+  ));
+
+  const codeItems = Object.values(
+    extractions.reduce(
+      (acc, cur) => Object.assign(acc, { [cur.isolateCode]: cur }),
+      {}
+    )
+  )
+    .sort((a: any, b: any) => a.isolateCode.localeCompare(b.isolateCode))
+    .map((i: any) => (
+      <div
+        className="item"
+        onClick={() => {
+          setValue("speciesOrig", i.value);
+          setValue("project", i.country);
+          setValue("dateIsolation", i.state);
+          setValue("ngul", i.localityName);
+          setValue("kit", i.latitude);
+          setValue("box", i.longitude);
+          setValue("storageSite", i.altitude);
+          setValue("habitat", i.habitat);
+          setValue("dateCollection", i.dateCollection);
+          setValue("collector", i.collector);
+          setValue("localityCode", i.localityCode);
+          setValue("country", i.country);
+          setValue("state", i.state);
+          setValue("localityName", i.localityName);
+          setValue("latitude", i.latitude);
+          setValue("longitude", i.longitude);
+          setValue("altitude", i.altitude);
+          setValue("habitat", i.habitat);
+          setValue("dateCollection", i.dateCollection);
+          setValue("collector", i.collector);
+        }}
+      >
+        {i.isolateCode}
+      </div>
+    ));
+
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new sample:</h5>
@@ -119,6 +199,27 @@ const NewSampleForm: React.FC = () => {
           error={errors.isolateCode?.message}
           register={register}
         />
+        <div>
+          <button type="button" onClick={() => setShowModalCode(true)}>
+            Show isolate codes
+          </button>
+          {showModalCode && (
+            <div className="side-panel">
+              <div className="body">
+                <h5>Isolate codes</h5>
+                {codeItems}
+
+                <button
+                  className="btn cancel-btn"
+                  type="button"
+                  onClick={() => setShowModalCode(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         <Controller
           render={({ field: { onChange, value } }) => (
             <CreatableSelectInput
@@ -218,6 +319,27 @@ const NewSampleForm: React.FC = () => {
           control={control}
           name="localityCode"
         />
+        <div>
+          <button type="button" onClick={() => setShowModalLoc(true)}>
+            Show localities
+          </button>
+          {showModalLoc && (
+            <div className="side-panel">
+              <div className="body">
+                <h5>Localities</h5>
+                {locItems}
+
+                <button
+                  className="btn cancel-btn"
+                  type="button"
+                  onClick={() => setShowModalLoc(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         <TextInput
           label="Country"
           name="country"
