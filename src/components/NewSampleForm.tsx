@@ -72,6 +72,7 @@ const NewSampleForm: React.FC = () => {
     control,
     formState: { errors },
     setValue,
+    setError,
     handleSubmit,
     watch,
   } = useForm<DnaExtractionsType>({
@@ -185,7 +186,7 @@ const NewSampleForm: React.FC = () => {
         {i.isolateCode}
       </div>
     ));
-
+  const isCodes = extractions.map((i) => i.isolateCode);
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new sample:</h5>
@@ -196,6 +197,13 @@ const NewSampleForm: React.FC = () => {
             name="isolateCode"
             error={errors.isolateCode?.message}
             register={register}
+            onBlur={(e: any) => {
+              if (isCodes.includes(e.target.value))
+                setError("isolateCode", {
+                  type: "custom",
+                  message: "Duplicate isolateCode",
+                });
+            }}
           />
           <div>
             <button type="button" onClick={() => setShowModalCode(true)}>
@@ -350,7 +358,7 @@ const NewSampleForm: React.FC = () => {
           error={errors.country?.message}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            setValue("localityCode", "");
+            /* setValue("localityCode", ""); */
           }}
           register={register}
         />
@@ -363,7 +371,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            setValue("localityCode", "");
+            /* setValue("localityCode", ""); */
           }}
         />
         <TextInput
@@ -373,7 +381,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            setValue("localityCode", "");
+            /* setValue("localityCode", ""); */
           }}
         />
       </div>
@@ -385,7 +393,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            setValue("localityCode", "");
+            /* setValue("localityCode", ""); */
           }}
         />
         <TextInput
@@ -395,7 +403,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            setValue("localityCode", "");
+            /* setValue("localityCode", ""); */
           }}
         />
       </div>
@@ -407,7 +415,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            setValue("localityCode", "");
+            /* setValue("localityCode", ""); */
           }}
         />
         <TextInput
@@ -417,7 +425,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            setValue("localityCode", "");
+            /* setValue("localityCode", ""); */
           }}
         />
       </div>

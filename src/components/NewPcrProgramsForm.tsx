@@ -1,7 +1,8 @@
 // @ts-nocheck
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import React from "react";
+import { getDatabase, onValue, ref } from "firebase/database";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import * as yup from "yup";
@@ -10,6 +11,21 @@ import { writePcrProgramsData } from "../firebase/firebase";
 import { PcrProgramsType } from "../types";
 
 const NewPcrProgramsForm: React.FC = () => {
+  const [pcrPrograms, setPcrPrograms] = useState<PcrProgramsType[]>([]);
+  const db = getDatabase();
+
+  useEffect(() => {
+    onValue(ref(db, "pcrPrograms/"), (snapshot) => {
+      const items: any = [];
+      snapshot.forEach((child) => {
+        let childItem = child.val();
+        childItem.key = child.key;
+        items.push(childItem);
+      });
+      setPcrPrograms(items);
+    });
+  }, [db]);
+
   const schema = yup
     .object({
       name: yup.string().required(),
@@ -32,10 +48,11 @@ const NewPcrProgramsForm: React.FC = () => {
     register,
     formState: { errors },
     handleSubmit,
+    setError,
   } = useForm<PcrProgramsType>({
     resolver: yupResolver(schema),
   });
-
+  const names = pcrPrograms.map((i) => i.name);
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new pcr program:</h5>
@@ -45,6 +62,13 @@ const NewPcrProgramsForm: React.FC = () => {
           name="name"
           error={errors.name?.message}
           register={register}
+          onBlur={(e: any) => {
+            if (names.includes(e.target.value))
+              setError("name", {
+                type: "custom",
+                message: "Duplicate name",
+              });
+          }}
         />
         <TextInput
           label="Initial Denaturation"

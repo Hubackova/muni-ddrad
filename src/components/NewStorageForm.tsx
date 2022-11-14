@@ -56,10 +56,11 @@ const NewStorageForm: React.FC = () => {
     formState: { errors },
     handleSubmit,
     control,
+    setError,
   } = useForm<StorageType>({
     resolver: yupResolver(schema),
   });
-
+  const boxes = storage.map((i) => i.box);
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new box:</h5>
@@ -69,6 +70,13 @@ const NewStorageForm: React.FC = () => {
           name="box"
           error={errors.box?.message}
           register={register}
+          onBlur={(e: any) => {
+            if (boxes.includes(e.target.value))
+              setError("box", {
+                type: "custom",
+                message: "Duplicate box",
+              });
+          }}
         />
         <Controller
           render={({ field: { onChange, value } }) => (

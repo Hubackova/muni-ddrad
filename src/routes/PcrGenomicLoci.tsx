@@ -9,6 +9,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { toast } from "react-toastify";
 import { DefaultFilterForColumn, GlobalFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
@@ -74,6 +75,7 @@ const PcrGenomicLoci: React.FC = () => {
     update(ref(db, "extractions/" + obj.key), {
       [name]: "",
     });
+    toast.success("Column was added successfully");
   };
 
   const editItem = useCallback(
@@ -103,6 +105,17 @@ const PcrGenomicLoci: React.FC = () => {
 
         Cell: ({ row: { original } }) => (
           <input defaultValue={[original.isolateCode] || ""} disabled></input>
+        ),
+      },
+      {
+        Header: "Isolate code group",
+        accessor: "isolateCodeGroup",
+
+        Cell: ({ row: { original } }) => (
+          <input
+            defaultValue={[original.isolateCodeGroup] || ""}
+            disabled
+          ></input>
         ),
       },
       {
