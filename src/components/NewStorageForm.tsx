@@ -76,7 +76,6 @@ const NewStorageForm: React.FC = () => {
               options={storageOptions}
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
-                console.log(e);
                 onChange(e?.value);
               }}
               label="Storage site"

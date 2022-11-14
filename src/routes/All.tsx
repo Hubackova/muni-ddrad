@@ -2,7 +2,10 @@
 
 import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useTable } from "react-table";
+import { CSVLink } from "react-csv";
+import { useRowSelect, useSortBy, useTable } from "react-table";
+import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
+import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { LocationType } from "../types";
 import "./Table.scss";
 
@@ -104,7 +107,6 @@ const All: React.FC = () => {
         accessor: "box",
         Cell: ({ row: { original } }) => {
           const box = storage.find((i) => i.key === original.box);
-          console.log(original);
           return <span>{box.box}</span>;
         },
       },
@@ -113,7 +115,7 @@ const All: React.FC = () => {
         accessor: "storageSite",
         Cell: ({ row: { original } }) => {
           const box = storage.find((i) => i.key === original.box);
-          console.log(original);
+
           return <span>{box.storageSite}</span>;
         },
       },
@@ -189,7 +191,7 @@ const All: React.FC = () => {
     () =>
       extractions.map((ex) => {
         const storageData = storage.find((i) => i.key === ex.box);
-        console.log(storageData);
+
         return {
           ...ex,
           box: storageData?.box,
@@ -235,53 +237,86 @@ const All: React.FC = () => {
     [customColumns, customColumns2, getColumnsAccessor, tableData]
   );
 
-  const tableInstance = useTable({ columns, data: extractions, defaultColumn });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+  const tableInstance = useTable(
+    { columns, data: extractions, defaultColumn },
+    useSortBy,
+    useRowSelect,
+    (hooks) => {
+      hooks.visibleColumns.push((columns) => [
+        {
+          id: "selection",
+          Header: ({ getToggleAllRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+            </div>
+          ),
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...columns,
+      ]);
+    }
+  );
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    selectedFlatRows,
+  } = tableInstance;
 
   return (
-    <table className="table" {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-            ))}
-            <th>IsolateCode Group</th>
-          </tr>
-        ))}
-      </thead>
-
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-
-          const groupItems = extractions.filter((i) => {
-            return i.isolateCodeGroup === row.original.isolateCode;
-          });
-
-          return (
-            <tr {...row.getRowProps()} key={row.original.key}>
-              {row.cells.map((cell) => {
-                return (
-                  <td
-                    {...cell.getCellProps()}
-                    onClick={() => console.log(cell)}
-                  >
-                    {cell.render("Cell")}
-                  </td>
-                );
-              })}
-              <td className="sample-list">
-                {groupItems.map((i) => (
-                  <span className="sample">{i.isolateCode}</span>
-                ))}
-              </td>
+    <>
+      <table className="table" {...getTableProps()}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+              ))}
+              <th>IsolateCode Group</th>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+
+            const groupItems = extractions.filter((i) => {
+              return i.isolateCodeGroup === row.original.isolateCode;
+            });
+
+            return (
+              <tr {...row.getRowProps()} key={row.original.key}>
+                {row.cells.map((cell) => {
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  );
+                })}
+                <td className="sample-list">
+                  {groupItems.map((i) => (
+                    <span className="sample">{i.isolateCode}</span>
+                  ))}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <div className="download">
+        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
+          <div className="export">
+            <ExportIcon />
+            export CSV
+          </div>
+        </CSVLink>
+      </div>
+    </>
   );
 };
 

@@ -23,8 +23,6 @@ export function GlobalFilter({ globalFilter, setGlobalFilter }) {
         placeholder=" Enter value "
         className="w-25"
         style={{
-          fontSize: "1.1rem",
-          margin: "15px",
           display: "inline",
         }}
       />

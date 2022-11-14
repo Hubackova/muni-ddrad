@@ -9,6 +9,11 @@
   * {
     font-size: 13px;
   }
+  th {
+    input {
+      margin-top: 20px;
+    }
+  }
   td {
     text-align: left;
 
@@ -65,13 +70,19 @@ form {
     font-size: 0.8rem;
   }
 }
-
+.download {
+  margin-top: 10px;
+  a {
+    text-decoration: none;
+  }
+}
 .export {
   display: flex;
   flex-direction: column;
   font-size: 0.75rem;
   width: min-content;
   align-items: center;
+  color: grey;
   svg {
     width: 30px;
   }

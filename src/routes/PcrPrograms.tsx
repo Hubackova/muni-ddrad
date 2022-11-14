@@ -34,7 +34,6 @@ const PcrPrograms: React.FC = () => {
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      console.log(newValue, id);
       update(ref(db, "pcrPrograms/" + key), {
         [id]: newValue,
       });

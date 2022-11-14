@@ -1,7 +1,12 @@
+// @ts-nocheck
+
 import { getDatabase, onValue, ref, remove, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Column, useTable } from "react-table";
+import { CSVLink } from "react-csv";
+import { Column, useRowSelect, useSortBy, useTable } from "react-table";
 import CreatableSelectInput from "../components/CreatableSelectInput";
+import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
+import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
 import "./Table.scss";
 
@@ -38,7 +43,6 @@ const Storage: React.FC = () => {
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      console.log(newValue, id);
       update(ref(db, "storage/" + key), {
         [id]: newValue,
       });
@@ -95,44 +99,84 @@ const Storage: React.FC = () => {
     [editItem, storageOptions]
   );
 
-  const tableInstance = useTable({ columns, data: storage });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+  const tableInstance = useTable(
+    { columns, data: storage },
+    useSortBy,
+    useRowSelect,
+    (hooks) => {
+      hooks.visibleColumns.push((columns) => [
+        {
+          id: "selection",
+          Header: ({ getToggleAllRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+            </div>
+          ),
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...columns,
+      ]);
+    }
+  );
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    selectedFlatRows,
+  } = tableInstance;
 
   return (
-    <table className="table" {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-            ))}
-            <th>List of samples in the box</th>
-          </tr>
-        ))}
-      </thead>
-
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          const samples = extractions.filter((i) => {
-            return i.box === row.original.key;
-          });
-          return (
-            <tr {...row.getRowProps()} key={row.original.key}>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-              })}
-              <td className="sample-list">
-                {samples.map((sample) => (
-                  <span className="sample">{sample.isolateCode}</span>
-                ))}
-              </td>
+    <>
+      <table className="table" {...getTableProps()}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+              ))}
+              <th>List of samples in the box</th>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            const samples = extractions.filter((i) => {
+              return i.box === row.original.key;
+            });
+            return (
+              <tr {...row.getRowProps()} key={row.original.key}>
+                {row.cells.map((cell) => {
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  );
+                })}
+                <td className="sample-list">
+                  {samples.map((sample) => (
+                    <span className="sample">{sample.isolateCode}</span>
+                  ))}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>{" "}
+      <div className="download">
+        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
+          <div className="export">
+            <ExportIcon />
+            export CSV
+          </div>
+        </CSVLink>
+      </div>
+    </>
   );
 };
 

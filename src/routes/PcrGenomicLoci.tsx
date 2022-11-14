@@ -78,7 +78,6 @@ const PcrGenomicLoci: React.FC = () => {
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      console.log(newValue, id);
       update(ref(db, "extractions/" + key), {
         [id]: newValue,
       });
@@ -305,18 +304,13 @@ const PcrGenomicLoci: React.FC = () => {
     useRowSelect,
     (hooks) => {
       hooks.visibleColumns.push((columns) => [
-        // Let's make a column for selection
         {
           id: "selection",
-          // The header can use the table's getToggleAllRowsSelectedProps method
-          // to render a checkbox
           Header: ({ getToggleAllRowsSelectedProps }) => (
             <div>
               <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
             </div>
           ),
-          // The cell can use the individual row's getToggleRowSelectedProps method
-          // to the render a checkbox
           Cell: ({ row }) => (
             <div>
               <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
@@ -348,7 +342,7 @@ const PcrGenomicLoci: React.FC = () => {
             <th
               colSpan={visibleColumns.length}
               style={{
-                textAlign: "center",
+                textAlign: "left",
               }}
             >
               {/* Rendering Global Filter */}

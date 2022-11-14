@@ -3,10 +3,12 @@
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import { Column, useTable } from "react-table";
+import { Column, useRowSelect, useSortBy, useTable } from "react-table";
+import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
+
 import "./Table.scss";
 
 const DnaExtractions: React.FC = () => {
@@ -37,7 +39,6 @@ const DnaExtractions: React.FC = () => {
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      console.log(newValue, id);
       update(ref(db, "extractions/" + key), {
         [id]: newValue,
       });
@@ -256,23 +257,18 @@ const DnaExtractions: React.FC = () => {
   };
 
   const tableInstance = useTable(
-    { columns, data: tableData, defaultColumn }
-    /*     useSortBy,
+    { columns, data: tableData, defaultColumn },
+    useSortBy,
     useRowSelect,
     (hooks) => {
       hooks.visibleColumns.push((columns) => [
-        // Let's make a column for selection
         {
           id: "selection",
-          // The header can use the table's getToggleAllRowsSelectedProps method
-          // to render a checkbox
           Header: ({ getToggleAllRowsSelectedProps }) => (
             <div>
               <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
             </div>
           ),
-          // The cell can use the individual row's getToggleRowSelectedProps method
-          // to the render a checkbox
           Cell: ({ row }) => (
             <div>
               <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
@@ -281,7 +277,7 @@ const DnaExtractions: React.FC = () => {
         },
         ...columns,
       ]);
-    } */
+    }
   );
   const {
     getTableProps,
@@ -298,12 +294,7 @@ const DnaExtractions: React.FC = () => {
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>
-                  {
-                    // Render the header
-                    column.render("Header")
-                  }
-                </th>
+                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
               ))}
             </tr>
           ))}
@@ -325,7 +316,7 @@ const DnaExtractions: React.FC = () => {
         </tbody>
       </table>
       <div className="download">
-        <CSVLink data={[] /* selectedFlatRows.map((i) => i.values) */}>
+        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
           <div className="export">
             <ExportIcon />
             export CSV

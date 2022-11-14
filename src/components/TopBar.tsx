@@ -1,9 +1,38 @@
-import React from "react";
+// @ts-nocheck
+
+import { getDatabase, onValue, ref } from "firebase/database";
+import React, { useEffect, useState } from "react";
+import { CSVLink } from "react-csv";
 import { NavLink } from "react-router-dom";
 import routes from "../routes";
 import "./TopBar.scss";
 
 const TopBar: React.FC = () => {
+  const [pcrPrograms, setPcrPrograms] = useState<PcrProgramsType[]>([]);
+  const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
+
+  const db = getDatabase();
+
+  useEffect(() => {
+    onValue(ref(db, "pcrPrograms/"), (snapshot) => {
+      const items: any = [];
+      snapshot.forEach((child) => {
+        let childItem = child.val();
+        childItem.key = child.key;
+        items.push(childItem);
+      });
+      setPcrPrograms(items);
+    });
+    onValue(ref(db, "extractions/"), (snapshot) => {
+      const items: any = [];
+      snapshot.forEach((child) => {
+        let childItem = child.val();
+        childItem.key = child.key;
+        items.push(childItem);
+      });
+      setExtractions(items);
+    });
+  }, [db]);
   return (
     <div className="topbar">
       <NavLink
@@ -62,6 +91,10 @@ const TopBar: React.FC = () => {
       >
         PCR programs
       </NavLink>
+
+      <CSVLink data={extractions} className="topbar-item">
+        <div>Export all (todo)</div>
+      </CSVLink>
     </div>
   );
 };

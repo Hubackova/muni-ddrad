@@ -55,7 +55,6 @@ const NewSampleForm: React.FC = () => {
   }, [db]);
 
   const addItem = (data: any) => {
-    console.log(data);
     const { storageSite, ...sampleData } = data;
     Object.keys(sampleData).forEach((key) => {
       if (sampleData[key] === undefined) {
