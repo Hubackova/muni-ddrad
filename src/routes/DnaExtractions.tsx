@@ -6,9 +6,9 @@ import { CSVLink } from "react-csv";
 import { Column, useRowSelect, useSortBy, useTable } from "react-table";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
+import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
-
 import "./Table.scss";
 
 const DnaExtractions: React.FC = () => {
@@ -39,6 +39,7 @@ const DnaExtractions: React.FC = () => {
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
+      if (!newValue) return;
       update(ref(db, "extractions/" + key), {
         [id]: newValue,
       });
@@ -56,29 +57,16 @@ const DnaExtractions: React.FC = () => {
     [storage]
   );
 
-  // const localityOptions = useMemo(
-  //   () =>
-  //     locations.map((i) => ({
-  //       value: i.key,
-  //       label: i.localityCode,
-  //       country: i.country,
-  //       state: i.state,
-  //       localityName: i.localityName,
-  //     })),
-  //   [locations]
-  // );
+  const localityOptions = useMemo(
+    () => getLocalityOptions(extractions),
+    [extractions]
+  );
+
   const columns: Column<any>[] = useMemo(
     () => [
       {
         Header: "Isolate code",
         accessor: "isolateCode",
-        // Cell: ({ row: { original } }) => (
-        //   <input
-        //     onChange={(e) => (original.isolateCode = e.target.value)}
-        //     onBlur={(e) => editItem(original.key, e.target.value, "isolateCode")}
-        //     defaultValue={[original.isolateCode] || ""}
-        //   ></input>
-        // ),
       },
       {
         Header: "Species (original det.)",
@@ -125,13 +113,13 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "ng/ul",
         accessor: "ngul",
-        // Cell: ({ row: { original } }) => (
-        //   <input
-        //     onChange={(e) => (original.ngul = e.target.value)}
-        //     onBlur={(e) => editItem(original.key, e.target.value, "ngul")}
-        //     defaultValue={[original.ngul] || ""}
-        //   ></input>
-        // ),
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => (original.ngul = e.target.value)}
+            onBlur={(e) => editItem(original.key, e.target.value, "ngul")}
+            defaultValue={[original.ngul] || ""}
+          ></input>
+        ),
       },
       {
         Header: "Box name",
@@ -157,53 +145,64 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "Locality code",
         accessor: "localityCode",
-        // Cell: ({ row: { original } }) => (
-        //   <SelectInput
-        //     options={[]}
-        //     value={
-        //       original.localityCode
-        //         ? { value: original.localityCode, label: original.localityCode }
-        //         : null
-        //     }
-        //     onChange={(value: any) => {
-        //       editItem(original.key, value.value, "localityCode");
-        //     }}
-        //     isSearchable
-        //     className="narrow"
-        //   />
-        // ),
+        Cell: ({ row: { original } }) => (
+          <SelectInput
+            options={localityOptions}
+            value={
+              original.localityCode
+                ? { value: original.localityCode, label: original.localityCode }
+                : null
+            }
+            onChange={(value: any) => {
+              editItem(original.key, value.value, "localityCode");
+              editItem(original.key, value.country, "country");
+              editItem(original.key, value.state, "state");
+              editItem(original.key, value.localityName, "localityName");
+              editItem(original.key, value.latitude, "latitude");
+              editItem(original.key, value.longitude, "longitude");
+              editItem(original.key, value.altitude, "altitude");
+              editItem(original.key, value.habitat, "habitat");
+              editItem(original.key, value.dateCollection, "dateCollection");
+              editItem(original.key, value.collector, "collector");
+            }}
+            isSearchable
+            className="narrow"
+          />
+        ),
       },
       {
         Header: "Country",
         accessor: "country",
-        // Cell: ({ row: { original } }) => (
-        //   <input
-        //     onChange={(e) => {
-        //       original.country = e.target.value;
-        //     }}
-        //     onBlur={(e) => {
-        //       editItem(original.key, e.target.value, "country");
-        //       editItem(original.key, "", "localityCode");
-        //     }}
-        //     defaultValue={[original.country] || ""}
-        //   ></input>
-        // ),
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => {
+              original.country = e.target.value;
+            }}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "country");
+              editItem(original.key, "", "localityCode");
+            }}
+            defaultValue={[original.country] || ""}
+            disabled={original.localityCode}
+          ></input>
+        ),
       },
       {
         Header: "State/province",
         accessor: "state",
-        // Cell: ({ row: { original } }) => (
-        //   <input
-        //     onChange={(e) => {
-        //       original.state = e.target.value;
-        //     }}
-        //     onBlur={(e) => {
-        //       editItem(original.key, e.target.value, "state");
-        //       editItem(original.key, "", "localityCode");
-        //     }}
-        //     defaultValue={[original.state] || ""}
-        //   ></input>
-        // ),
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => {
+              original.state = e.target.value;
+            }}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "state");
+              editItem(original.key, "", "localityCode");
+            }}
+            defaultValue={[original.state] || ""}
+            disabled={original.localityCode}
+          ></input>
+        ),
       },
       {
         Header: "Kit",
@@ -220,21 +219,22 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "Locality name",
         accessor: "localityName",
-        // Cell: ({ row: { original } }) => (
-        //   <input
-        //     onChange={(e) => {
-        //       original.localityName = e.target.value;
-        //     }}
-        //     onBlur={(e) => {
-        //       editItem(original.key, e.target.value, "localityName");
-        //       editItem(original.key, "", "localityCode");
-        //     }}
-        //     defaultValue={[original.localityName] || ""}
-        //   ></input>
-        // ),
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => {
+              original.localityName = e.target.value;
+            }}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "localityName");
+              editItem(original.key, "", "localityCode");
+            }}
+            defaultValue={[original.localityName] || ""}
+            disabled={original.localityCode}
+          ></input>
+        ),
       },
     ],
-    [boxOptions, editItem]
+    [boxOptions, editItem, localityOptions]
   );
 
   const tableData = React.useMemo(

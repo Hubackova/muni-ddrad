@@ -13,14 +13,17 @@ import { toast } from "react-toastify";
 import { DefaultFilterForColumn, GlobalFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
+import { legend } from "../constants";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
+import { ReactComponent as InfoIcon } from "../images/info.svg";
 import { DnaExtractionsType, StorageType } from "../types";
-
 import "./Table.scss";
+
 const PcrGenomicLoci: React.FC = () => {
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [newColumn, setNewColumn] = useState("");
+  const [isPopoverOpen, setIsPopoverOpen] = useState("");
   const db = getDatabase();
 
   useEffect(() => {
@@ -49,7 +52,6 @@ const PcrGenomicLoci: React.FC = () => {
       extractions.map((ex) => {
         const {
           kit,
-          localityCode,
           speciesUpdated,
           altitude,
           collector,
@@ -151,9 +153,6 @@ const PcrGenomicLoci: React.FC = () => {
       {
         Header: "ng/ul",
         accessor: "ngul",
-        Cell: ({ row: { original } }) => (
-          <input disabled defaultValue={[original.ngul] || ""}></input>
-        ),
       },
       {
         Header: "Box name",
@@ -180,46 +179,162 @@ const PcrGenomicLoci: React.FC = () => {
       {
         Header: "Country",
         accessor: "country",
-        Cell: ({ row: { original } }) => <span>{original.country}</span>,
+        Cell: ({ row, row: { original } }) => {
+          console.log(row);
+          return (
+            <input
+              onChange={(e) => {
+                original.country = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "country");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.country] || ""}
+              disabled={original.localityCode}
+            ></input>
+          );
+        },
       },
       {
         Header: "State/province",
         accessor: "state",
-        Cell: ({ row: { original } }) => <span>{original.state}</span>,
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => {
+              original.state = e.target.value;
+            }}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "state");
+              editItem(original.key, "", "localityCode");
+            }}
+            defaultValue={[original.state] || ""}
+            disabled={original.localityCode}
+          ></input>
+        ),
       },
       {
         Header: "Locality name",
         accessor: "localityName",
-        Cell: ({ row: { original } }) => <span>{original.localityName}</span>,
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => {
+              original.localityName = e.target.value;
+            }}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "localityName");
+              editItem(original.key, "", "localityCode");
+            }}
+            defaultValue={[original.localityName] || ""}
+            disabled={original.localityCode}
+          ></input>
+        ),
       },
       {
         Header: "cytB",
         accessor: "cytB",
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => (original.cytB = e.target.value)}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "cytB");
+              setIsPopoverOpen(false);
+            }}
+            onFocus={() => setIsPopoverOpen(true)}
+            defaultValue={[original.cytB] || ""}
+          ></input>
+        ),
       },
       {
         Header: "16C",
         accessor: "16C",
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => (original["16C"] = e.target.value)}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "16C");
+              setIsPopoverOpen(false);
+            }}
+            onFocus={() => setIsPopoverOpen(true)}
+            defaultValue={[original["16C"]] || ""}
+          ></input>
+        ),
       },
       {
         Header: "COI",
         accessor: "COI",
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => (original.COI = e.target.value)}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "COI");
+              setIsPopoverOpen(false);
+            }}
+            onFocus={() => setIsPopoverOpen(true)}
+            defaultValue={[original.COI] || ""}
+          ></input>
+        ),
       },
       {
         Header: "COII",
         accessor: "COII",
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => (original.COII = e.target.value)}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "COII");
+              setIsPopoverOpen(false);
+            }}
+            onFocus={() => setIsPopoverOpen(true)}
+            defaultValue={[original.COII] || ""}
+          ></input>
+        ),
       },
 
       {
         Header: "ITS1",
         accessor: "ITS1",
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => (original.ITS1 = e.target.value)}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "ITS1");
+              setIsPopoverOpen(false);
+            }}
+            onFocus={() => setIsPopoverOpen(true)}
+            defaultValue={[original.ITS1] || ""}
+          ></input>
+        ),
       },
       {
         Header: "ITS2",
         accessor: "ITS2",
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => (original.ITS2 = e.target.value)}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "ITS2");
+              setIsPopoverOpen(false);
+            }}
+            onFocus={() => setIsPopoverOpen(true)}
+            defaultValue={[original.ITS2] || ""}
+          ></input>
+        ),
       },
       {
         Header: "ELAV",
         accessor: "ELAV",
+        Cell: ({ row: { original } }) => (
+          <input
+            onChange={(e) => (original.ELAV = e.target.value)}
+            onBlur={(e) => {
+              editItem(original.key, e.target.value, "ELAV");
+              setIsPopoverOpen(false);
+            }}
+            onFocus={() => setIsPopoverOpen(true)}
+            defaultValue={[original.ELAV] || ""}
+          ></input>
+        ),
       },
     ],
     [boxOptions, editItem]
@@ -282,24 +397,18 @@ const PcrGenomicLoci: React.FC = () => {
     cell,
     column: { id },
   }) => {
-    // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState(initialValue);
 
     const onChange = (e: any) => {
       setValue(e.target.value);
     };
-
-    // We'll only update the external data when the input is blurred
     const onBlur = (e: any) => {
       if (e.target.value)
         editItem(row.original.key, e.target.value, cell.column.id);
     };
-
-    // If the initialValue is changed external, sync it up with our state
     React.useEffect(() => {
       setValue(initialValue);
     }, [initialValue]);
-
     return <input value={value} onChange={onChange} onBlur={onBlur} />;
   };
 
@@ -307,7 +416,7 @@ const PcrGenomicLoci: React.FC = () => {
     {
       columns,
       data: tableData,
-
+      initialState: { hiddenColumns: ["localityCode"] },
       defaultColumn: { Cell: EditableCell, Filter: DefaultFilterForColumn },
     },
 
@@ -368,24 +477,29 @@ const PcrGenomicLoci: React.FC = () => {
           </tr>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render("Header")}
-                  {/* Rendering Default Column Filter */}
-                  <div>{column.canFilter ? column.render("Filter") : null}</div>
-                  <span>
-                    {column.isSorted
-                      ? column.isSortedDesc
-                        ? " 🔽"
-                        : " 🔼"
-                      : ""}
-                  </span>
-                </th>
-              ))}
+              {headerGroup.headers.map((column) => {
+                return (
+                  <th
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+                  >
+                    {column.render("Header")}
+                    <div>
+                      {column.canFilter ? column.render("Filter") : null}
+                    </div>
+                    <span>
+                      {column.isSorted
+                        ? column.isSortedDesc
+                          ? " 🔽"
+                          : " 🔼"
+                        : ""}
+                    </span>
+                  </th>
+                );
+              })}
             </tr>
           ))}
         </thead>
-
         <tbody {...getTableBodyProps()}>
           {rows.map((row) => {
             prepareRow(row);
@@ -401,6 +515,16 @@ const PcrGenomicLoci: React.FC = () => {
           })}
         </tbody>
       </table>
+      {isPopoverOpen && (
+        <div className="popover">
+          <div className="close" onClick={() => setIsPopoverOpen(false)}>
+            x
+          </div>
+          {legend.map((i) => (
+            <div>{i}</div>
+          ))}
+        </div>
+      )}
       <div className="add-new">
         <input
           value={newColumn}
@@ -408,6 +532,7 @@ const PcrGenomicLoci: React.FC = () => {
         />
         <button onClick={() => addColumn(newColumn)}>Add new column</button>
       </div>
+
       <div className="download">
         <CSVLink data={selectedFlatRows.map((i) => i.values)}>
           <div className="export">
@@ -415,6 +540,13 @@ const PcrGenomicLoci: React.FC = () => {
             export CSV
           </div>
         </CSVLink>
+        <div
+          className="legend"
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
+          <InfoIcon />
+          {isPopoverOpen ? "hide legend" : "show legend"}
+        </div>
       </div>
     </>
   );

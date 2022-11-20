@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import * as yup from "yup";
 import CreatableSelectInput from "../components/CreatableSelectInput";
 import { writeExtractionData } from "../firebase/firebase";
+import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { DnaExtractionsType, StorageType } from "../types";
 import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
@@ -14,11 +15,8 @@ import TextInput from "./TextInput";
 const schema = yup
   .object({
     isolateCode: yup.string().required(),
-    dateIsolation: yup.string().required(),
-    box: yup.string().required(),
     project: yup.string().required(),
     speciesOrig: yup.string().required(),
-    ngul: yup.string().required(),
     kit: yup.string().required(),
     country: yup.string().required(),
     localityName: yup.string().required(),
@@ -31,6 +29,7 @@ const NewSampleForm: React.FC = () => {
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
   const [showModalLoc, setShowModalLoc] = useState(false);
   const [showModalCode, setShowModalCode] = useState(false);
+  const [localityDisabled, setLocalityDisabled] = useState(false);
   const db = getDatabase();
 
   useEffect(() => {
@@ -85,54 +84,7 @@ const NewSampleForm: React.FC = () => {
     storageSite: i.storageSite,
   }));
 
-  const localityOpt = Object.values(
-    extractions.reduce(
-      (acc, cur) => Object.assign(acc, { [cur.localityCode]: cur }),
-      {}
-    )
-  )
-    .sort((a: any, b: any) => a.localityCode.localeCompare(b.localityCode))
-    .map((i: any) => ({
-      value: i.localityCode,
-      label: i.localityCode,
-      country: i.country,
-      state: i.state,
-      localityName: i.localityName,
-      latitude: i.latitude,
-      longitude: i.longitude,
-      altitude: i.altitude,
-      habitat: i.habitat,
-      dateCollection: i.dateCollection,
-      collector: i.collector,
-    }))
-    .filter((i) => !!i.value);
-
-  const localityOptions = [
-    ...localityOpt,
-    {
-      value: "",
-      label: "-- empty --",
-      country: "",
-      state: "",
-      localityName: "",
-      latitude: "",
-      longitude: "",
-      altitude: "",
-      habitat: "",
-      dateCollection: "",
-      collector: "",
-    },
-  ];
-
-  const speciesOptions = Object.values(
-    extractions.reduce(
-      (acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }),
-      {}
-    )
-  ).map((i: any) => ({
-    value: i.speciesOrig,
-    label: i.speciesOrig,
-  }));
+  const localityOptions = getLocalityOptions(extractions);
 
   const locItems = localityOptions.map((i: any) => (
     <div
@@ -153,6 +105,16 @@ const NewSampleForm: React.FC = () => {
       {i.value}
     </div>
   ));
+
+  const speciesOptions = Object.values(
+    extractions.reduce(
+      (acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }),
+      {}
+    )
+  ).map((i: any) => ({
+    value: i.speciesOrig,
+    label: i.speciesOrig,
+  }));
 
   const codeItems = Object.values(
     extractions.reduce(
@@ -321,6 +283,10 @@ const NewSampleForm: React.FC = () => {
                   setValue("habitat", e.habitat);
                   setValue("dateCollection", e.dateCollection);
                   setValue("collector", e.collector);
+                  setValue("isolateCodeGroup", "");
+                  e.value
+                    ? setLocalityDisabled(true)
+                    : setLocalityDisabled(false);
                 }}
                 label="Locality code"
                 error={errors.localityCode?.message}
@@ -358,9 +324,9 @@ const NewSampleForm: React.FC = () => {
           error={errors.country?.message}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            /* setValue("localityCode", ""); */
           }}
           register={register}
+          disabled={localityDisabled}
         />
       </div>
       <div className="row">
@@ -371,8 +337,8 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            /* setValue("localityCode", ""); */
           }}
+          disabled={localityDisabled}
         />
         <TextInput
           label="Longitude [°E]"
@@ -381,8 +347,8 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            /* setValue("localityCode", ""); */
           }}
+          disabled={localityDisabled}
         />
       </div>
       <div className="row">
@@ -393,8 +359,8 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            /* setValue("localityCode", ""); */
           }}
+          disabled={localityDisabled}
         />
         <TextInput
           label="State/province"
@@ -403,8 +369,8 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            /* setValue("localityCode", ""); */
           }}
+          disabled={localityDisabled}
         />
       </div>
       <div className="row">
@@ -415,8 +381,8 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            /* setValue("localityCode", ""); */
           }}
+          disabled={localityDisabled}
         />
         <TextInput
           label="Habitat"
@@ -425,8 +391,8 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
-            /* setValue("localityCode", ""); */
           }}
+          disabled={localityDisabled}
         />
       </div>
       <div className="row">
@@ -436,12 +402,14 @@ const NewSampleForm: React.FC = () => {
           error={errors.dateCollection?.message}
           register={register}
           type="date"
+          disabled={localityDisabled}
         />
         <TextInput
           label="Collector"
           name="collector"
           error={errors.collector?.message}
           register={register}
+          disabled={localityDisabled}
         />
       </div>
       <div className="row"></div>

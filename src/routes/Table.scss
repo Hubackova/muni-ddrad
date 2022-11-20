@@ -91,7 +91,11 @@ form {
 .download {
   display: flex;
   gap: 15px;
-  .export {
+
+  .export,
+  .legend {
+    cursor: pointer;
+    color: grey;
     display: flex;
     flex-direction: column;
     font-size: 0.75rem;
@@ -107,4 +111,22 @@ form {
   margin: 10px 0;
   display: flex;
   align-items: flex-start;
+}
+
+.popover {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 8px;
+  border: 1px solid grey;
+  background: white;
+  max-width: 200px;
+  margin: 8px;
+  .close {
+    text-align: right;
+    cursor: pointer;
+  }
+  div {
+    white-space: normal;
+  }
 }
