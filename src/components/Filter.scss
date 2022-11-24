@@ -1,0 +1,28 @@
+.search-label {
+  font-style: italic;
+  font-weight: 400;
+  color: grey;
+}
+
+.select-input-filter {
+  max-height: 21px;
+  margin-bottom: 3px;
+
+  * {
+    max-width: 100%;
+  }
+
+  .select__control {
+    min-height: 21px;
+
+    &:not(.select__control--is-focused) {
+      .select__value-container--has-value {
+        max-height: 26px;
+      }
+    }
+  }
+  .select__indicator,
+  .select__value-container {
+    padding: 0;
+  }
+}
