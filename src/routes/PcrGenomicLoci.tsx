@@ -10,7 +10,13 @@ import {
   useTable,
 } from "react-table";
 import { toast } from "react-toastify";
-import { DefaultFilterForColumn, GlobalFilter } from "../components/Filter";
+import {
+  DefaultFilterForColumn,
+  GlobalFilter,
+  multiSelectFilter,
+  NumberRangeColumnFilter,
+  SelectColumnFilter,
+} from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { legend } from "../constants";
@@ -108,22 +114,26 @@ const PcrGenomicLoci: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <input defaultValue={[original.isolateCode] || ""} disabled></input>
         ),
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "Isolate code group",
         accessor: "isolateCodeGroup",
-
         Cell: ({ row: { original } }) => (
           <input
             defaultValue={[original.isolateCodeGroup] || ""}
             disabled
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Species (original det.)",
         accessor: "speciesOrig",
         Cell: ({ row: { original } }) => <span>{original.speciesOrig}</span>,
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Project",
@@ -135,6 +145,8 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.project] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Isolation date",
@@ -149,10 +161,14 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.dateIsolation] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "ng/ul",
         accessor: "ngul",
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
       },
       {
         Header: "Box name",
@@ -180,7 +196,6 @@ const PcrGenomicLoci: React.FC = () => {
         Header: "Country",
         accessor: "country",
         Cell: ({ row, row: { original } }) => {
-          console.log(row);
           return (
             <input
               onChange={(e) => {
@@ -195,6 +210,8 @@ const PcrGenomicLoci: React.FC = () => {
             ></input>
           );
         },
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "State/province",
@@ -212,6 +229,8 @@ const PcrGenomicLoci: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Locality name",
@@ -417,7 +436,7 @@ const PcrGenomicLoci: React.FC = () => {
       columns,
       data: tableData,
       initialState: { hiddenColumns: ["localityCode"] },
-      defaultColumn: { Cell: EditableCell, Filter: DefaultFilterForColumn },
+      defaultColumn: { Cell: EditableCell, Filter: () => {} },
     },
 
     useGlobalFilter,
@@ -479,21 +498,18 @@ const PcrGenomicLoci: React.FC = () => {
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => {
                 return (
-                  <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                    onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-                  >
-                    {column.render("Header")}
-                    <div>
-                      {column.canFilter ? column.render("Filter") : null}
-                    </div>
+                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                    {column.render("Header")}{" "}
                     <span>
                       {column.isSorted
                         ? column.isSortedDesc
-                          ? " 🔽"
-                          : " 🔼"
+                          ? " ⬇️"
+                          : " ⬆️"
                         : ""}
                     </span>
+                    <div className="filter-wrapper">
+                      {column.canFilter ? column.render("Filter") : null}
+                    </div>
                   </th>
                 );
               })}

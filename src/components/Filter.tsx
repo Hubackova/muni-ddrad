@@ -1,7 +1,8 @@
 // @ts-nocheck
-
 import React, { useMemo, useState } from "react";
+import CreatableSelect from "react-select/creatable";
 import { useAsyncDebounce } from "react-table";
+import "./Filter.scss";
 
 // Component for Global Filter
 export function GlobalFilter({ globalFilter, setGlobalFilter }) {
@@ -107,10 +108,28 @@ export function SelectColumnFilter({
     });
     return [...options.values()];
   }, [id, preFilteredRows]);
-
+  const selectOptions = options.map((i) => ({ value: i, label: i }));
   // UI for Multi-Select box
   return (
-    <select
+    <CreatableSelect
+      options={selectOptions}
+      isSearchable={true}
+      className="select-input-filter"
+      classNamePrefix="select"
+      menuPlacement="auto"
+      isMulti
+      formatCreateLabel={(userInput) => (
+        <div className="search-label">{`Search for "${userInput}"`}</div>
+      )}
+      value={
+        filterValue ? filterValue.map((i) => ({ value: i, label: i })) : ""
+      }
+      onChange={(e) => {
+        setFilter(e.length > 0 ? e.map((i) => i.value) : "");
+      }}
+    />
+
+    /*     <select
       value={filterValue}
       onChange={(e) => {
         setFilter(e.target.value || undefined);
@@ -122,6 +141,69 @@ export function SelectColumnFilter({
           {option}
         </option>
       ))}
-    </select>
+    </select> */
   );
+}
+export function NumberRangeColumnFilter({
+  column: { filterValue = [], preFilteredRows, setFilter, id },
+}) {
+  const [min, max] = React.useMemo(() => {
+    let min = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
+    let max = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
+    preFilteredRows.forEach((row) => {
+      min = Math.min(row.values[id], min);
+      max = Math.max(row.values[id], max);
+    });
+    return [min, max];
+  }, [id, preFilteredRows]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+      }}
+    >
+      <input
+        value={filterValue[0] || ""}
+        type="number"
+        onChange={(e) => {
+          const val = e.target.value;
+          setFilter((old = []) => [
+            val ? parseInt(val, 10) : undefined,
+            old[1],
+          ]);
+        }}
+        placeholder={`Min (${min})`}
+        style={{
+          width: "70px",
+          marginRight: "0.5rem",
+        }}
+      />
+      to
+      <input
+        value={filterValue[1] || ""}
+        type="number"
+        onChange={(e) => {
+          const val = e.target.value;
+          setFilter((old = []) => [
+            old[0],
+            val ? parseInt(val, 10) : undefined,
+          ]);
+        }}
+        placeholder={`Max (${max})`}
+        style={{
+          width: "70px",
+          marginLeft: "0.5rem",
+        }}
+      />
+    </div>
+  );
+}
+
+export function multiSelectFilter(rows, columnIds, filterValue) {
+  return filterValue.length === 0
+    ? rows
+    : rows.filter((row) =>
+        filterValue.includes(String(row.original[columnIds]))
+      );
 }

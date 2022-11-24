@@ -29,7 +29,6 @@ const NewSampleForm: React.FC = () => {
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
   const [showModalLoc, setShowModalLoc] = useState(false);
   const [showModalCode, setShowModalCode] = useState(false);
-  const [localityDisabled, setLocalityDisabled] = useState(false);
   const db = getDatabase();
 
   useEffect(() => {
@@ -71,8 +70,10 @@ const NewSampleForm: React.FC = () => {
     control,
     formState: { errors },
     setValue,
+    getValues,
     setError,
     handleSubmit,
+    clearErrors,
     watch,
   } = useForm<DnaExtractionsType>({
     resolver: yupResolver(schema),
@@ -85,6 +86,7 @@ const NewSampleForm: React.FC = () => {
   }));
 
   const localityOptions = getLocalityOptions(extractions);
+  console.log(errors, watch("country"), getValues());
 
   const locItems = localityOptions.map((i: any) => (
     <div
@@ -127,21 +129,29 @@ const NewSampleForm: React.FC = () => {
       <div
         className="item"
         onClick={() => {
-          setValue("speciesOrig", i.speciesOrig);
+          setValue("speciesOrig", i.speciesOrig, {
+            shouldValidate: true,
+          });
           setValue("project", i.country);
           setValue("habitat", i.habitat);
           setValue("dateCollection", i.dateCollection);
           setValue("collector", i.collector);
           setValue("localityCode", i.localityCode);
-          setValue("country", i.country);
+          setValue("country", i.country, {
+            shouldValidate: true,
+          });
           setValue("state", i.state);
-          setValue("localityName", i.localityName);
+          setValue("localityName", i.localityName, {
+            shouldValidate: true,
+          });
           setValue("latitude", i.latitude);
           setValue("longitude", i.longitude);
           setValue("altitude", i.altitude);
           setValue("habitat", i.habitat);
           setValue("dateCollection", i.dateCollection);
-          setValue("collector", i.collector);
+          setValue("collector", i.collector, {
+            shouldValidate: true,
+          });
           setValue("isolateCodeGroup", i.isolateCode);
         }}
       >
@@ -274,19 +284,20 @@ const NewSampleForm: React.FC = () => {
                 value={value ? { value, label: value } : null}
                 onChange={(e: any) => {
                   onChange(e?.value);
-                  setValue("country", e.country);
-                  setValue("state", e.state);
-                  setValue("localityName", e.localityName);
-                  setValue("latitude", e.latitude);
-                  setValue("longitude", e.longitude);
-                  setValue("altitude", e.altitude);
-                  setValue("habitat", e.habitat);
-                  setValue("dateCollection", e.dateCollection);
-                  setValue("collector", e.collector);
-                  setValue("isolateCodeGroup", "");
-                  e.value
-                    ? setLocalityDisabled(true)
-                    : setLocalityDisabled(false);
+
+                  setTimeout(() => {
+                    console.log("s");
+                    setValue("country", e.country);
+                    setValue("state", e.state);
+                    setValue("localityName", e.localityName);
+                    setValue("latitude", e.latitude);
+                    setValue("longitude", e.longitude);
+                    setValue("altitude", e.altitude);
+                    setValue("habitat", e.habitat);
+                    setValue("dateCollection", e.dateCollection);
+                    setValue("collector", e.collector);
+                    setValue("isolateCodeGroup", "");
+                  }, 500);
                 }}
                 label="Locality code"
                 error={errors.localityCode?.message}
@@ -326,7 +337,7 @@ const NewSampleForm: React.FC = () => {
             setValue("isolateCodeGroup", "");
           }}
           register={register}
-          disabled={localityDisabled}
+          disabled={!!watch("localityCode")}
         />
       </div>
       <div className="row">
@@ -338,7 +349,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={localityDisabled}
+          disabled={!!watch("localityCode")}
         />
         <TextInput
           label="Longitude [°E]"
@@ -348,7 +359,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={localityDisabled}
+          disabled={!!watch("localityCode")}
         />
       </div>
       <div className="row">
@@ -360,7 +371,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={localityDisabled}
+          disabled={!!watch("localityCode")}
         />
         <TextInput
           label="State/province"
@@ -370,7 +381,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={localityDisabled}
+          disabled={!!watch("localityCode")}
         />
       </div>
       <div className="row">
@@ -378,11 +389,11 @@ const NewSampleForm: React.FC = () => {
           label="Locality name"
           name="localityName"
           error={errors.localityName?.message}
+          disabled={true}
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={localityDisabled}
         />
         <TextInput
           label="Habitat"
@@ -392,7 +403,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={localityDisabled}
+          disabled={!!watch("localityCode")}
         />
       </div>
       <div className="row">
@@ -402,14 +413,14 @@ const NewSampleForm: React.FC = () => {
           error={errors.dateCollection?.message}
           register={register}
           type="date"
-          disabled={localityDisabled}
+          disabled={!!watch("localityCode")}
         />
         <TextInput
           label="Collector"
           name="collector"
           error={errors.collector?.message}
           register={register}
-          disabled={localityDisabled}
+          disabled={!!watch("localityCode")}
         />
       </div>
       <div className="row"></div>

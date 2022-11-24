@@ -9,11 +9,24 @@
   * {
     font-size: 13px;
   }
+
+  tbody {
+    padding-top: 20px;
+  }
   th {
-    input {
-      margin-top: 20px;
+    .filter-wrapper {
+      margin-top: 4px;
+
+      > input,
+      > div > input {
+        margin-top: 0 !important;
+        height: 20px;
+        border-radius: 4px;
+        border: 1px solid lightgray;
+      }
     }
   }
+
   td {
     text-align: left;
 
