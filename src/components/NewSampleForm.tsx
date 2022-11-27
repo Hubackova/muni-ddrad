@@ -1,9 +1,7 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import { getDatabase, onValue, ref } from "firebase/database";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import * as yup from "yup";
 import CreatableSelectInput from "../components/CreatableSelectInput";
 import { writeExtractionData } from "../firebase/firebase";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
@@ -12,23 +10,12 @@ import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
 
-const schema = yup
-  .object({
-    isolateCode: yup.string().required(),
-    project: yup.string().required(),
-    speciesOrig: yup.string().required(),
-    kit: yup.string().required(),
-    country: yup.string().required(),
-    localityName: yup.string().required(),
-    collector: yup.string().required(),
-  })
-  .required();
-
 const NewSampleForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
   const [showModalLoc, setShowModalLoc] = useState(false);
   const [showModalCode, setShowModalCode] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const db = getDatabase();
 
   useEffect(() => {
@@ -54,6 +41,12 @@ const NewSampleForm: React.FC = () => {
 
   const addItem = (data: any) => {
     const { storageSite, ...sampleData } = data;
+    if (isCodes.includes(sampleData.isolateCode)) {
+      setError("isolateCode", {
+        type: "custom",
+        message: "Duplicate isolateCode",
+      });
+    }
     Object.keys(sampleData).forEach((key) => {
       if (sampleData[key] === undefined) {
         delete sampleData[key];
@@ -70,13 +63,13 @@ const NewSampleForm: React.FC = () => {
     control,
     formState: { errors },
     setValue,
-    getValues,
     setError,
     handleSubmit,
     clearErrors,
     watch,
+    getValues,
   } = useForm<DnaExtractionsType>({
-    resolver: yupResolver(schema),
+    mode: "all",
   });
 
   const boxOptions = storage.map((i) => ({
@@ -86,53 +79,59 @@ const NewSampleForm: React.FC = () => {
   }));
 
   const localityOptions = getLocalityOptions(extractions);
-  console.log(errors, watch("country"), getValues());
 
-  const locItems = localityOptions.map((i: any) => (
-    <div
-      className="item"
-      onClick={() => {
-        setValue("localityCode", i.value);
-        setValue("country", i.country);
-        setValue("state", i.state);
-        setValue("localityName", i.localityName);
-        setValue("latitude", i.latitude);
-        setValue("longitude", i.longitude);
-        setValue("altitude", i.altitude);
-        setValue("habitat", i.habitat);
-        setValue("dateCollection", i.dateCollection);
-        setValue("collector", i.collector);
-      }}
-    >
-      {i.value}
-    </div>
-  ));
+  const locItems = useMemo(
+    () =>
+      localityOptions.map((i: any, index) => (
+        <div
+          key={index}
+          className="item"
+          onClick={() => {
+            setValue("localityCode", i.value);
+            setValue("country", i.country);
+            setValue("state", i.state);
+            setValue("localityName", i.localityName);
+            setValue("latitude", i.latitude);
+            setValue("longitude", i.longitude);
+            setValue("altitude", i.altitude);
+            setValue("habitat", i.habitat);
+            setValue("dateCollection", i.dateCollection);
+            setValue("collector", i.collector);
+            clearErrors("country");
+            clearErrors("localityName");
+            clearErrors("collector");
+          }}
+        >
+          {i.value}
+        </div>
+      )),
+    [clearErrors, localityOptions, setValue]
+  );
 
-  const speciesOptions = Object.values(
-    extractions.reduce(
-      (acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }),
-      {}
-    )
-  ).map((i: any) => ({
-    value: i.speciesOrig,
-    label: i.speciesOrig,
-  }));
+  const speciesOptions = useMemo(
+    () =>
+      Object.values(
+        extractions.reduce((acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }), {})
+      ).map((i: any) => ({
+        value: i.speciesOrig,
+        label: i.speciesOrig,
+      })),
+    [extractions]
+  );
 
   const codeItems = Object.values(
-    extractions.reduce(
-      (acc, cur) => Object.assign(acc, { [cur.isolateCode]: cur }),
-      {}
-    )
+    extractions.reduce((acc, cur) => Object.assign(acc, { [cur.isolateCode]: cur }), {})
   )
     .sort((a: any, b: any) => a.isolateCode.localeCompare(b.isolateCode))
-    .map((i: any) => (
+    .map((i: any, index) => (
       <div
+        key={index}
         className="item"
         onClick={() => {
           setValue("speciesOrig", i.speciesOrig, {
             shouldValidate: true,
           });
-          setValue("project", i.country);
+          setValue("project", i.project);
           setValue("habitat", i.habitat);
           setValue("dateCollection", i.dateCollection);
           setValue("collector", i.collector);
@@ -153,37 +152,35 @@ const NewSampleForm: React.FC = () => {
             shouldValidate: true,
           });
           setValue("isolateCodeGroup", i.isolateCode);
+          clearErrors("country");
+          clearErrors("localityName");
+          clearErrors("collector");
+          clearErrors("project");
         }}
       >
         {i.isolateCode}
       </div>
     ));
   const isCodes = extractions.map((i) => i.isolateCode);
+
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new sample:</h5>
       <div className="row">
         <div>
           <TextInput
-            label="Isolate code"
             name="isolateCode"
+            label="Isolate code"
             error={errors.isolateCode?.message}
             register={register}
-            onBlur={(e: any) => {
-              if (isCodes.includes(e.target.value))
-                setError("isolateCode", {
-                  type: "custom",
-                  message: "Duplicate isolateCode",
-                });
-            }}
+            required="This field is required"
+            validate={() => !isCodes.includes(getValues("isolateCode")) || "Duplicate isolateCode"}
           />
           <div>
             <button type="button" onClick={() => setShowModalCode(true)}>
               Show isolate codes
             </button>
-            {watch("isolateCodeGroup") && (
-              <span>{`(${watch("isolateCodeGroup")})`}</span>
-            )}
+            {watch("isolateCodeGroup") && <span>{`(${watch("isolateCodeGroup")})`}</span>}
             {showModalCode && (
               <div className="side-panel">
                 <div className="body">
@@ -213,6 +210,7 @@ const NewSampleForm: React.FC = () => {
               label="Species (original det.)"
               error={errors.speciesOrig?.message}
               isSearchable
+              required="This field is required"
             />
           )}
           control={control}
@@ -223,6 +221,7 @@ const NewSampleForm: React.FC = () => {
         <TextInput
           label="Project"
           name="project"
+          required="This field is required"
           error={errors.project?.message}
           register={register}
         />
@@ -235,17 +234,13 @@ const NewSampleForm: React.FC = () => {
         />
       </div>
       <div className="row">
-        <TextInput
-          label="ng/ul"
-          name="ngul"
-          error={errors.ngul?.message}
-          register={register}
-        />
+        <TextInput label="ng/ul" name="ngul" error={errors.ngul?.message} register={register} />
         <TextInput
           label="Kit"
           name="kit"
           error={errors.kit?.message}
           register={register}
+          required="This field is required"
         />
       </div>
       <div className="row">
@@ -284,20 +279,20 @@ const NewSampleForm: React.FC = () => {
                 value={value ? { value, label: value } : null}
                 onChange={(e: any) => {
                   onChange(e?.value);
-
-                  setTimeout(() => {
-                    console.log("s");
-                    setValue("country", e.country);
-                    setValue("state", e.state);
-                    setValue("localityName", e.localityName);
-                    setValue("latitude", e.latitude);
-                    setValue("longitude", e.longitude);
-                    setValue("altitude", e.altitude);
-                    setValue("habitat", e.habitat);
-                    setValue("dateCollection", e.dateCollection);
-                    setValue("collector", e.collector);
-                    setValue("isolateCodeGroup", "");
-                  }, 500);
+                  setValue("country", e.country);
+                  setValue("state", e.state);
+                  setValue("localityName", e.localityName);
+                  setValue("latitude", e.latitude);
+                  setValue("longitude", e.longitude);
+                  setValue("altitude", e.altitude);
+                  setValue("habitat", e.habitat);
+                  setValue("dateCollection", e.dateCollection);
+                  setValue("collector", e.collector);
+                  setValue("isolateCodeGroup", "");
+                  clearErrors("country");
+                  clearErrors("localityName");
+                  clearErrors("collector");
+                  e?.value ? setIsDisabled(true) : setIsDisabled(false);
                 }}
                 label="Locality code"
                 error={errors.localityCode?.message}
@@ -333,11 +328,12 @@ const NewSampleForm: React.FC = () => {
           label="Country"
           name="country"
           error={errors.country?.message}
+          required="This field is required"
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
+          disabled={isDisabled}
           register={register}
-          disabled={!!watch("localityCode")}
         />
       </div>
       <div className="row">
@@ -349,7 +345,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={!!watch("localityCode")}
+          disabled={isDisabled}
         />
         <TextInput
           label="Longitude [°E]"
@@ -359,7 +355,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={!!watch("localityCode")}
+          disabled={isDisabled}
         />
       </div>
       <div className="row">
@@ -371,7 +367,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={!!watch("localityCode")}
+          disabled={isDisabled}
         />
         <TextInput
           label="State/province"
@@ -381,7 +377,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={!!watch("localityCode")}
+          disabled={isDisabled}
         />
       </div>
       <div className="row">
@@ -389,8 +385,9 @@ const NewSampleForm: React.FC = () => {
           label="Locality name"
           name="localityName"
           error={errors.localityName?.message}
-          disabled={true}
+          disabled={isDisabled}
           register={register}
+          required="This field is required"
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
@@ -403,7 +400,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={() => {
             setValue("isolateCodeGroup", "");
           }}
-          disabled={!!watch("localityCode")}
+          disabled={isDisabled}
         />
       </div>
       <div className="row">
@@ -413,14 +410,15 @@ const NewSampleForm: React.FC = () => {
           error={errors.dateCollection?.message}
           register={register}
           type="date"
-          disabled={!!watch("localityCode")}
+          disabled={isDisabled}
         />
         <TextInput
           label="Collector"
           name="collector"
           error={errors.collector?.message}
           register={register}
-          disabled={!!watch("localityCode")}
+          disabled={isDisabled}
+          required="This field is required"
         />
       </div>
       <div className="row"></div>

@@ -1,21 +1,27 @@
 // @ts-nocheck
-
-import { yupResolver } from "@hookform/resolvers/yup";
-import React from "react";
+import { getDatabase, onValue, ref } from "firebase/database";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import * as yup from "yup";
 import TextInput from "../components/TextInput";
 import { writePrimersData } from "../firebase/firebase";
 import { PrimersType } from "../types";
 
 const NewPrimerForm: React.FC = () => {
-  const schema = yup
-    .object({
-      name: yup.string().required(),
-      sequence: yup.string().required(),
-    })
-    .required();
+  const [primers, setPrimers] = useState<PrimersType[]>([]);
+  const db = getDatabase();
+
+  useEffect(() => {
+    onValue(ref(db, "primers/"), (snapshot) => {
+      const items: any = [];
+      snapshot.forEach((child) => {
+        let childItem = child.val();
+        childItem.key = child.key;
+        items.push(childItem);
+      });
+      setPrimers(items);
+    });
+  }, [db]);
 
   const addItem = (data: any) => {
     writePrimersData(data);
@@ -26,9 +32,10 @@ const NewPrimerForm: React.FC = () => {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<PrimersType>({
-    resolver: yupResolver(schema),
-  });
+    getValues,
+  } = useForm<PrimersType>({});
+
+  const primersNames = primers.map((i) => i.name);
 
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
@@ -39,6 +46,8 @@ const NewPrimerForm: React.FC = () => {
           name="name"
           error={errors.name?.message}
           register={register}
+          required="This field is required"
+          validate={() => !primersNames.includes(getValues("name")) || "Duplicate name"}
         />
         <TextInput
           label="Country"
@@ -67,6 +76,7 @@ const NewPrimerForm: React.FC = () => {
           name="sequence"
           error={errors.sequence?.message}
           register={register}
+          required="This field is required"
         />
         <TextInput
           label="Author"
@@ -90,12 +100,7 @@ const NewPrimerForm: React.FC = () => {
         />
       </div>
       <div className="row">
-        <TextInput
-          label="Work?"
-          name="work"
-          error={errors.work?.message}
-          register={register}
-        />
+        <TextInput label="Work?" name="work" error={errors.work?.message} register={register} />
         <TextInput
           label="Note on use"
           name="noteOnUse"
