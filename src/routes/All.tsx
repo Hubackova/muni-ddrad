@@ -2,7 +2,21 @@
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import { useRowSelect, useSortBy, useTable } from "react-table";
+import {
+  Column,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
+} from "react-table";
+import {
+  DefaultFilterForColumn,
+  GlobalFilter,
+  multiSelectFilter,
+  NumberRangeColumnFilter,
+  SelectColumnFilter,
+} from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
@@ -73,6 +87,7 @@ const All: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <input defaultValue={[original.isolateCode] || ""} disabled></input>
         ),
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "Locality code",
@@ -101,6 +116,8 @@ const All: React.FC = () => {
             className="narrow"
           />
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Species (original det.)",
@@ -108,6 +125,8 @@ const All: React.FC = () => {
         Cell: ({ row: { original } }) => {
           return <span>{original.speciesOrig}</span>;
         },
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Country",
@@ -125,6 +144,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Latitude [°N]",
@@ -176,6 +197,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Locality name",
@@ -193,6 +216,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Habitat",
@@ -210,6 +235,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Altitude [m a.s.l.]",
@@ -227,6 +254,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
       },
       {
         Header: "Date collection",
@@ -261,6 +290,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Species, updated name",
@@ -274,10 +305,14 @@ const All: React.FC = () => {
             defaultValue={[original.speciesUpdated] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Project",
         accessor: "project",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Isolation date",
@@ -286,6 +321,8 @@ const All: React.FC = () => {
       {
         Header: "ng/ul",
         accessor: "ngul",
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
       },
       {
         Header: "Box name",
@@ -308,6 +345,8 @@ const All: React.FC = () => {
             />
           );
         },
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Storage site",
@@ -315,38 +354,54 @@ const All: React.FC = () => {
         Cell: ({ row: { original } }) => {
           return <span>{original?.storageSite}</span>;
         },
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "cytB",
         accessor: "cytB",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "16C",
         accessor: "16C",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "COI",
         accessor: "COI",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "COII",
         accessor: "COII",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
 
       {
         Header: "ITS1",
         accessor: "ITS1",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "ITS2",
         accessor: "ITS2",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "ELAV",
         accessor: "ELAV",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
     ],
-    [boxOptions, editItem, localityOptions, storage]
+    [boxOptions, editItem, localityOptions]
   );
 
   const customColumns2: Column<any>[] = useMemo(
@@ -354,18 +409,23 @@ const All: React.FC = () => {
       {
         Header: "note on PCR",
         accessor: "notePCR",
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "note on sequencing",
         accessor: "noteSequencing",
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "General Note",
         accessor: "noteGeneral",
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "STATUS",
         accessor: "status",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
     ],
     []
@@ -398,6 +458,8 @@ const All: React.FC = () => {
           return {
             Header: i,
             accessor: i,
+            Filter: SelectColumnFilter,
+            filter: multiSelectFilter,
           };
         })
         .filter((i) => i && i.accessor !== "key");
@@ -439,8 +501,10 @@ const All: React.FC = () => {
     {
       columns,
       data: tableData,
-      defaultColumn: { Cell: EditableCell },
+      defaultColumn: { Cell: EditableCell, Filter: () => {} },
     },
+    useGlobalFilter,
+    useFilters,
     useSortBy,
     useRowSelect,
     (hooks) => {
@@ -467,49 +531,73 @@ const All: React.FC = () => {
     getTableBodyProps,
     headerGroups,
     rows,
+    state,
     prepareRow,
     selectedFlatRows,
+    setGlobalFilter,
+    preGlobalFilteredRows,
   } = tableInstance;
 
   return (
     <>
-      <table className="table" {...getTableProps()}>
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-              ))}
-              <th>IsolateCode Group</th>
-            </tr>
-          ))}
-        </thead>
-
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-
-            const groupItems = extractions.filter((i) => {
-              return i.isolateCodeGroup === row.original.isolateCode;
-            });
-
-            return (
-              <tr {...row.getRowProps()} key={row.original.key}>
-                {row.cells.map((cell) => {
-                  return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                  );
-                })}
-                <td className="sample-list">
-                  {groupItems.map((i) => (
-                    <span className="sample">{i.isolateCode}</span>
-                  ))}
-                </td>
+      <div class="table-container">
+        <table className="table" {...getTableProps()}>
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                    {column.render("Header")}
+                    <span>
+                      {column.isSorted
+                        ? column.isSortedDesc
+                          ? " ⬇️"
+                          : " ⬆️"
+                        : ""}
+                    </span>
+                    <div className="filter-wrapper">
+                      {column.canFilter ? column.render("Filter") : null}
+                    </div>
+                  </th>
+                ))}
+                <th>IsolateCode Group</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+
+              const groupItems = extractions.filter((i) => {
+                return i.isolateCodeGroup === row.original.isolateCode;
+              });
+
+              return (
+                <tr {...row.getRowProps()} key={row.original.key}>
+                  {row.cells.map((cell) => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
+                  })}
+                  <td className="sample-list">
+                    {groupItems.map((i) => (
+                      <span className="sample">{i.isolateCode}</span>
+                    ))}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>{" "}
+      </div>
+      <div className="controls">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </div>
       <div className="download">
         <CSVLink data={selectedFlatRows.map((i) => i.values)}>
           <div className="export">

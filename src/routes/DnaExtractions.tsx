@@ -3,7 +3,21 @@
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import { Column, useRowSelect, useSortBy, useTable } from "react-table";
+import {
+  Column,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
+} from "react-table";
+import {
+  DefaultFilterForColumn,
+  GlobalFilter,
+  multiSelectFilter,
+  NumberRangeColumnFilter,
+  SelectColumnFilter,
+} from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
@@ -67,10 +81,13 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "Isolate code",
         accessor: "isolateCode",
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "Species (original det.)",
         accessor: "speciesOrig",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Species, updated name",
@@ -84,6 +101,8 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.speciesUpdated] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Project",
@@ -95,6 +114,8 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.project] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Isolation date",
@@ -120,6 +141,8 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.ngul] || ""}
           ></input>
         ),
+        Filter: NumberRangeColumnFilter,
+        filter: "between",
       },
       {
         Header: "Box name",
@@ -137,10 +160,14 @@ const DnaExtractions: React.FC = () => {
             className="narrow"
           />
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Storage site",
         accessor: "storageSite",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Locality code",
@@ -169,6 +196,8 @@ const DnaExtractions: React.FC = () => {
             className="narrow"
           />
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Country",
@@ -186,6 +215,8 @@ const DnaExtractions: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "State/province",
@@ -203,6 +234,8 @@ const DnaExtractions: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Kit",
@@ -214,6 +247,8 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.kit] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
 
       {
@@ -232,10 +267,33 @@ const DnaExtractions: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
     ],
     [boxOptions, editItem, localityOptions]
   );
+  // Create an editable cell renderer
+  const EditableCell: React.FC<any> = ({
+    value: initialValue,
+    row,
+    cell,
+    column: { id },
+  }) => {
+    const [value, setValue] = React.useState(initialValue);
+
+    const onChange = (e: any) => {
+      setValue(e.target.value);
+    };
+    const onBlur = (e: any) => {
+      if (e.target.value)
+        editItem(row.original.key, e.target.value, cell.column.id);
+    };
+    React.useEffect(() => {
+      setValue(initialValue);
+    }, [initialValue]);
+    return <input value={value} onChange={onChange} onBlur={onBlur} />;
+  };
 
   const tableData = React.useMemo(
     () =>
@@ -250,14 +308,14 @@ const DnaExtractions: React.FC = () => {
     [extractions, storage]
   );
 
-  const defaultColumn = {
-    Cell: ({ value: initialValue }: any) => {
-      return <span>{initialValue}</span>;
-    },
-  };
-
   const tableInstance = useTable(
-    { columns, data: tableData, defaultColumn },
+    {
+      columns,
+      data: tableData,
+      defaultColumn: { Cell: EditableCell, Filter: () => {} },
+    },
+    useGlobalFilter,
+    useFilters,
     useSortBy,
     useRowSelect,
     (hooks) => {
@@ -284,37 +342,64 @@ const DnaExtractions: React.FC = () => {
     getTableBodyProps,
     headerGroups,
     rows,
+    state,
     prepareRow,
     selectedFlatRows,
+    setGlobalFilter,
+    preGlobalFilteredRows,
   } = tableInstance;
   return (
     <>
-      <table className="table" {...getTableProps()}>
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()} key={row.original.key}>
-                {row.cells.map((cell) => {
+      <div class="table-container">
+        <table className="table" {...getTableProps()}>
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => {
                   return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    <th
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    >
+                      {column.render("Header")}{" "}
+                      <span>
+                        {column.isSorted
+                          ? column.isSortedDesc
+                            ? " ⬇️"
+                            : " ⬆️"
+                          : ""}
+                      </span>
+                      <div className="filter-wrapper">
+                        {column.canFilter ? column.render("Filter") : null}
+                      </div>
+                    </th>
                   );
                 })}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()} key={row.original.key}>
+                  {row.cells.map((cell) => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="controls">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </div>
       <div className="download">
         <CSVLink data={selectedFlatRows.map((i) => i.values)}>
           <div className="export">

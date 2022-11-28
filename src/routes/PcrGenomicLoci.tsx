@@ -2,7 +2,13 @@
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import { useFilters, useGlobalFilter, useRowSelect, useSortBy, useTable } from "react-table";
+import {
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
+} from "react-table";
 import { toast } from "react-toastify";
 import {
   DefaultFilterForColumn,
@@ -114,7 +120,10 @@ const PcrGenomicLoci: React.FC = () => {
         Header: "Isolate code group",
         accessor: "isolateCodeGroup",
         Cell: ({ row: { original } }) => (
-          <input defaultValue={[original.isolateCodeGroup] || ""} disabled></input>
+          <input
+            defaultValue={[original.isolateCodeGroup] || ""}
+            disabled
+          ></input>
         ),
         Filter: SelectColumnFilter,
         filter: multiSelectFilter,
@@ -146,7 +155,9 @@ const PcrGenomicLoci: React.FC = () => {
           <input
             type="date"
             onChange={(e) => (original.dateIsolation = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "dateIsolation")}
+            onBlur={(e) =>
+              editItem(original.key, e.target.value, "dateIsolation")
+            }
             defaultValue={[original.dateIsolation] || ""}
           ></input>
         ),
@@ -165,7 +176,9 @@ const PcrGenomicLoci: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <SelectInput
             options={boxOptions}
-            value={original.box ? { value: original.box, label: original.box } : null}
+            value={
+              original.box ? { value: original.box, label: original.box } : null
+            }
             onChange={(value: any) => {
               editItem(original.key, value.value, "box");
             }}
@@ -173,11 +186,14 @@ const PcrGenomicLoci: React.FC = () => {
             className="narrow"
           />
         ),
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "Storage site",
         accessor: "storageSite",
         Cell: ({ row: { original } }) => <span>{original.storageSite}</span>,
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Country",
@@ -235,6 +251,8 @@ const PcrGenomicLoci: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "cytB",
@@ -250,6 +268,8 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.cytB] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "16C",
@@ -265,6 +285,8 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original["16C"]] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "COI",
@@ -280,6 +302,8 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.COI] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "COII",
@@ -295,6 +319,8 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.COII] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
 
       {
@@ -311,6 +337,8 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.ITS1] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "ITS2",
@@ -326,6 +354,8 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.ITS2] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "ELAV",
@@ -341,6 +371,8 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.ELAV] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
     ],
     [boxOptions, editItem]
@@ -351,18 +383,23 @@ const PcrGenomicLoci: React.FC = () => {
       {
         Header: "note on PCR",
         accessor: "notePCR",
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "note on sequencing",
         accessor: "noteSequencing",
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "General Note",
         accessor: "noteGeneral",
+        Filter: DefaultFilterForColumn,
       },
       {
         Header: "STATUS",
         accessor: "status",
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
     ],
     []
@@ -371,7 +408,9 @@ const PcrGenomicLoci: React.FC = () => {
   const getColumnsAccessor = useCallback(
     (tableData) => {
       if (!tableData || !tableData.length) return [];
-      const customKeys = [...customColumns, ...customColumns2].map((i) => i.accessor);
+      const customKeys = [...customColumns, ...customColumns2].map(
+        (i) => i.accessor
+      );
       const tableDataKeys = Object.keys(tableData[0]);
       return tableDataKeys
         .map((i) => {
@@ -379,6 +418,8 @@ const PcrGenomicLoci: React.FC = () => {
           return {
             Header: i,
             accessor: i,
+            Filter: SelectColumnFilter,
+            filter: multiSelectFilter,
           };
         })
         .filter((i) => i && i.accessor !== "key");
@@ -387,18 +428,28 @@ const PcrGenomicLoci: React.FC = () => {
   );
 
   const columns = React.useMemo(
-    () => [...customColumns, ...getColumnsAccessor(tableData), ...customColumns2],
+    () => [
+      ...customColumns,
+      ...getColumnsAccessor(tableData),
+      ...customColumns2,
+    ],
     [customColumns, customColumns2, tableData, getColumnsAccessor]
   );
   // Create an editable cell renderer
-  const EditableCell: React.FC<any> = ({ value: initialValue, row, cell, column: { id } }) => {
+  const EditableCell: React.FC<any> = ({
+    value: initialValue,
+    row,
+    cell,
+    column: { id },
+  }) => {
     const [value, setValue] = React.useState(initialValue);
 
     const onChange = (e: any) => {
       setValue(e.target.value);
     };
     const onBlur = (e: any) => {
-      if (e.target.value) editItem(row.original.key, e.target.value, cell.column.id);
+      if (e.target.value)
+        editItem(row.original.key, e.target.value, cell.column.id);
     };
     React.useEffect(() => {
       setValue(initialValue);
@@ -458,9 +509,17 @@ const PcrGenomicLoci: React.FC = () => {
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => {
                   return (
-                    <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                    <th
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    >
                       {column.render("Header")}{" "}
-                      <span>{column.isSorted ? (column.isSortedDesc ? " ⬇️" : " ⬆️") : ""}</span>
+                      <span>
+                        {column.isSorted
+                          ? column.isSortedDesc
+                            ? " ⬇️"
+                            : " ⬆️"
+                          : ""}
+                      </span>
                       <div className="filter-wrapper">
                         {column.canFilter ? column.render("Filter") : null}
                       </div>
@@ -476,7 +535,9 @@ const PcrGenomicLoci: React.FC = () => {
               return (
                 <tr {...row.getRowProps()} key={row.original.key}>
                   {row.cells.map((cell) => {
-                    return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
                   })}
                 </tr>
               );
@@ -497,7 +558,10 @@ const PcrGenomicLoci: React.FC = () => {
 
       <div className="controls">
         <div className="add-new">
-          <input value={newColumn} onChange={(e) => setNewColumn(e.target.value)} />
+          <input
+            value={newColumn}
+            onChange={(e) => setNewColumn(e.target.value)}
+          />
           <button onClick={() => addColumn(newColumn)}>Add new column</button>
         </div>
         <GlobalFilter
@@ -513,7 +577,10 @@ const PcrGenomicLoci: React.FC = () => {
             export CSV
           </div>
         </CSVLink>
-        <div className="legend" onClick={() => setIsPopoverOpen(!isPopoverOpen)}>
+        <div
+          className="legend"
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
           <InfoIcon />
           {isPopoverOpen ? "hide legend" : "show legend"}
         </div>

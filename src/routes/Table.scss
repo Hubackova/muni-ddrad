@@ -8,7 +8,27 @@
   white-space: nowrap;
   border: 2px solid grey;
   width: min-content;
-  // position: relative;
+
+  .remove button {
+    padding: 0 3px;
+  }
+
+  &.pcr {
+    tr > td,
+    tr > th {
+      &:nth-of-type(3) {
+        left: 40px;
+        position: sticky;
+        z-index: 99991;
+        background-color: white;
+      }
+    }
+    tr > th {
+      &:nth-of-type(3) {
+        z-index: 99999;
+      }
+    }
+  }
 
   * {
     font-size: 13px;
