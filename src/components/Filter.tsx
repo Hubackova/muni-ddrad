@@ -14,7 +14,7 @@ export function GlobalFilter({ globalFilter, setGlobalFilter }) {
 
   return (
     <div>
-      <label>Search Table: </label>
+      <span>Search Table: </span>
       <input
         value={value || ""}
         onChange={(e) => {
@@ -22,10 +22,6 @@ export function GlobalFilter({ globalFilter, setGlobalFilter }) {
           onChange(e.target.value);
         }}
         placeholder=" Enter value "
-        className="w-25"
-        style={{
-          display: "inline",
-        }}
       />
     </div>
   );
@@ -47,7 +43,6 @@ export function DefaultFilterForColumn({
         setFilter(e.target.value || undefined);
       }}
       placeholder={`Search ${length} records..`}
-      style={{ marginTop: "10px" }}
     />
   );
 }
@@ -72,8 +67,7 @@ export function DefaultFilterForColumnEditable({
 
   // We'll only update the external data when the input is blurred
   const onBlur = (e: any) => {
-    if (e.target.value)
-      editItem(row.original.key, e.target.value, cell.column.id);
+    if (e.target.value) editItem(row.original.key, e.target.value, cell.column.id);
   };
 
   // If the initialValue is changed external, sync it up with our state
@@ -97,9 +91,7 @@ export function DefaultFilterForColumnEditable({
 }
 
 // Component for Custom Select Filter
-export function SelectColumnFilter({
-  column: { filterValue, setFilter, preFilteredRows, id },
-}) {
+export function SelectColumnFilter({ column: { filterValue, setFilter, preFilteredRows, id } }) {
   // Use preFilteredRows to calculate the options
   const options = useMemo(() => {
     const options = new Set();
@@ -121,9 +113,7 @@ export function SelectColumnFilter({
       formatCreateLabel={(userInput) => (
         <div className="search-label">{`Search for "${userInput}"`}</div>
       )}
-      value={
-        filterValue ? filterValue.map((i) => ({ value: i, label: i })) : ""
-      }
+      value={filterValue ? filterValue.map((i) => ({ value: i, label: i })) : ""}
       onChange={(e) => {
         setFilter(e.length > 0 ? e.map((i) => i.value) : "");
       }}
@@ -158,20 +148,13 @@ export function NumberRangeColumnFilter({
   }, [id, preFilteredRows]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-      }}
-    >
+    <div>
       <input
         value={filterValue[0] || ""}
         type="number"
         onChange={(e) => {
           const val = e.target.value;
-          setFilter((old = []) => [
-            val ? parseInt(val, 10) : undefined,
-            old[1],
-          ]);
+          setFilter((old = []) => [val ? parseInt(val, 10) : undefined, old[1]]);
         }}
         placeholder={`Min (${min})`}
         style={{
@@ -185,10 +168,7 @@ export function NumberRangeColumnFilter({
         type="number"
         onChange={(e) => {
           const val = e.target.value;
-          setFilter((old = []) => [
-            old[0],
-            val ? parseInt(val, 10) : undefined,
-          ]);
+          setFilter((old = []) => [old[0], val ? parseInt(val, 10) : undefined]);
         }}
         placeholder={`Max (${max})`}
         style={{
@@ -203,7 +183,5 @@ export function NumberRangeColumnFilter({
 export function multiSelectFilter(rows, columnIds, filterValue) {
   return filterValue.length === 0
     ? rows
-    : rows.filter((row) =>
-        filterValue.includes(String(row.original[columnIds]))
-      );
+    : rows.filter((row) => filterValue.includes(String(row.original[columnIds])));
 }

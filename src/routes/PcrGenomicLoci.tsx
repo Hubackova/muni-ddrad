@@ -2,13 +2,7 @@
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import {
-  useFilters,
-  useGlobalFilter,
-  useRowSelect,
-  useSortBy,
-  useTable,
-} from "react-table";
+import { useFilters, useGlobalFilter, useRowSelect, useSortBy, useTable } from "react-table";
 import { toast } from "react-toastify";
 import {
   DefaultFilterForColumn,
@@ -120,10 +114,7 @@ const PcrGenomicLoci: React.FC = () => {
         Header: "Isolate code group",
         accessor: "isolateCodeGroup",
         Cell: ({ row: { original } }) => (
-          <input
-            defaultValue={[original.isolateCodeGroup] || ""}
-            disabled
-          ></input>
+          <input defaultValue={[original.isolateCodeGroup] || ""} disabled></input>
         ),
         Filter: SelectColumnFilter,
         filter: multiSelectFilter,
@@ -155,9 +146,7 @@ const PcrGenomicLoci: React.FC = () => {
           <input
             type="date"
             onChange={(e) => (original.dateIsolation = e.target.value)}
-            onBlur={(e) =>
-              editItem(original.key, e.target.value, "dateIsolation")
-            }
+            onBlur={(e) => editItem(original.key, e.target.value, "dateIsolation")}
             defaultValue={[original.dateIsolation] || ""}
           ></input>
         ),
@@ -176,9 +165,7 @@ const PcrGenomicLoci: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <SelectInput
             options={boxOptions}
-            value={
-              original.box ? { value: original.box, label: original.box } : null
-            }
+            value={original.box ? { value: original.box, label: original.box } : null}
             onChange={(value: any) => {
               editItem(original.key, value.value, "box");
             }}
@@ -384,9 +371,7 @@ const PcrGenomicLoci: React.FC = () => {
   const getColumnsAccessor = useCallback(
     (tableData) => {
       if (!tableData || !tableData.length) return [];
-      const customKeys = [...customColumns, ...customColumns2].map(
-        (i) => i.accessor
-      );
+      const customKeys = [...customColumns, ...customColumns2].map((i) => i.accessor);
       const tableDataKeys = Object.keys(tableData[0]);
       return tableDataKeys
         .map((i) => {
@@ -402,28 +387,18 @@ const PcrGenomicLoci: React.FC = () => {
   );
 
   const columns = React.useMemo(
-    () => [
-      ...customColumns,
-      ...getColumnsAccessor(tableData),
-      ...customColumns2,
-    ],
+    () => [...customColumns, ...getColumnsAccessor(tableData), ...customColumns2],
     [customColumns, customColumns2, tableData, getColumnsAccessor]
   );
   // Create an editable cell renderer
-  const EditableCell: React.FC<any> = ({
-    value: initialValue,
-    row,
-    cell,
-    column: { id },
-  }) => {
+  const EditableCell: React.FC<any> = ({ value: initialValue, row, cell, column: { id } }) => {
     const [value, setValue] = React.useState(initialValue);
 
     const onChange = (e: any) => {
       setValue(e.target.value);
     };
     const onBlur = (e: any) => {
-      if (e.target.value)
-        editItem(row.original.key, e.target.value, cell.column.id);
+      if (e.target.value) editItem(row.original.key, e.target.value, cell.column.id);
     };
     React.useEffect(() => {
       setValue(initialValue);
@@ -466,7 +441,6 @@ const PcrGenomicLoci: React.FC = () => {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    visibleColumns,
     state,
     rows,
     setGlobalFilter,
@@ -477,78 +451,61 @@ const PcrGenomicLoci: React.FC = () => {
 
   return (
     <>
-      <table className="table" {...getTableProps()}>
-        <thead>
-          <tr>
-            <th
-              colSpan={visibleColumns.length}
-              style={{
-                textAlign: "left",
-              }}
-            >
-              {/* Rendering Global Filter */}
-              <GlobalFilter
-                preGlobalFilteredRows={preGlobalFilteredRows}
-                globalFilter={state.globalFilter}
-                setGlobalFilter={setGlobalFilter}
-              />
-            </th>
-          </tr>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => {
-                return (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                    {column.render("Header")}{" "}
-                    <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? " ⬇️"
-                          : " ⬆️"
-                        : ""}
-                    </span>
-                    <div className="filter-wrapper">
-                      {column.canFilter ? column.render("Filter") : null}
-                    </div>
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()} key={row.original.key}>
-                {row.cells.map((cell) => {
+      <div class="table-container">
+        <table className="table" {...getTableProps()}>
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => {
                   return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                      {column.render("Header")}{" "}
+                      <span>{column.isSorted ? (column.isSortedDesc ? " ⬇️" : " ⬆️") : ""}</span>
+                      <div className="filter-wrapper">
+                        {column.canFilter ? column.render("Filter") : null}
+                      </div>
+                    </th>
                   );
                 })}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {isPopoverOpen && (
-        <div className="popover">
-          <div className="close" onClick={() => setIsPopoverOpen(false)}>
-            x
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()} key={row.original.key}>
+                  {row.cells.map((cell) => {
+                    return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {isPopoverOpen && (
+          <div className="popover">
+            <div className="close" onClick={() => setIsPopoverOpen(false)}>
+              x
+            </div>
+            {legend.map((i) => (
+              <div>{i}</div>
+            ))}
           </div>
-          {legend.map((i) => (
-            <div>{i}</div>
-          ))}
-        </div>
-      )}
-      <div className="add-new">
-        <input
-          value={newColumn}
-          onChange={(e) => setNewColumn(e.target.value)}
-        />
-        <button onClick={() => addColumn(newColumn)}>Add new column</button>
+        )}
       </div>
 
+      <div className="controls">
+        <div className="add-new">
+          <input value={newColumn} onChange={(e) => setNewColumn(e.target.value)} />
+          <button onClick={() => addColumn(newColumn)}>Add new column</button>
+        </div>
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </div>
       <div className="download">
         <CSVLink data={selectedFlatRows.map((i) => i.values)}>
           <div className="export">
@@ -556,10 +513,7 @@ const PcrGenomicLoci: React.FC = () => {
             export CSV
           </div>
         </CSVLink>
-        <div
-          className="legend"
-          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-        >
+        <div className="legend" onClick={() => setIsPopoverOpen(!isPopoverOpen)}>
           <InfoIcon />
           {isPopoverOpen ? "hide legend" : "show legend"}
         </div>
