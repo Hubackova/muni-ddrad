@@ -1,10 +1,22 @@
 // @ts-nocheck
 
-import { getDatabase, onValue, ref, remove, update } from "firebase/database";
+import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import { Column, useRowSelect, useSortBy, useTable } from "react-table";
+import {
+  Column,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
+} from "react-table";
 import CreatableSelectInput from "../components/CreatableSelectInput";
+import {
+  GlobalFilter,
+  multiSelectFilter,
+  SelectColumnFilter,
+} from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
@@ -36,10 +48,6 @@ const Storage: React.FC = () => {
       setExtractions(items);
     });
   }, [db]);
-
-  const removeItem = (id: string) => {
-    remove(ref(db, "storage/" + id));
-  };
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
@@ -75,6 +83,8 @@ const Storage: React.FC = () => {
             defaultValue={[original.box] || ""}
           ></input>
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Storage site",
@@ -94,13 +104,42 @@ const Storage: React.FC = () => {
             className="narrow"
           />
         ),
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
     ],
     [editItem, storageOptions]
   );
 
+  const EditableCell: React.FC<any> = ({
+    value: initialValue,
+    row,
+    cell,
+    column: { id },
+  }) => {
+    const [value, setValue] = React.useState(initialValue);
+
+    const onChange = (e: any) => {
+      setValue(e.target.value);
+    };
+    const onBlur = (e: any) => {
+      if (e.target.value)
+        editItem(row.original.key, e.target.value, cell.column.id);
+    };
+    React.useEffect(() => {
+      setValue(initialValue);
+    }, [initialValue]);
+    return <input value={value} onChange={onChange} onBlur={onBlur} />;
+  };
+
   const tableInstance = useTable(
-    { columns, data: storage },
+    {
+      columns,
+      data: storage,
+      defaultColumn: { Cell: EditableCell, Filter: () => {} },
+    },
+    useGlobalFilter,
+    useFilters,
     useSortBy,
     useRowSelect,
     (hooks) => {
@@ -127,47 +166,71 @@ const Storage: React.FC = () => {
     getTableBodyProps,
     headerGroups,
     rows,
+    setGlobalFilter,
+    state,
     prepareRow,
     selectedFlatRows,
+    preGlobalFilteredRows,
   } = tableInstance;
 
   return (
     <>
-      <table className="table" {...getTableProps()}>
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-              ))}
-              <th>List of samples in the box</th>
-            </tr>
-          ))}
-        </thead>
-
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            const samples = extractions.filter((i) => {
-              return i.box === row.original.key;
-            });
-            return (
-              <tr {...row.getRowProps()} key={row.original.key}>
-                {row.cells.map((cell) => {
-                  return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                  );
-                })}
-                <td className="sample-list">
-                  {samples.map((sample) => (
-                    <span className="sample">{sample.isolateCode}</span>
-                  ))}
-                </td>
+      <div class="table-container">
+        <table className="table" {...getTableProps()}>
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                    {column.render("Header")}{" "}
+                    <span>
+                      {column.isSorted
+                        ? column.isSortedDesc
+                          ? " ⬇️"
+                          : " ⬆️"
+                        : ""}
+                    </span>
+                    <div className="filter-wrapper">
+                      {column.canFilter ? column.render("Filter") : null}
+                    </div>
+                  </th>
+                ))}
+                <th>List of samples in the box</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>{" "}
+            ))}
+          </thead>
+
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              const samples = extractions.filter((i) => {
+                return i.box === row.original.key;
+              });
+              return (
+                <tr {...row.getRowProps()} key={row.original.key}>
+                  {row.cells.map((cell) => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
+                  })}
+                  <td className="sample-list">
+                    {samples.map((sample) => (
+                      <span className="sample">{sample.isolateCode}</span>
+                    ))}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>{" "}
+      </div>
+      <div className="controls">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </div>
       <div className="download">
         <CSVLink data={selectedFlatRows.map((i) => i.values)}>
           <div className="export">

@@ -186,7 +186,8 @@ const PcrGenomicLoci: React.FC = () => {
             className="narrow"
           />
         ),
-        Filter: DefaultFilterForColumn,
+        Filter: SelectColumnFilter,
+        filter: multiSelectFilter,
       },
       {
         Header: "Storage site",

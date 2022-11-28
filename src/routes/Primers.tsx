@@ -221,7 +221,7 @@ const Primers: React.FC = () => {
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} key={row.original.key}>
-                  <td role="cell">
+                  <td role="cell" className="remove">
                     <button onClick={() => removeItem(row.original.key)}>
                       X
                     </button>
