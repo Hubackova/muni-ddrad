@@ -250,7 +250,10 @@ const PcrPrograms: React.FC = () => {
         />
       </div>
       <div className="download">
-        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
+        <CSVLink
+          data={selectedFlatRows.map((i) => i.values)}
+          filename="pcr-programs.csv"
+        >
           <div className="export">
             <ExportIcon />
             export CSV

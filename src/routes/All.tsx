@@ -599,7 +599,10 @@ const All: React.FC = () => {
         />
       </div>
       <div className="download">
-        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
+        <CSVLink
+          data={selectedFlatRows.map((i) => i.values)}
+          filename="db-mollusca-all.csv"
+        >
           <div className="export">
             <ExportIcon />
             export CSV

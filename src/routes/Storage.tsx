@@ -178,8 +178,8 @@ const Storage: React.FC = () => {
       <div class="table-container">
         <table className="table" {...getTableProps()}>
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroups.map((headerGroup, index) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
                 {headerGroup.headers.map((column) => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                     {column.render("Header")}{" "}
@@ -232,7 +232,10 @@ const Storage: React.FC = () => {
         />
       </div>
       <div className="download">
-        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
+        <CSVLink
+          data={selectedFlatRows.map((i) => i.values)}
+          filename="storage.csv"
+        >
           <div className="export">
             <ExportIcon />
             export CSV

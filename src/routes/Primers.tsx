@@ -245,7 +245,10 @@ const Primers: React.FC = () => {
         />
       </div>
       <div className="download">
-        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
+        <CSVLink
+          data={selectedFlatRows.map((i) => i.values)}
+          filename="primers.csv"
+        >
           <div className="export">
             <ExportIcon />
             export CSV

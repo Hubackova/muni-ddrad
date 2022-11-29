@@ -204,12 +204,25 @@ form {
   background: white;
   max-width: 200px;
   margin: 8px;
+
+  &.top {
+    top: 0;
+    height: max-content;
+    padding: 8px 16px;
+  }
+
   .close {
     text-align: right;
     cursor: pointer;
   }
   div {
     white-space: normal;
+    margin-bottom: 4px;
+  }
+
+  .title {
+    text-align: center;
+    text-decoration: underline;
   }
 }
 

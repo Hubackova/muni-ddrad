@@ -4,6 +4,11 @@
   gap: 20px;
   max-width: 600px;
 
+  .row {
+    display: flex;
+    flex-direction: column;
+  }
+
   .submit-btn {
     height: 40px;
   }
@@ -37,6 +42,12 @@
         position: absolute;
         bottom: 50px;
       }
+    }
+  }
+
+  @media (min-width: 756px) {
+    .row {
+      flex-direction: row;
     }
   }
 }

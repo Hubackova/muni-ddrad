@@ -4,19 +4,19 @@ import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-  Column,
-  useFilters,
-  useGlobalFilter,
-  useRowSelect,
-  useSortBy,
-  useTable,
+    Column,
+    useFilters,
+    useGlobalFilter,
+    useRowSelect,
+    useSortBy,
+    useTable
 } from "react-table";
 import {
-  DefaultFilterForColumn,
-  GlobalFilter,
-  multiSelectFilter,
-  NumberRangeColumnFilter,
-  SelectColumnFilter,
+    DefaultFilterForColumn,
+    GlobalFilter,
+    multiSelectFilter,
+    NumberRangeColumnFilter,
+    SelectColumnFilter
 } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
@@ -401,7 +401,10 @@ const DnaExtractions: React.FC = () => {
         />
       </div>
       <div className="download">
-        <CSVLink data={selectedFlatRows.map((i) => i.values)}>
+        <CSVLink
+          data={selectedFlatRows.map((i) => i.values)}
+          filename="DNA-extractions.csv"
+        >
           <div className="export">
             <ExportIcon />
             export CSV

@@ -1,21 +1,36 @@
 .topbar {
-  height: 80px;
+  height: 160px;
   border-bottom: 1px solid grey;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
   column-gap: 20px;
+
+  .export {
+    margin: 0 auto;
+    align-self: center;
+  }
+
+  @media (min-width: 1024px) {
+    height: 80px;
+    grid-auto-flow: column;
+  }
 }
 
 .topbar-item {
-  min-width: 120px;
   text-decoration: none;
   color: darkgrey;
   text-align: center;
-
+  cursor: pointer;
+  display: inline;
   &:hover,
   &.active {
     color: black;
+  }
+
+  @media (min-width: 1024px) {
+    min-width: 120px;
   }
 }
