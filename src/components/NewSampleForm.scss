@@ -48,6 +48,10 @@
   @media (min-width: 756px) {
     .row {
       flex-direction: row;
+
+      > div {
+        width: 50%;
+      }
     }
   }
 }
