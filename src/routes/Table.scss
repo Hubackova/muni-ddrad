@@ -1,6 +1,4 @@
 .table-container {
-  overflow: auto;
-  max-height: 80vh;
 }
 
 .table {
@@ -47,7 +45,10 @@
   }
 
   tbody {
+    /*     display: block;
+    overflow: auto; */
     padding-top: 20px;
+    max-height: 20vh;
   }
 
   tr > td,
@@ -83,6 +84,7 @@
     background-color: white;
     top: 0;
     z-index: 99998;
+
     .filter-wrapper {
       margin-top: 4px;
 

@@ -26,3 +26,20 @@
     padding: 0;
   }
 }
+
+.filter-wrapper {
+  z-index: 99999999;
+
+  .filter-content {
+    position: absolute;
+    background-color: white;
+    padding: 2px;
+    border: 1px solid black;
+    width: 100%;
+
+    .filter-link {
+      cursor: pointer;
+      text-align: left;
+    }
+  }
+}

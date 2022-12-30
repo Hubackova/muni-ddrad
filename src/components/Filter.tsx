@@ -67,7 +67,8 @@ export function DefaultFilterForColumnEditable({
 
   // We'll only update the external data when the input is blurred
   const onBlur = (e: any) => {
-    if (e.target.value) editItem(row.original.key, e.target.value, cell.column.id);
+    if (e.target.value)
+      editItem(row.original.key, e.target.value, cell.column.id);
   };
 
   // If the initialValue is changed external, sync it up with our state
@@ -91,7 +92,9 @@ export function DefaultFilterForColumnEditable({
 }
 
 // Component for Custom Select Filter
-export function SelectColumnFilter({ column: { filterValue, setFilter, preFilteredRows, id } }) {
+export function SelectColumnFilter({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}) {
   // Use preFilteredRows to calculate the options
   const options = useMemo(() => {
     const options = new Set();
@@ -113,7 +116,9 @@ export function SelectColumnFilter({ column: { filterValue, setFilter, preFilter
       formatCreateLabel={(userInput) => (
         <div className="search-label">{`Search for "${userInput}"`}</div>
       )}
-      value={filterValue ? filterValue.map((i) => ({ value: i, label: i })) : ""}
+      value={
+        filterValue ? filterValue.map((i) => ({ value: i, label: i })) : ""
+      }
       onChange={(e) => {
         setFilter(e.length > 0 ? e.map((i) => i.value) : "");
       }}
@@ -154,7 +159,10 @@ export function NumberRangeColumnFilter({
         type="number"
         onChange={(e) => {
           const val = e.target.value;
-          setFilter((old = []) => [val ? parseInt(val, 10) : undefined, old[1]]);
+          setFilter((old = []) => [
+            val ? parseInt(val, 10) : undefined,
+            old[1],
+          ]);
         }}
         placeholder={`Min (${min})`}
         style={{
@@ -168,7 +176,10 @@ export function NumberRangeColumnFilter({
         type="number"
         onChange={(e) => {
           const val = e.target.value;
-          setFilter((old = []) => [old[0], val ? parseInt(val, 10) : undefined]);
+          setFilter((old = []) => [
+            old[0],
+            val ? parseInt(val, 10) : undefined,
+          ]);
         }}
         placeholder={`Max (${max})`}
         style={{
@@ -183,5 +194,123 @@ export function NumberRangeColumnFilter({
 export function multiSelectFilter(rows, columnIds, filterValue) {
   return filterValue.length === 0
     ? rows
-    : rows.filter((row) => filterValue.includes(String(row.original[columnIds])));
+    : rows.filter((row) =>
+        filterValue.includes(String(row.original[columnIds]))
+      );
+}
+function arrayRemove(arr, value) {
+  return arr.filter(function (ele) {
+    return ele !== value;
+  });
+}
+
+export function Multi({
+  column: { filterValue, setFilter, preFilteredRows, id },
+  column,
+}) {
+  const [opened, setOpened] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const options = useMemo(() => {
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id]);
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
+  const selectOptions = searchValue
+    ? options
+        .filter((i) => i.includes(searchValue))
+        .map((i) => ({ value: i, label: i }))
+    : options.map((i) => ({ value: i, label: i }));
+
+  console.log(column);
+  // UI for Multi-Select box
+  return (
+    <div className="filter-wrapper">
+      <button onClick={() => setOpened(!opened)}>🔥</button>
+      {opened && (
+        <div className="filter-content">
+          <div
+            {...column.getHeaderProps(column.getSortByToggleProps())}
+            className="filter-link"
+          >
+            {column.isSorted
+              ? column.isSortedDesc
+                ? "Unsort"
+                : "Sort Z -> A "
+              : "Sort A -> Z"}
+          </div>
+          <hr />
+          <div
+            onClick={() => setFilter(selectOptions.map((i) => i.value))}
+            className="filter-link"
+          >
+            Select all
+          </div>
+          <div onClick={() => setFilter([])} className="filter-link">
+            Unselect all
+          </div>
+          <input
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            placeholder={`Search records..`}
+          />
+
+          {selectOptions.map((i, index) => {
+            const isChecked =
+              filterValue?.length && filterValue.includes(i.value);
+
+            return (
+              <div
+                key={index}
+                className="filter-link"
+                onClick={() => {
+                  isChecked
+                    ? setFilter(arrayRemove(filterValue, i.value))
+                    : setFilter(
+                        filterValue?.length
+                          ? [...filterValue, i.value]
+                          : [i.value]
+                      );
+                }}
+              >
+                <>
+                  {isChecked ? "✅" : "⬜"} {i.value}
+                </>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+    /*       <CreatableSelect
+        options={selectOptions}
+        isSearchable={true}
+        className="select-input-filter"
+        classNamePrefix="select"
+        menuPlacement="auto"
+        isMulti
+        formatCreateLabel={(userInput) => (
+          <div className="search-label">{`Search for "${userInput}"`}</div>
+        )}
+        value={filterValue ? filterValue.map((i) => ({ value: i, label: i })) : ""}
+        onChange={(e) => {
+          setFilter(e.length > 0 ? e.map((i) => i.value) : "");
+        }}
+      /> */
+
+    /*     <select
+        value={filterValue}
+        onChange={(e) => {
+          setFilter(e.target.value || undefined);
+        }}
+      >
+        <option value="">All</option>
+        {options.map((option, i) => (
+          <option key={i} value={option}>
+            {option}
+          </option>
+        ))}
+      </select> */
+  );
 }

@@ -4,19 +4,20 @@ import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-    Column,
-    useFilters,
-    useGlobalFilter,
-    useRowSelect,
-    useSortBy,
-    useTable
+  Column,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
 } from "react-table";
 import {
-    DefaultFilterForColumn,
-    GlobalFilter,
-    multiSelectFilter,
-    NumberRangeColumnFilter,
-    SelectColumnFilter
+  DefaultFilterForColumn,
+  GlobalFilter,
+  Multi,
+  multiSelectFilter,
+  NumberRangeColumnFilter,
+  SelectColumnFilter,
 } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
@@ -86,7 +87,7 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "Species (original det.)",
         accessor: "speciesOrig",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -114,7 +115,7 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.project] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -215,7 +216,7 @@ const DnaExtractions: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -358,16 +359,16 @@ const DnaExtractions: React.FC = () => {
                 {headerGroup.headers.map((column) => {
                   return (
                     <th
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    /*   {...column.getHeaderProps(column.getSortByToggleProps())} */
                     >
                       {column.render("Header")}{" "}
-                      <span>
+                      {/*                       <span>
                         {column.isSorted
                           ? column.isSortedDesc
                             ? " ⬇️"
                             : " ⬆️"
                           : ""}
-                      </span>
+                      </span> */}
                       <div className="filter-wrapper">
                         {column.canFilter ? column.render("Filter") : null}
                       </div>
