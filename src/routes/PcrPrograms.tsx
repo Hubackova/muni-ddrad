@@ -12,12 +12,7 @@ import {
 } from "react-table";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/ConfirmModal";
-import {
-  DefaultFilterForColumn,
-  GlobalFilter,
-  multiSelectFilter,
-  SelectColumnFilter,
-} from "../components/Filter";
+import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { PcrProgramsType } from "../types";
@@ -58,60 +53,62 @@ const PcrPrograms: React.FC = () => {
       {
         Header: "Name",
         accessor: "name",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Initial Denaturation",
         accessor: "initialDenaturation",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Denaturation",
         accessor: "denaturation",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Annealing",
         accessor: "annealing",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Extension",
         accessor: "extension",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Number of cycles",
         accessor: "numberCycles",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Final Extension",
         accessor: "finalExtension",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "End (forever)",
         accessor: "end",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "PCR Product Size",
         accessor: "pcrProductSize",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Note",
         accessor: "note",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
     ],
     []

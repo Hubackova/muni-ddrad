@@ -10,13 +10,7 @@ import {
   useTable,
 } from "react-table";
 import { toast } from "react-toastify";
-import {
-  DefaultFilterForColumn,
-  GlobalFilter,
-  multiSelectFilter,
-  NumberRangeColumnFilter,
-  SelectColumnFilter,
-} from "../components/Filter";
+import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { legend } from "../constants";
@@ -114,7 +108,8 @@ const PcrGenomicLoci: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <input defaultValue={[original.isolateCode] || ""} disabled></input>
         ),
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Isolate code group",
@@ -125,14 +120,14 @@ const PcrGenomicLoci: React.FC = () => {
             disabled
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Species (original det.)",
         accessor: "speciesOrig",
         Cell: ({ row: { original } }) => <span>{original.speciesOrig}</span>,
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -145,7 +140,7 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.project] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -161,14 +156,14 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.dateIsolation] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "ng/ul",
         accessor: "ngul",
-        Filter: NumberRangeColumnFilter,
-        filter: "between",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Box name",
@@ -186,14 +181,14 @@ const PcrGenomicLoci: React.FC = () => {
             className="narrow"
           />
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Storage site",
         accessor: "storageSite",
         Cell: ({ row: { original } }) => <span>{original.storageSite}</span>,
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -214,7 +209,7 @@ const PcrGenomicLoci: React.FC = () => {
             ></input>
           );
         },
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -233,7 +228,7 @@ const PcrGenomicLoci: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -252,7 +247,7 @@ const PcrGenomicLoci: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -269,7 +264,7 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.cytB] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -286,7 +281,7 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original["16C"]] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -303,7 +298,7 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.COI] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -320,7 +315,7 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.COII] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
 
@@ -338,7 +333,7 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.ITS1] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -355,7 +350,7 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.ITS2] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -372,7 +367,7 @@ const PcrGenomicLoci: React.FC = () => {
             defaultValue={[original.ELAV] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
     ],
@@ -384,22 +379,25 @@ const PcrGenomicLoci: React.FC = () => {
       {
         Header: "note on PCR",
         accessor: "notePCR",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "note on sequencing",
         accessor: "noteSequencing",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "General Note",
         accessor: "noteGeneral",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "STATUS",
         accessor: "status",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
     ],
@@ -419,7 +417,7 @@ const PcrGenomicLoci: React.FC = () => {
           return {
             Header: i,
             accessor: i,
-            Filter: SelectColumnFilter,
+            Filter: Multi,
             filter: multiSelectFilter,
           };
         })

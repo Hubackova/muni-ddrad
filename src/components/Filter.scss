@@ -29,17 +29,35 @@
 
 .filter-wrapper {
   z-index: 99999999;
+  display: inline;
+  text-align: left;
+  font-weight: 400;
+
+  .filter-btn {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+
+    svg {
+      width: 22px;
+    }
+  }
 
   .filter-content {
+    min-width: 200px;
     position: absolute;
     background-color: white;
     padding: 2px;
     border: 1px solid black;
     width: 100%;
 
+    .normal {
+      font-weight: normal;
+      margin-top: 4px;
+    }
+
     .filter-link {
       cursor: pointer;
-      text-align: left;
     }
   }
 }

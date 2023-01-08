@@ -12,11 +12,7 @@ import {
   useTable,
 } from "react-table";
 import CreatableSelectInput from "../components/CreatableSelectInput";
-import {
-  GlobalFilter,
-  multiSelectFilter,
-  SelectColumnFilter,
-} from "../components/Filter";
+import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
@@ -83,7 +79,7 @@ const Storage: React.FC = () => {
             defaultValue={[original.box] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -104,7 +100,7 @@ const Storage: React.FC = () => {
             className="narrow"
           />
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
     ],

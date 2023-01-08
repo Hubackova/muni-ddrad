@@ -11,14 +11,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import {
-  DefaultFilterForColumn,
-  GlobalFilter,
-  Multi,
-  multiSelectFilter,
-  NumberRangeColumnFilter,
-  SelectColumnFilter,
-} from "../components/Filter";
+import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
@@ -82,7 +75,8 @@ const DnaExtractions: React.FC = () => {
       {
         Header: "Isolate code",
         accessor: "isolateCode",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Species (original det.)",
@@ -102,7 +96,7 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.speciesUpdated] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -131,6 +125,8 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.dateIsolation] || ""}
           ></input>
         ),
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "ng/ul",
@@ -142,8 +138,8 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.ngul] || ""}
           ></input>
         ),
-        Filter: NumberRangeColumnFilter,
-        filter: "between",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Box name",
@@ -161,13 +157,13 @@ const DnaExtractions: React.FC = () => {
             className="narrow"
           />
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Storage site",
         accessor: "storageSite",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -197,7 +193,7 @@ const DnaExtractions: React.FC = () => {
             className="narrow"
           />
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -235,7 +231,7 @@ const DnaExtractions: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -248,7 +244,7 @@ const DnaExtractions: React.FC = () => {
             defaultValue={[original.kit] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
 
@@ -268,7 +264,7 @@ const DnaExtractions: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
     ],

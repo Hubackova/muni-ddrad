@@ -10,13 +10,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import {
-  DefaultFilterForColumn,
-  GlobalFilter,
-  multiSelectFilter,
-  NumberRangeColumnFilter,
-  SelectColumnFilter,
-} from "../components/Filter";
+import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
@@ -87,7 +81,8 @@ const All: React.FC = () => {
         Cell: ({ row: { original } }) => (
           <input defaultValue={[original.isolateCode] || ""} disabled></input>
         ),
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Locality code",
@@ -116,7 +111,7 @@ const All: React.FC = () => {
             className="narrow"
           />
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -125,7 +120,7 @@ const All: React.FC = () => {
         Cell: ({ row: { original } }) => {
           return <span>{original.speciesOrig}</span>;
         },
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -144,7 +139,7 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -163,6 +158,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Longitude [°E]",
@@ -180,6 +177,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "State/province",
@@ -197,7 +196,7 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -216,7 +215,7 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -235,7 +234,7 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -254,8 +253,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: NumberRangeColumnFilter,
-        filter: "between",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Date collection",
@@ -273,6 +272,8 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Collector",
@@ -290,7 +291,7 @@ const All: React.FC = () => {
             disabled={original.localityCode}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -305,30 +306,31 @@ const All: React.FC = () => {
             defaultValue={[original.speciesUpdated] || ""}
           ></input>
         ),
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Project",
         accessor: "project",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Isolation date",
         accessor: "dateIsolation",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "ng/ul",
         accessor: "ngul",
-        Filter: NumberRangeColumnFilter,
-        filter: "between",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Box name",
         accessor: "box",
         Cell: ({ row: { original } }) => {
-          console.log(original);
           return (
             <SelectInput
               options={boxOptions}
@@ -345,7 +347,7 @@ const All: React.FC = () => {
             />
           );
         },
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
@@ -354,50 +356,50 @@ const All: React.FC = () => {
         Cell: ({ row: { original } }) => {
           return <span>{original?.storageSite}</span>;
         },
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "cytB",
         accessor: "cytB",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "16C",
         accessor: "16C",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "COI",
         accessor: "COI",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "COII",
         accessor: "COII",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
 
       {
         Header: "ITS1",
         accessor: "ITS1",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "ITS2",
         accessor: "ITS2",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "ELAV",
         accessor: "ELAV",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
     ],
@@ -409,22 +411,25 @@ const All: React.FC = () => {
       {
         Header: "note on PCR",
         accessor: "notePCR",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "note on sequencing",
         accessor: "noteSequencing",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "General Note",
         accessor: "noteGeneral",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "STATUS",
         accessor: "status",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
     ],
@@ -458,7 +463,7 @@ const All: React.FC = () => {
           return {
             Header: i,
             accessor: i,
-            Filter: SelectColumnFilter,
+            Filter: Multi,
             filter: multiSelectFilter,
           };
         })

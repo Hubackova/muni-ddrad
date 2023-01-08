@@ -12,13 +12,7 @@ import {
 } from "react-table";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/ConfirmModal";
-import {
-  DefaultFilterForColumn,
-  GlobalFilter,
-  multiSelectFilter,
-  NumberRangeColumnFilter,
-  SelectColumnFilter,
-} from "../components/Filter";
+import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { PrimersType } from "../types";
@@ -59,54 +53,57 @@ const Primers: React.FC = () => {
       {
         Header: "Name",
         accessor: "name",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Marker",
         accessor: "marker",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Specificity",
         accessor: "specificity",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Sequence",
         accessor: "sequence",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
 
       {
         Header: "Author",
         accessor: "author",
-        Filter: SelectColumnFilter,
+        Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Anneal T [°C]",
         accessor: "anneal",
-        Filter: NumberRangeColumnFilter,
-        filter: "between",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Length of PCR product",
         accessor: "lengthPCR",
-        Filter: NumberRangeColumnFilter,
-        filter: "between",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Work?",
         accessor: "work",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Note on use",
         accessor: "noteOnUse",
-        Filter: DefaultFilterForColumn,
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
     ],
     []

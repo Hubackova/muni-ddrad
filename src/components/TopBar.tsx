@@ -14,7 +14,6 @@ const TopBar: React.FC = () => {
       let dataStr = JSON.stringify(snapshot);
       let dataUri =
         "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-      console.log(dataStr);
       let link = document.createElement("a");
       link.download = "db-mollusca-backup.json";
       link.href = dataUri;
