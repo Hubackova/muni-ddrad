@@ -366,8 +366,8 @@ const All: React.FC = () => {
         filter: multiSelectFilter,
       },
       {
-        Header: "16C",
-        accessor: "16C",
+        Header: "16S",
+        accessor: "16S",
         Filter: Multi,
         filter: multiSelectFilter,
       },

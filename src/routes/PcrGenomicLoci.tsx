@@ -268,17 +268,17 @@ const PcrGenomicLoci: React.FC = () => {
         filter: multiSelectFilter,
       },
       {
-        Header: "16C",
-        accessor: "16C",
+        Header: "16S",
+        accessor: "16S",
         Cell: ({ row: { original } }) => (
           <input
-            onChange={(e) => (original["16C"] = e.target.value)}
+            onChange={(e) => (original["16S"] = e.target.value)}
             onBlur={(e) => {
-              editItem(original.key, e.target.value, "16C");
+              editItem(original.key, e.target.value, "16S");
               setIsPopoverOpen(false);
             }}
             onFocus={() => setIsPopoverOpen(true)}
-            defaultValue={[original["16C"]] || ""}
+            defaultValue={[original["16S"]] || ""}
           ></input>
         ),
         Filter: Multi,
