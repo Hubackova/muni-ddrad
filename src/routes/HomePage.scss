@@ -1,4 +1,23 @@
 .main-wrapper {
-  margin: 0 auto;
-  max-width: 1280px;
+  margin: 0 auto 20px;
+
+  .form-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+
+    .form-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-wrapper {
+      border: 1px solid lightblue;
+      border-radius: 24px;
+      padding: 16px;
+      height: max-content;
+    }
+  }
 }

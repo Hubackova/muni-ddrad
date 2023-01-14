@@ -12,6 +12,13 @@ export interface DnaExtractionsType {
   state: string;
   kit: string;
   localityName: string;
+  latitude: string;
+  longitude: string;
+  altitude: string;
+  habitat: string;
+  dateCollection: string;
+  collector: string;
+  isolateCodeGroup: string;
 }
 
 export interface StorageType {

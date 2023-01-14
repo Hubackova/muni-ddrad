@@ -3,9 +3,55 @@
   flex-direction: column;
   gap: 20px;
   max-width: 600px;
-  margin: 20px auto;
+
+  .row {
+    display: flex;
+    flex-direction: column;
+  }
 
   .submit-btn {
     height: 40px;
+  }
+
+  .input:disabled {
+    background-color: rgb(235, 235, 235);
+  }
+
+  .side-panel {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    z-index: 9;
+
+    .body {
+      padding: 20px;
+      height: 100vh;
+      width: 320px;
+      background: white;
+      border-left: 1px solid grey;
+      border-bottom: 1px solid grey;
+      position: relative;
+
+      .item {
+        padding: 8px;
+        text-align: left;
+        cursor: pointer;
+      }
+      .cancel-btn {
+        position: absolute;
+        bottom: 50px;
+      }
+    }
+  }
+
+  @media (min-width: 756px) {
+    .row {
+      flex-direction: row;
+
+      > div {
+        width: 50%;
+      }
+    }
   }
 }

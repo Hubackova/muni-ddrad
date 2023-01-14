@@ -9,7 +9,14 @@ export interface DefaultOptionType {
 }
 
 function CreatableSelectInput(
-  { label, error, isTransparent = false, isSearchable = false, ...props }: any,
+  {
+    label,
+    error,
+    isTransparent = false,
+    isSearchable = false,
+    isFilter = false,
+    ...props
+  }: any,
   ref: React.Ref<any>
 ) {
   return (

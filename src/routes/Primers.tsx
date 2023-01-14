@@ -2,20 +2,28 @@
 
 import { getDatabase, onValue, ref, remove, update } from "firebase/database";
 import React, { useCallback, useEffect, useState } from "react";
-import { useSortBy, useTable } from "react-table";
+import { CSVLink } from "react-csv";
+import {
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
+} from "react-table";
+import { toast } from "react-toastify";
+import ConfirmModal from "../components/ConfirmModal";
+import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
+import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
+import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { PrimersType } from "../types";
-import TextInput from "../components/TextInput";
-import { writePrimersData } from "../firebase/firebase";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
 import "./Table.scss";
 
 const Primers: React.FC = () => {
   const [primers, setPrimers] = useState<PrimersType[]>([]);
-  const db = getDatabase();
+  const [showModal, setShowModal] = useState(null);
 
   useEffect(() => {
+    const db = getDatabase();
     onValue(ref(db, "primers/"), (snapshot) => {
       const items: any = [];
       snapshot.forEach((child) => {
@@ -23,105 +31,96 @@ const Primers: React.FC = () => {
         childItem.key = child.key;
         items.push(childItem);
       });
+      console.log("useEffect load");
       setPrimers(items);
     });
-  }, [db]);
+  }, []);
 
   const removeItem = (id: string) => {
-    remove(ref(db, "primers/" + id));
+    setShowModal(id);
   };
 
-  const editItem = useCallback(
-    (key: string, newValue: string, id: string) => {
-      console.log(newValue, id);
-      update(ref(db, "primers/" + key), {
-        [id]: newValue,
-      });
-    },
-    [db]
-  );
+  const editItem = useCallback((key: string, newValue: string, id: string) => {
+    const db = getDatabase();
+    update(ref(db, "primers/" + key), {
+      [id]: newValue,
+    });
+  }, []);
 
-  const schema = yup
-    .object({
-      name: yup.string().required(),
-      sequence: yup.string().required(),
-    })
-    .required();
-
-  const customColumns = React.useMemo(
+  const columns = React.useMemo(
     () => [
       {
         Header: "Name",
         accessor: "name",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Marker",
         accessor: "marker",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Specificity",
         accessor: "specificity",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Sequence",
         accessor: "sequence",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
 
       {
         Header: "Author",
         accessor: "author",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Anneal T [°C]",
         accessor: "anneal",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Length of PCR product",
         accessor: "lengthPCR",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Work?",
         accessor: "work",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
       {
         Header: "Note on use",
         accessor: "noteOnUse",
+        Filter: Multi,
+        filter: multiSelectFilter,
       },
     ],
     []
   );
 
-  const getColumnsAccessor = useCallback(
-    (fbData) => {
-      if (!fbData || !fbData.length) return [];
-      const customKeys = customColumns.map((i) => i.accessor);
-      const fbKeys = Object.keys(fbData[0]);
-
-      return fbKeys
-        .map((i) => {
-          if (customKeys.includes(i)) return null;
-          return {
-            Header: i,
-            accessor: i,
-          };
-        })
-        .filter((i) => i && i.accessor !== "key");
-    },
-    [customColumns]
-  );
-
-  const columns = React.useMemo(
-    () => [...customColumns, ...getColumnsAccessor(primers)],
-    [customColumns, primers, getColumnsAccessor]
-  );
-
-  const EditableCell: React.FC<any> = ({ value: initialValue, row, cell, column: { id } }) => {
+  const EditableCell: React.FC<any> = ({
+    value: initialValue,
+    row,
+    cell,
+    column: { id },
+  }) => {
     const [value, setValue] = React.useState(initialValue);
     const onChange = (e: any) => {
       setValue(e.target.value);
     };
     const onBlur = (e: any) => {
-      if (e.target.value) editItem(row.original.key, e.target.value, cell.column.id);
+      if (e.target.value)
+        editItem(row.original.key, e.target.value, cell.column.id);
     };
     React.useEffect(() => {
       setValue(initialValue);
@@ -129,125 +128,133 @@ const Primers: React.FC = () => {
     return <input value={value} onChange={onChange} onBlur={onBlur} />;
   };
 
-  const defaultColumn = {
-    Cell: EditableCell,
-  };
-
-  const tableInstance = useTable({ columns, data: primers, defaultColumn }, useSortBy);
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
-
-  const addItem = (data: any) => {
-    writePrimersData(data);
-  };
-
+  const tableInstance = useTable(
+    {
+      columns,
+      data: primers,
+      defaultColumn: { Cell: EditableCell, Filter: () => {} },
+    },
+    useGlobalFilter,
+    useFilters,
+    useSortBy,
+    useRowSelect,
+    (hooks) => {
+      hooks.visibleColumns.push((columns) => [
+        // Let's make a column for selection
+        {
+          id: "selection",
+          // The header can use the table's getToggleAllRowsSelectedProps method
+          // to render a checkbox
+          Header: ({ getToggleAllRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+            </div>
+          ),
+          // The cell can use the individual row's getToggleRowSelectedProps method
+          // to the render a checkbox
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...columns,
+      ]);
+    }
+  );
   const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm<PrimersType>({
-    resolver: yupResolver(schema),
-  });
-
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    state,
+    rows,
+    setGlobalFilter,
+    preGlobalFilteredRows,
+    selectedFlatRows,
+    prepareRow,
+  } = tableInstance;
+  console.log("primers comp load");
   return (
     <>
-      <table className="table" {...getTableProps()}>
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              <th>Remove</th>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render("Header")}
-                  {/* Add a sort direction indicator */}
-                  <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()} key={row.original.key}>
-                <td role="cell">
-                  <button onClick={() => removeItem(row.original.key)}>X</button>
-                </td>
-                {row.cells.map((cell) => {
-                  return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-                })}
+      <div className="controls">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="primers.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+        </div>
+      </div>
+      <div className="table-container">
+        {showModal && (
+          <ConfirmModal
+            title="Do you want to continue?"
+            onConfirm={() => {
+              setShowModal(null);
+              remove(ref(db, "primers/" + showModal));
+              toast.success("Primer was removed successfully");
+            }}
+            onHide={() => setShowModal(null)}
+          />
+        )}
+        <table className="table pcr" {...getTableProps()}>
+          <thead>
+            {headerGroups.map((headerGroup, index) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                <th></th>
+                {headerGroup.headers.map((column) => (
+                  <th key={column.id}>
+                    <span
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    >
+                      {column.render("Header")}
+                      <span>
+                        {column.isSorted
+                          ? column.isSortedDesc
+                            ? " ⬇️"
+                            : " ⬆️"
+                          : ""}
+                      </span>
+                    </span>
+                    <div className="filter-wrapper">
+                      {column.canFilter ? column.render("Filter") : null}
+                    </div>
+                  </th>
+                ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
 
-      <form className="form" onSubmit={handleSubmit(addItem)}>
-        <div className="row">
-          <TextInput label="Name" name="name" error={errors.name?.message} register={register} />
-          <TextInput
-            label="Country"
-            name="country"
-            error={errors.country?.message}
-            register={register}
-          />
-        </div>
-        <div className="row">
-          <TextInput
-            label="Marker"
-            name="marker"
-            error={errors.marker?.message}
-            register={register}
-          />
-          <TextInput
-            label="Specificity"
-            name="specificity"
-            error={errors.specificity?.message}
-            register={register}
-          />
-        </div>
-        <div className="row">
-          <TextInput
-            label="Sequence"
-            name="sequence"
-            error={errors.sequence?.message}
-            register={register}
-          />
-          <TextInput
-            label="Author"
-            name="author"
-            error={errors.author?.message}
-            register={register}
-          />
-        </div>
-        <div className="row">
-          <TextInput
-            label="Anneal T [°C]"
-            name="anneal"
-            error={errors.anneal?.message}
-            register={register}
-          />
-          <TextInput
-            label="Length of PCR product"
-            name="lengthPCR"
-            error={errors.lengthPCR?.message}
-            register={register}
-          />
-        </div>
-        <div className="row">
-          <TextInput label="Work?" name="work" error={errors.work?.message} register={register} />
-          <TextInput
-            label="Note on use"
-            name="noteOnUse"
-            error={errors.noteOnUse?.message}
-            register={register}
-          />
-        </div>
-        <button className="submit-btn" type="submit">
-          Save
-        </button>
-      </form>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()} key={row.original.key}>
+                  <td role="cell" className="remove">
+                    <button onClick={() => removeItem(row.original.key)}>
+                      X
+                    </button>
+                  </td>
+                  {row.cells.map((cell) => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };
