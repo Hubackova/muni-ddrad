@@ -15,6 +15,7 @@ import Primers from "./routes/Primers";
 import Storage from "./routes/Storage";
 
 const App: React.FC = () => {
+  console.log("app load");
   return (
     <div>
       <TopBar />

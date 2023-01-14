@@ -21,9 +21,9 @@ import "./Table.scss";
 const Primers: React.FC = () => {
   const [primers, setPrimers] = useState<PrimersType[]>([]);
   const [showModal, setShowModal] = useState(null);
-  const db = getDatabase();
 
   useEffect(() => {
+    const db = getDatabase();
     onValue(ref(db, "primers/"), (snapshot) => {
       const items: any = [];
       snapshot.forEach((child) => {
@@ -31,22 +31,21 @@ const Primers: React.FC = () => {
         childItem.key = child.key;
         items.push(childItem);
       });
+      console.log("load");
       setPrimers(items);
     });
-  }, [db]);
+  }, []);
 
   const removeItem = (id: string) => {
     setShowModal(id);
   };
 
-  const editItem = useCallback(
-    (key: string, newValue: string, id: string) => {
-      update(ref(db, "primers/" + key), {
-        [id]: newValue,
-      });
-    },
-    [db]
-  );
+  const editItem = useCallback((key: string, newValue: string, id: string) => {
+    const db = getDatabase();
+    update(ref(db, "primers/" + key), {
+      [id]: newValue,
+    });
+  }, []);
 
   const columns = React.useMemo(
     () => [
@@ -195,7 +194,7 @@ const Primers: React.FC = () => {
           </CSVLink>
         </div>
       </div>
-      <div class="table-container">
+      <div className="table-container">
         {showModal && (
           <ConfirmModal
             title="Do you want to continue?"
@@ -209,11 +208,11 @@ const Primers: React.FC = () => {
         )}
         <table className="table pcr" {...getTableProps()}>
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroups.map((headerGroup, index) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
                 <th></th>
                 {headerGroup.headers.map((column) => (
-                  <th>
+                  <th key={column.id}>
                     <span
                       {...column.getHeaderProps(column.getSortByToggleProps())}
                     >
