@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import TextInput from "../components/TextInput";
+import { backup } from "../content/primers";
 import { writePrimersData } from "../firebase/firebase";
 import { PrimersType } from "../types";
 
@@ -28,6 +29,11 @@ const NewPrimerForm: React.FC = () => {
     toast.success("Primer was added successfully");
   };
 
+  const addItemsBackup = () => {
+    backup.forEach((i: any) => writePrimersData(i));
+    toast.success("ok");
+  };
+
   const {
     register,
     formState: { errors },
@@ -47,7 +53,9 @@ const NewPrimerForm: React.FC = () => {
           error={errors.name?.message}
           register={register}
           required="This field is required"
-          validate={() => !primersNames.includes(getValues("name")) || "Duplicate name"}
+          validate={() =>
+            !primersNames.includes(getValues("name")) || "Duplicate name"
+          }
         />
         <TextInput
           label="Country"
@@ -100,7 +108,12 @@ const NewPrimerForm: React.FC = () => {
         />
       </div>
       <div className="row">
-        <TextInput label="Work?" name="work" error={errors.work?.message} register={register} />
+        <TextInput
+          label="Work?"
+          name="work"
+          error={errors.work?.message}
+          register={register}
+        />
         <TextInput
           label="Note on use"
           name="noteOnUse"
@@ -111,6 +124,13 @@ const NewPrimerForm: React.FC = () => {
       <button className="submit-btn" type="submit">
         Save
       </button>
+      {/*       <button
+        className="submit-btn"
+        type="button"
+        onClick={() => addItemsBackup()}
+      >
+        Backup
+      </button> */}
     </form>
   );
 };

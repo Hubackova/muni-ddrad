@@ -501,6 +501,39 @@ const PcrGenomicLoci: React.FC = () => {
 
   return (
     <>
+      <div className="controls">
+        <div className="add-new">
+          <input
+            value={newColumn}
+            onChange={(e) => setNewColumn(e.target.value)}
+            placeholder="New column name"
+          />
+          <button onClick={() => addColumn(newColumn)}>Add</button>
+        </div>
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="PCR-genomic-loci.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+          <div
+            className="legend"
+            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          >
+            <InfoIcon />
+            {isPopoverOpen ? "hide legend" : "show legend"}
+          </div>
+        </div>
+      </div>
       <div class="table-container">
         <table className="table" {...getTableProps()}>
           <thead>
@@ -508,16 +541,20 @@ const PcrGenomicLoci: React.FC = () => {
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => {
                   return (
-                    <th
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
-                    >
-                      {column.render("Header")}{" "}
-                      <span>
-                        {column.isSorted
-                          ? column.isSortedDesc
-                            ? " ⬇️"
-                            : " ⬆️"
-                          : ""}
+                    <th>
+                      <span
+                        {...column.getHeaderProps(
+                          column.getSortByToggleProps()
+                        )}
+                      >
+                        {column.render("Header")}
+                        <span>
+                          {column.isSorted
+                            ? column.isSortedDesc
+                              ? " ⬇️"
+                              : " ⬆️"
+                            : ""}
+                        </span>
                       </span>
                       <div className="filter-wrapper">
                         {column.canFilter ? column.render("Filter") : null}
@@ -553,39 +590,6 @@ const PcrGenomicLoci: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
-
-      <div className="controls">
-        <div className="add-new">
-          <input
-            value={newColumn}
-            onChange={(e) => setNewColumn(e.target.value)}
-          />
-          <button onClick={() => addColumn(newColumn)}>Add new column</button>
-        </div>
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-      </div>
-      <div className="download">
-        <CSVLink
-          data={selectedFlatRows.map((i) => i.values)}
-          filename="PCR-genomic-loci.csv"
-        >
-          <div className="export">
-            <ExportIcon />
-            export CSV
-          </div>
-        </CSVLink>
-        <div
-          className="legend"
-          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-        >
-          <InfoIcon />
-          {isPopoverOpen ? "hide legend" : "show legend"}
-        </div>
       </div>
     </>
   );

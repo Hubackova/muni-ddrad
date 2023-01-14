@@ -16,14 +16,13 @@ export function GlobalFilter({ globalFilter, setGlobalFilter }) {
 
   return (
     <div>
-      <span>Search Table: </span>
       <input
         value={value || ""}
         onChange={(e) => {
           setValue(e.target.value);
           onChange(e.target.value);
         }}
-        placeholder=" Enter value "
+        placeholder="Search Table:"
       />
     </div>
   );

@@ -182,6 +182,24 @@ const PcrPrograms: React.FC = () => {
 
   return (
     <>
+      <div className="controls">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="pcr-programs.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+        </div>
+      </div>
       <div class="table-container">
         {showModal && (
           <ConfirmModal
@@ -200,14 +218,18 @@ const PcrPrograms: React.FC = () => {
               <tr {...headerGroup.getHeaderGroupProps()}>
                 <th></th>
                 {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                    {column.render("Header")}{" "}
-                    <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? " ⬇️"
-                          : " ⬆️"
-                        : ""}
+                  <th>
+                    <span
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    >
+                      {column.render("Header")}
+                      <span>
+                        {column.isSorted
+                          ? column.isSortedDesc
+                            ? " ⬇️"
+                            : " ⬆️"
+                          : ""}
+                      </span>
                     </span>
                     <div className="filter-wrapper">
                       {column.canFilter ? column.render("Filter") : null}
@@ -238,24 +260,6 @@ const PcrPrograms: React.FC = () => {
             })}
           </tbody>
         </table>
-      </div>
-      <div className="controls">
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-      </div>
-      <div className="download">
-        <CSVLink
-          data={selectedFlatRows.map((i) => i.values)}
-          filename="pcr-programs.csv"
-        >
-          <div className="export">
-            <ExportIcon />
-            export CSV
-          </div>
-        </CSVLink>
       </div>
     </>
   );

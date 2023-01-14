@@ -1,20 +1,12 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import * as yup from "yup";
 import CreatableSelectInput from "../components/CreatableSelectInput";
 import TextInput from "../components/TextInput";
+import { backup } from "../content/storage";
 import { writeStorageData } from "../firebase/firebase";
 import { StorageType } from "../types";
-
-const schema = yup
-  .object({
-    box: yup.string().required(),
-    storageSite: yup.string().required(),
-  })
-  .required();
 
 const NewStorageForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
@@ -51,14 +43,18 @@ const NewStorageForm: React.FC = () => {
     toast.success("Box was added successfully");
   };
 
+  const addItemsBackup = () => {
+    backup.forEach((i: any) => writeStorageData(i));
+    toast.success("ok");
+  };
+
   const {
     register,
     formState: { errors },
     handleSubmit,
     control,
-    setError,
   } = useForm<StorageType>({
-    resolver: yupResolver(schema),
+    mode: "all",
   });
   const boxes = storage.map((i) => i.box);
   return (
@@ -70,13 +66,10 @@ const NewStorageForm: React.FC = () => {
           name="box"
           error={errors.box?.message}
           register={register}
-          onBlur={(e: any) => {
-            if (boxes.includes(e.target.value))
-              setError("box", {
-                type: "custom",
-                message: "Duplicate box",
-              });
+          validate={(e: any) => {
+            return !boxes.includes(e) || "Duplicate box";
           }}
+          required="This field is required"
         />
         <Controller
           render={({ field: { onChange, value } }) => (
@@ -89,6 +82,7 @@ const NewStorageForm: React.FC = () => {
               label="Storage site"
               error={errors.storageSite?.message}
               isSearchable
+              required="This field is required"
             />
           )}
           control={control}
@@ -98,6 +92,13 @@ const NewStorageForm: React.FC = () => {
       <button className="submit-btn" type="submit">
         Save
       </button>
+      {/*       <button
+        className="submit-btn"
+        type="button"
+        onClick={() => addItemsBackup()}
+      >
+        Backup
+      </button> */}
     </form>
   );
 };

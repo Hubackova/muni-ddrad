@@ -4,9 +4,16 @@ export const getLocalityOptions = (extractions: DnaExtractionsType[]) => {
   const localityOpt = !extractions.length
     ? []
     : Object.values(
-        extractions.reduce((acc, cur) => Object.assign(acc, { [cur.localityCode]: cur }), {})
+        extractions.reduce(
+          (acc, cur) => Object.assign(acc, { [cur.localityCode]: cur }),
+          {}
+        )
       )
-        .sort((a: any, b: any) => a.localityCode && a.localityCode.localeCompare(b.localityCode))
+        .sort(
+          (a: any, b: any) =>
+            a.localityCode &&
+            a.localityCode.toString().localeCompare(b.localityCode.toString())
+        )
         .map((i: any) => ({
           value: i.localityCode,
           label: i.localityCode,

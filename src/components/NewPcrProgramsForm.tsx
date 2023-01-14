@@ -1,12 +1,11 @@
 // @ts-nocheck
 
-import { yupResolver } from "@hookform/resolvers/yup";
 import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import * as yup from "yup";
 import TextInput from "../components/TextInput";
+import { backup } from "../content/pcrprograms";
 import { writePcrProgramsData } from "../firebase/firebase";
 import { PcrProgramsType } from "../types";
 
@@ -26,31 +25,22 @@ const NewPcrProgramsForm: React.FC = () => {
     });
   }, [db]);
 
-  const schema = yup
-    .object({
-      name: yup.string().required(),
-      initialDenaturation: yup.string().required(),
-      denaturation: yup.string().required(),
-      annealing: yup.string().required(),
-      extension: yup.string().required(),
-      numberCycles: yup.string().required(),
-      finalExtension: yup.string().required(),
-      end: yup.string().required(),
-    })
-    .required();
-
   const addItem = (data: any) => {
     writePcrProgramsData(data);
     toast.success("Pcr-Program was added successfully");
+  };
+
+  const addItemsBackup = () => {
+    backup.forEach((i: any) => writePcrProgramsData(i));
+    toast.success("ok");
   };
 
   const {
     register,
     formState: { errors },
     handleSubmit,
-    setError,
   } = useForm<PcrProgramsType>({
-    resolver: yupResolver(schema),
+    mode: "all",
   });
   const names = pcrPrograms.map((i) => i.name);
   return (
@@ -62,19 +52,17 @@ const NewPcrProgramsForm: React.FC = () => {
           name="name"
           error={errors.name?.message}
           register={register}
-          onBlur={(e: any) => {
-            if (names.includes(e.target.value))
-              setError("name", {
-                type: "custom",
-                message: "Duplicate name",
-              });
+          validate={(e: any) => {
+            return !names.includes(e) || "Duplicate name";
           }}
+          required="This field is required"
         />
         <TextInput
           label="Initial Denaturation"
           name="initialDenaturation"
           error={errors.initialDenaturation?.message}
           register={register}
+          required="This field is required"
         />
       </div>
       <div className="row">
@@ -83,12 +71,14 @@ const NewPcrProgramsForm: React.FC = () => {
           name="denaturation"
           error={errors.denaturation?.message}
           register={register}
+          required="This field is required"
         />
         <TextInput
           label="Annealing"
           name="annealing"
           error={errors.annealing?.message}
           register={register}
+          required="This field is required"
         />
       </div>
       <div className="row">
@@ -97,12 +87,14 @@ const NewPcrProgramsForm: React.FC = () => {
           name="extension"
           error={errors.extension?.message}
           register={register}
+          required="This field is required"
         />
         <TextInput
           label="Number of cycles"
           name="numberCycles"
           error={errors.numberCycles?.message}
           register={register}
+          required="This field is required"
         />
       </div>
       <div className="row">
@@ -111,12 +103,14 @@ const NewPcrProgramsForm: React.FC = () => {
           name="finalExtension"
           error={errors.finalExtension?.message}
           register={register}
+          required="This field is required"
         />
         <TextInput
           label="End (forever)"
           name="end"
           error={errors.end?.message}
           register={register}
+          required="This field is required"
         />
       </div>
       <div className="row">
@@ -136,6 +130,13 @@ const NewPcrProgramsForm: React.FC = () => {
       <button className="submit-btn" type="submit">
         Save
       </button>
+      {/*       <button
+        className="submit-btn"
+        type="button"
+        onClick={() => addItemsBackup()}
+      >
+        Backup
+      </button> */}
     </form>
   );
 };

@@ -347,6 +347,24 @@ const DnaExtractions: React.FC = () => {
   } = tableInstance;
   return (
     <>
+      <div className="controls">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="DNA-extractions.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+        </div>
+      </div>
       <div class="table-container">
         <table className="table" {...getTableProps()}>
           <thead>
@@ -354,17 +372,21 @@ const DnaExtractions: React.FC = () => {
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => {
                   return (
-                    <th
-                    /*   {...column.getHeaderProps(column.getSortByToggleProps())} */
-                    >
-                      {column.render("Header")}{" "}
-                      {/*                       <span>
-                        {column.isSorted
-                          ? column.isSortedDesc
-                            ? " ⬇️"
-                            : " ⬆️"
-                          : ""}
-                      </span> */}
+                    <th>
+                      <span
+                        {...column.getHeaderProps(
+                          column.getSortByToggleProps()
+                        )}
+                      >
+                        {column.render("Header")}
+                        <span>
+                          {column.isSorted
+                            ? column.isSortedDesc
+                              ? " ⬇️"
+                              : " ⬆️"
+                            : ""}
+                        </span>
+                      </span>
                       <div className="filter-wrapper">
                         {column.canFilter ? column.render("Filter") : null}
                       </div>
@@ -389,24 +411,6 @@ const DnaExtractions: React.FC = () => {
             })}
           </tbody>
         </table>
-      </div>
-      <div className="controls">
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-      </div>
-      <div className="download">
-        <CSVLink
-          data={selectedFlatRows.map((i) => i.values)}
-          filename="DNA-extractions.csv"
-        >
-          <div className="export">
-            <ExportIcon />
-            export CSV
-          </div>
-        </CSVLink>
       </div>
     </>
   );

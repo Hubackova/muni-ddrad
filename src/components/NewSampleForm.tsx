@@ -1,8 +1,10 @@
 import { getDatabase, onValue, ref } from "firebase/database";
-import React, { useEffect, useState, useMemo } from "react";
+import moment from "moment";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import CreatableSelectInput from "../components/CreatableSelectInput";
+import { backup } from "../content/all";
 import { writeExtractionData } from "../firebase/firebase";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { DnaExtractionsType, StorageType } from "../types";
@@ -58,6 +60,22 @@ const NewSampleForm: React.FC = () => {
     toast.success("Sample was added successfully");
   };
 
+  const addItemsBackup = () => {
+    backup.forEach((i: any) =>
+      writeExtractionData({
+        ...i,
+        dateCollection: moment(i.dateCollection, "DD.MM.YYYY").format(
+          "YYYY-MM-DD"
+        ),
+        dateIsolation: moment(i.dateIsolation, "DD.MM.YYYY").format(
+          "YYYY-MM-DD"
+        ),
+        isolateCode: i.isolateCode.toString(),
+      })
+    );
+    toast.success("ok");
+  };
+
   const {
     register,
     control,
@@ -111,7 +129,10 @@ const NewSampleForm: React.FC = () => {
   const speciesOptions = useMemo(
     () =>
       Object.values(
-        extractions.reduce((acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }), {})
+        extractions.reduce(
+          (acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }),
+          {}
+        )
       ).map((i: any) => ({
         value: i.speciesOrig,
         label: i.speciesOrig,
@@ -120,7 +141,10 @@ const NewSampleForm: React.FC = () => {
   );
 
   const codeItems = Object.values(
-    extractions.reduce((acc, cur) => Object.assign(acc, { [cur.isolateCode]: cur }), {})
+    extractions.reduce(
+      (acc, cur) => Object.assign(acc, { [cur.isolateCode]: cur }),
+      {}
+    )
   )
     .sort((a: any, b: any) => a.isolateCode.localeCompare(b.isolateCode))
     .map((i: any, index) => (
@@ -174,13 +198,18 @@ const NewSampleForm: React.FC = () => {
             error={errors.isolateCode?.message}
             register={register}
             required="This field is required"
-            validate={() => !isCodes.includes(getValues("isolateCode")) || "Duplicate isolateCode"}
+            validate={() =>
+              !isCodes.includes(getValues("isolateCode")) ||
+              "Duplicate isolateCode"
+            }
           />
           <div>
             <button type="button" onClick={() => setShowModalCode(true)}>
               Show isolate codes
             </button>
-            {watch("isolateCodeGroup") && <span>{`(${watch("isolateCodeGroup")})`}</span>}
+            {watch("isolateCodeGroup") && (
+              <span>{`(${watch("isolateCodeGroup")})`}</span>
+            )}
             {showModalCode && (
               <div className="side-panel">
                 <div className="body">
@@ -234,7 +263,12 @@ const NewSampleForm: React.FC = () => {
         />
       </div>
       <div className="row">
-        <TextInput label="ng/ul" name="ngul" error={errors.ngul?.message} register={register} />
+        <TextInput
+          label="ng/ul"
+          name="ngul"
+          error={errors.ngul?.message}
+          register={register}
+        />
         <TextInput
           label="Kit"
           name="kit"
@@ -424,6 +458,13 @@ const NewSampleForm: React.FC = () => {
       <div className="row"></div>
       <button className="submit-btn" type="submit">
         Save
+      </button>
+      <button
+        className="submit-btn"
+        type="button"
+        onClick={() => addItemsBackup()}
+      >
+        Backup
       </button>
     </form>
   );
