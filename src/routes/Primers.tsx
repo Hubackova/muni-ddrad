@@ -31,7 +31,7 @@ const Primers: React.FC = () => {
         childItem.key = child.key;
         items.push(childItem);
       });
-      console.log("load");
+      console.log("useEffect load");
       setPrimers(items);
     });
   }, []);
@@ -173,7 +173,7 @@ const Primers: React.FC = () => {
     selectedFlatRows,
     prepareRow,
   } = tableInstance;
-
+  console.log("primers comp load");
   return (
     <>
       <div className="controls">
