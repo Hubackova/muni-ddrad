@@ -564,13 +564,13 @@ const All: React.FC = () => {
         />
       </div>
 
-      <div class="table-container">
+      <div className="table-container">
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th>
+                  <th key={column.id}>
                     <span
                       {...column.getHeaderProps(column.getSortByToggleProps())}
                     >

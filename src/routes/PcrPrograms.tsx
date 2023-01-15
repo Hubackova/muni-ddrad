@@ -200,7 +200,7 @@ const PcrPrograms: React.FC = () => {
           </CSVLink>
         </div>
       </div>
-      <div class="table-container">
+      <div className="table-container">
         {showModal && (
           <ConfirmModal
             title="Do you want to continue?"
@@ -218,7 +218,7 @@ const PcrPrograms: React.FC = () => {
               <tr {...headerGroup.getHeaderGroupProps()}>
                 <th></th>
                 {headerGroup.headers.map((column) => (
-                  <th>
+                  <th key={column.id}>
                     <span
                       {...column.getHeaderProps(column.getSortByToggleProps())}
                     >

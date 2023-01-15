@@ -365,14 +365,14 @@ const DnaExtractions: React.FC = () => {
           </CSVLink>
         </div>
       </div>
-      <div class="table-container">
+      <div className="table-container">
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => {
                   return (
-                    <th>
+                    <th key={column.id}>
                       <span
                         {...column.getHeaderProps(
                           column.getSortByToggleProps()

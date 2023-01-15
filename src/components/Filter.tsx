@@ -320,13 +320,13 @@ export function Multi({
             onChange={(e) => setSearchValue(e.target.value)}
             placeholder={`Search records..`}
           />
-          {selectOptions.map((i, index) => {
+          {selectOptions.map((i) => {
             const isChecked =
               filterValue?.length && filterValue.includes(i.value);
 
             return (
               <div
-                key={index}
+                key={i.value}
                 className="filter-link"
                 onClick={() => {
                   isChecked

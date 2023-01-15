@@ -36,9 +36,9 @@ const Primers: React.FC = () => {
     });
   }, []);
 
-  const removeItem = (id: string) => {
+  const removeItem = useCallback((id: string) => {
     setShowModal(id);
-  };
+  }, []);
 
   const editItem = useCallback((key: string, newValue: string, id: string) => {
     const db = getDatabase();
@@ -108,25 +108,22 @@ const Primers: React.FC = () => {
     []
   );
 
-  const EditableCell: React.FC<any> = ({
-    value: initialValue,
-    row,
-    cell,
-    column: { id },
-  }) => {
-    const [value, setValue] = React.useState(initialValue);
-    const onChange = (e: any) => {
-      setValue(e.target.value);
-    };
-    const onBlur = (e: any) => {
-      if (e.target.value)
-        editItem(row.original.key, e.target.value, cell.column.id);
-    };
-    React.useEffect(() => {
-      setValue(initialValue);
-    }, [initialValue]);
-    return <input value={value} onChange={onChange} onBlur={onBlur} />;
-  };
+  const EditableCell = React.memo<React.FC<any>>(
+    ({ value: initialValue, row, cell, column: { id } }) => {
+      const [value, setValue] = React.useState(initialValue);
+      const onChange = (e: any) => {
+        setValue(e.target.value);
+      };
+      const onBlur = (e: any) => {
+        if (e.target.value)
+          editItem(row.original.key, e.target.value, cell.column.id);
+      };
+      React.useEffect(() => {
+        setValue(initialValue);
+      }, [initialValue]);
+      return <input value={value} onChange={onChange} onBlur={onBlur} />;
+    }
+  );
 
   const tableInstance = useTable(
     {
@@ -173,7 +170,7 @@ const Primers: React.FC = () => {
     selectedFlatRows,
     prepareRow,
   } = tableInstance;
-  console.log("primers comp load");
+  if (!primers) return <div>loading...</div>;
   return (
     <>
       <div className="controls">
