@@ -17,7 +17,6 @@ import SelectInput from "../components/SelectInput";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
-import "./Table.scss";
 
 const DnaExtractions: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);

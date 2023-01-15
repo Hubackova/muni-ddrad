@@ -16,7 +16,6 @@ import SelectInput from "../components/SelectInput";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { LocationType } from "../types";
-import "./Table.scss";
 
 const All: React.FC = () => {
   const [extractions, setExtractions] = useState<LocationType[]>([]);

@@ -16,7 +16,6 @@ import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
-import "./Table.scss";
 
 const Storage: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);

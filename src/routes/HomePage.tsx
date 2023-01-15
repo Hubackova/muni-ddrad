@@ -4,6 +4,7 @@ import NewPrimerForm from "../components/NewPrimerForm";
 import NewSampleForm from "../components/NewSampleForm";
 import NewStorageForm from "../components/NewStorageForm";
 import "./HomePage.scss";
+import "./Table.scss";
 
 const HomePage: React.FC = () => {
   return (

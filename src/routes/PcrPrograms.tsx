@@ -16,7 +16,6 @@ import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { PcrProgramsType } from "../types";
-import "./Table.scss";
 
 const PcrPrograms: React.FC = () => {
   const [pcrPrograms, setPcrPrograms] = useState<PcrProgramsType[]>([]);

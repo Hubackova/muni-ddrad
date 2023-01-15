@@ -17,7 +17,6 @@ import { legend } from "../constants";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { ReactComponent as InfoIcon } from "../images/info.svg";
 import { DnaExtractionsType, StorageType } from "../types";
-import "./Table.scss";
 
 const PcrGenomicLoci: React.FC = () => {
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);

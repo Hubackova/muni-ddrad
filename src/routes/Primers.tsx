@@ -16,7 +16,6 @@ import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { PrimersType } from "../types";
-import "./Table.scss";
 
 const Primers: React.FC = () => {
   const [primers, setPrimers] = useState<PrimersType[]>([]);
