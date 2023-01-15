@@ -538,40 +538,13 @@ const PcrGenomicLoci: React.FC = () => {
 
   return (
     <>
-      <div className="controls">
-        <div className="add-new">
-          <input
-            value={newColumn}
-            onChange={(e) => setNewColumn(e.target.value)}
-            placeholder="New column name"
-          />
-          <button onClick={() => addColumn(newColumn)}>Add</button>
-        </div>
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-        <div className="download">
-          <CSVLink
-            data={selectedFlatRows.map((i) => i.values)}
-            filename="PCR-genomic-loci.csv"
-          >
-            <div className="export">
-              <ExportIcon />
-              export CSV
-            </div>
-          </CSVLink>
-          <div
-            className="legend"
-            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-          >
-            <InfoIcon />
-            {isPopoverOpen ? "hide legend" : "show legend"}
-          </div>
-        </div>
-      </div>
-      <div className="table-container">
+      <div
+        className="table-container"
+        style={{
+          height: `80vh`,
+          overflow: "auto",
+        }}
+      >
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
@@ -632,6 +605,39 @@ const PcrGenomicLoci: React.FC = () => {
             ))}
           </div>
         )}
+      </div>
+      <div className="controls">
+        <div className="add-new">
+          <input
+            value={newColumn}
+            onChange={(e) => setNewColumn(e.target.value)}
+            placeholder="New column name"
+          />
+          <button onClick={() => addColumn(newColumn)}>Add</button>
+        </div>
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="PCR-genomic-loci.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+          <div
+            className="legend"
+            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          >
+            <InfoIcon />
+            {isPopoverOpen ? "hide legend" : "show legend"}
+          </div>
+        </div>
       </div>
     </>
   );

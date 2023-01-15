@@ -158,25 +158,13 @@ const Storage: React.FC = () => {
 
   return (
     <>
-      <div className="controls">
-        <div className="download">
-          <CSVLink
-            data={selectedFlatRows.map((i) => i.values)}
-            filename="storage.csv"
-          >
-            <div className="export">
-              <ExportIcon />
-              export CSV
-            </div>
-          </CSVLink>
-        </div>
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-      </div>
-      <div className="table-container">
+      <div
+        className="table-container"
+        style={{
+          height: `80vh`,
+          overflow: "auto",
+        }}
+      >
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
@@ -235,6 +223,24 @@ const Storage: React.FC = () => {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="controls">
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="storage.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+        </div>
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
       </div>
     </>
   );

@@ -172,25 +172,13 @@ const Primers: React.FC = () => {
   if (!primers) return <div>loading...</div>;
   return (
     <>
-      <div className="controls">
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-        <div className="download">
-          <CSVLink
-            data={selectedFlatRows.map((i) => i.values)}
-            filename="primers.csv"
-          >
-            <div className="export">
-              <ExportIcon />
-              export CSV
-            </div>
-          </CSVLink>
-        </div>
-      </div>
-      <div className="table-container">
+      <div
+        className="table-container"
+        style={{
+          height: `80vh`,
+          overflow: "auto",
+        }}
+      >
         {showModal && (
           <ConfirmModal
             title="Do you want to continue?"
@@ -250,6 +238,24 @@ const Primers: React.FC = () => {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="controls">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="primers.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+        </div>
       </div>
     </>
   );

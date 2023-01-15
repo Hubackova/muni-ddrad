@@ -17,7 +17,12 @@ import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { LocationType } from "../types";
 
-const All: React.FC = () => {
+interface DnaExtractionsProps {
+  storage: StorageType[];
+  extractions: DnaExtractionsType[];
+}
+
+const All: React.FC<DnaExtractionsProps> = () => {
   const [extractions, setExtractions] = useState<LocationType[]>([]);
   const [storage, setStorage] = useState<StorageType[]>([]);
   const db = getDatabase();
@@ -578,26 +583,13 @@ const All: React.FC = () => {
 
   return (
     <>
-      <div className="controls">
-        <div className="download">
-          <CSVLink
-            data={selectedFlatRows.map((i) => i.values)}
-            filename="db-mollusca-all.csv"
-          >
-            <div className="export">
-              <ExportIcon />
-              export CSV
-            </div>
-          </CSVLink>
-        </div>
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-      </div>
-
-      <div className="table-container">
+      <div
+        className="table-container"
+        style={{
+          height: `80vh`,
+          overflow: "auto",
+        }}
+      >
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup) => (
@@ -658,6 +650,24 @@ const All: React.FC = () => {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="controls">
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="db-mollusca-all.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+        </div>
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
       </div>
     </>
   );

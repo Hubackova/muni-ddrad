@@ -1,7 +1,7 @@
 // @ts-nocheck
 
-import { getDatabase, onValue, ref, update } from "firebase/database";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { getDatabase, ref, update } from "firebase/database";
+import React, { useCallback, useMemo } from "react";
 import { CSVLink } from "react-csv";
 import {
   Column,
@@ -18,31 +18,16 @@ import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
 
-const DnaExtractions: React.FC = () => {
-  const [storage, setStorage] = useState<StorageType[]>([]);
-  const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
-  const db = getDatabase();
+interface DnaExtractionsProps {
+  storage: StorageType[];
+  extractions: DnaExtractionsType[];
+}
 
-  useEffect(() => {
-    onValue(ref(db, "extractions/"), (snapshot) => {
-      const items: DnaExtractionsType[] = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setExtractions(items);
-    });
-    onValue(ref(db, "storage/"), (snapshot) => {
-      const items: StorageType[] = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setStorage(items);
-    });
-  }, [db]);
+const DnaExtractions: React.FC<DnaExtractionsProps> = ({
+  storage,
+  extractions,
+}) => {
+  const db = getDatabase();
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
@@ -338,25 +323,13 @@ const DnaExtractions: React.FC = () => {
 
   return (
     <>
-      <div className="controls">
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-        <div className="download">
-          <CSVLink
-            data={selectedFlatRows.map((i) => i.values)}
-            filename="DNA-extractions.csv"
-          >
-            <div className="export">
-              <ExportIcon />
-              export CSV
-            </div>
-          </CSVLink>
-        </div>
-      </div>
-      <div className="table-container">
+      <div
+        className="table-container"
+        style={{
+          height: `80vh`,
+          overflow: "auto", // Make it scroll!
+        }}
+      >
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
@@ -407,6 +380,24 @@ const DnaExtractions: React.FC = () => {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="controls">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+        <div className="download">
+          <CSVLink
+            data={selectedFlatRows.map((i) => i.values)}
+            filename="DNA-extractions.csv"
+          >
+            <div className="export">
+              <ExportIcon />
+              export CSV
+            </div>
+          </CSVLink>
+        </div>
       </div>
     </>
   );
