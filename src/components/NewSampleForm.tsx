@@ -100,29 +100,32 @@ const NewSampleForm: React.FC = () => {
 
   const locItems = useMemo(
     () =>
-      localityOptions.map((i: any, index) => (
-        <div
-          key={index}
-          className="item"
-          onClick={() => {
-            setValue("localityCode", i.value);
-            setValue("country", i.country);
-            setValue("state", i.state);
-            setValue("localityName", i.localityName);
-            setValue("latitude", i.latitude);
-            setValue("longitude", i.longitude);
-            setValue("altitude", i.altitude);
-            setValue("habitat", i.habitat);
-            setValue("dateCollection", i.dateCollection);
-            setValue("collector", i.collector);
-            clearErrors("country");
-            clearErrors("localityName");
-            clearErrors("collector");
-          }}
-        >
-          {i.value}
-        </div>
-      )),
+      localityOptions.map((i: any, index) => {
+        if (!i.value) return null;
+        return (
+          <div
+            key={index}
+            className="item"
+            onClick={() => {
+              setValue("localityCode", i.value);
+              setValue("country", i.country);
+              setValue("state", i.state);
+              setValue("localityName", i.localityName);
+              setValue("latitude", i.latitude);
+              setValue("longitude", i.longitude);
+              setValue("altitude", i.altitude);
+              setValue("habitat", i.habitat);
+              setValue("dateCollection", i.dateCollection);
+              setValue("collector", i.collector);
+              clearErrors("country");
+              clearErrors("localityName");
+              clearErrors("collector");
+            }}
+          >
+            {i.value}
+          </div>
+        );
+      }),
     [clearErrors, localityOptions, setValue]
   );
 
@@ -214,7 +217,7 @@ const NewSampleForm: React.FC = () => {
               <div className="side-panel">
                 <div className="body">
                   <h5>Isolate codes</h5>
-                  {codeItems}
+                  <div className="items">{codeItems}</div>
 
                   <button
                     className="btn cancel-btn"
@@ -344,8 +347,7 @@ const NewSampleForm: React.FC = () => {
               <div className="side-panel">
                 <div className="body">
                   <h5>Localities</h5>
-                  {locItems}
-
+                  <div className="items">{locItems}</div>
                   <button
                     className="btn cancel-btn"
                     type="button"
@@ -459,13 +461,13 @@ const NewSampleForm: React.FC = () => {
       <button className="submit-btn" type="submit">
         Save
       </button>
-      <button
+      {/*       <button
         className="submit-btn"
         type="button"
         onClick={() => addItemsBackup()}
       >
         Backup
-      </button>
+      </button> */}
     </form>
   );
 };
