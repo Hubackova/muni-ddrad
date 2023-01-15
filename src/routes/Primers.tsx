@@ -31,7 +31,6 @@ const Primers: React.FC = () => {
         childItem.key = child.key;
         items.push(childItem);
       });
-      console.log("useEffect load");
       setPrimers(items);
     });
   }, []);
@@ -46,7 +45,27 @@ const Primers: React.FC = () => {
       [id]: newValue,
     });
   }, []);
+  const customComparator = (prevProps, nextProps) => {
+    return nextProps.value === prevProps.value;
+  };
 
+  const EditableCell = React.memo<React.FC<any>>(
+    ({ value: initialValue, row, cell }) => {
+      const [value, setValue] = React.useState(initialValue);
+      const onChange = (e: any) => {
+        setValue(e.target.value);
+      };
+      const onBlur = (e: any) => {
+        if (e.target.value)
+          editItem(row.original.key, e.target.value, cell.column.id);
+      };
+      React.useEffect(() => {
+        setValue(initialValue);
+      }, [initialValue]);
+      return <input value={value} onChange={onChange} onBlur={onBlur} />;
+    },
+    customComparator
+  );
   const columns = React.useMemo(
     () => [
       {
@@ -108,23 +127,6 @@ const Primers: React.FC = () => {
     []
   );
 
-  const EditableCell = React.memo<React.FC<any>>(
-    ({ value: initialValue, row, cell, column: { id } }) => {
-      const [value, setValue] = React.useState(initialValue);
-      const onChange = (e: any) => {
-        setValue(e.target.value);
-      };
-      const onBlur = (e: any) => {
-        if (e.target.value)
-          editItem(row.original.key, e.target.value, cell.column.id);
-      };
-      React.useEffect(() => {
-        setValue(initialValue);
-      }, [initialValue]);
-      return <input value={value} onChange={onChange} onBlur={onBlur} />;
-    }
-  );
-
   const tableInstance = useTable(
     {
       columns,
@@ -137,22 +139,20 @@ const Primers: React.FC = () => {
     useRowSelect,
     (hooks) => {
       hooks.visibleColumns.push((columns) => [
-        // Let's make a column for selection
         {
           id: "selection",
-          // The header can use the table's getToggleAllRowsSelectedProps method
-          // to render a checkbox
           Header: ({ getToggleAllRowsSelectedProps }) => (
             <div>
               <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
             </div>
           ),
-          // The cell can use the individual row's getToggleRowSelectedProps method
-          // to the render a checkbox
-          Cell: ({ row }) => (
-            <div>
-              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-            </div>
+          Cell: React.memo<React.FC<any>>(
+            ({ row }) => (
+              <div>
+                <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+              </div>
+            ),
+            customComparator
           ),
         },
         ...columns,

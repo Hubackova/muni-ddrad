@@ -18,11 +18,6 @@ import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { LocationType } from "../types";
 import "./Table.scss";
 
-interface Column {
-  Header: any;
-  accessor: any;
-}
-
 const All: React.FC = () => {
   const [extractions, setExtractions] = useState<LocationType[]>([]);
   const [storage, setStorage] = useState<StorageType[]>([]);
@@ -49,10 +44,7 @@ const All: React.FC = () => {
     });
   }, [db]);
 
-  const localityOptions = useMemo(
-    () => getLocalityOptions(extractions),
-    [extractions]
-  );
+  const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
@@ -73,13 +65,38 @@ const All: React.FC = () => {
     [storage]
   );
 
+  const customComparator = (prevProps, nextProps) => {
+    return nextProps.value === prevProps.value;
+  };
+
+  const EditableCell = React.memo<React.FC<any>>(
+    ({ value: initialValue, row, cell }) => {
+      const [value, setValue] = React.useState(initialValue);
+      const onChange = (e: any) => {
+        setValue(e.target.value);
+      };
+      const onBlur = (e: any) => {
+        if (e.target.value)
+          editItem(row.original.key, e.target.value, cell.column.id);
+      };
+      React.useEffect(() => {
+        setValue(initialValue);
+      }, [initialValue]);
+      return <input value={value} onChange={onChange} onBlur={onBlur} />;
+    },
+    customComparator
+  );
+
   const customColumns: Column<any>[] = useMemo(
     () => [
       {
         Header: "Isolate code",
         accessor: "isolateCode",
-        Cell: ({ row: { original } }) => (
-          <input defaultValue={[original.isolateCode] || ""} disabled></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input defaultValue={[original.isolateCode] || ""} disabled></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -87,29 +104,35 @@ const All: React.FC = () => {
       {
         Header: "Locality code",
         accessor: "localityCode",
-        Cell: ({ row: { original } }) => (
-          <SelectInput
-            options={localityOptions}
-            value={
-              original.localityCode
-                ? { value: original.localityCode, label: original.localityCode }
-                : null
-            }
-            onChange={(value: any) => {
-              editItem(original.key, value.value, "localityCode");
-              editItem(original.key, value.country, "country");
-              editItem(original.key, value.state, "state");
-              editItem(original.key, value.localityName, "localityName");
-              editItem(original.key, value.latitude, "latitude");
-              editItem(original.key, value.longitude, "longitude");
-              editItem(original.key, value.altitude, "altitude");
-              editItem(original.key, value.habitat, "habitat");
-              editItem(original.key, value.dateCollection, "dateCollection");
-              editItem(original.key, value.collector, "collector");
-            }}
-            isSearchable
-            className="narrow"
-          />
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <SelectInput
+              options={localityOptions}
+              value={
+                original.localityCode
+                  ? {
+                      value: original.localityCode,
+                      label: original.localityCode,
+                    }
+                  : null
+              }
+              onChange={(value: any) => {
+                editItem(original.key, value.value, "localityCode");
+                editItem(original.key, value.country, "country");
+                editItem(original.key, value.state, "state");
+                editItem(original.key, value.localityName, "localityName");
+                editItem(original.key, value.latitude, "latitude");
+                editItem(original.key, value.longitude, "longitude");
+                editItem(original.key, value.altitude, "altitude");
+                editItem(original.key, value.habitat, "habitat");
+                editItem(original.key, value.dateCollection, "dateCollection");
+                editItem(original.key, value.collector, "collector");
+              }}
+              isSearchable
+              className="narrow"
+            />
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -117,27 +140,32 @@ const All: React.FC = () => {
       {
         Header: "Species (original det.)",
         accessor: "speciesOrig",
-        Cell: ({ row: { original } }) => {
-          return <span>{original.speciesOrig}</span>;
-        },
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => <span>{original.speciesOrig}</span>,
+          customComparator
+        ),
+
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Country",
         accessor: "country",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.country = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "country");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.country] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.country = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "country");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.country] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -145,18 +173,21 @@ const All: React.FC = () => {
       {
         Header: "Latitude [°N]",
         accessor: "latitude",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.latitude = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "latitude");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.latitude] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.latitude = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "latitude");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.latitude] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -164,18 +195,21 @@ const All: React.FC = () => {
       {
         Header: "Longitude [°E]",
         accessor: "longitude",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.longitude = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "longitude");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.longitude] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.longitude = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "longitude");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.longitude] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -183,18 +217,21 @@ const All: React.FC = () => {
       {
         Header: "State/province",
         accessor: "state",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.state = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "state");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.state] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.state = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "state");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.state] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -202,18 +239,21 @@ const All: React.FC = () => {
       {
         Header: "Locality name",
         accessor: "localityName",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.localityName = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "localityName");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.localityName] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.localityName = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "localityName");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.localityName] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -221,18 +261,21 @@ const All: React.FC = () => {
       {
         Header: "Habitat",
         accessor: "habitat",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.habitat = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "habitat");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.habitat] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.habitat = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "habitat");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.habitat] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -240,18 +283,21 @@ const All: React.FC = () => {
       {
         Header: "Altitude [m a.s.l.]",
         accessor: "altitude",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.altitude = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "altitude");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.altitude] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.altitude = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "altitude");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.altitude] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -259,18 +305,21 @@ const All: React.FC = () => {
       {
         Header: "Date collection",
         accessor: "dateCollection",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.dateCollection = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "dateCollection");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.dateCollection] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.dateCollection = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "dateCollection");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.dateCollection] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -278,18 +327,21 @@ const All: React.FC = () => {
       {
         Header: "Collector",
         accessor: "collector",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => {
-              original.collector = e.target.value;
-            }}
-            onBlur={(e) => {
-              editItem(original.key, e.target.value, "collector");
-              editItem(original.key, "", "localityCode");
-            }}
-            defaultValue={[original.collector] || ""}
-            disabled={original.localityCode}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => {
+                original.collector = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "collector");
+                editItem(original.key, "", "localityCode");
+              }}
+              defaultValue={[original.collector] || ""}
+              disabled={original.localityCode}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -297,14 +349,17 @@ const All: React.FC = () => {
       {
         Header: "Species, updated name",
         accessor: "speciesUpdated",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => (original.speciesUpdated = e.target.value)}
-            onBlur={(e) =>
-              editItem(original.key, e.target.value, "speciesUpdated")
-            }
-            defaultValue={[original.speciesUpdated] || ""}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => (original.speciesUpdated = e.target.value)}
+              onBlur={(e) =>
+                editItem(original.key, e.target.value, "speciesUpdated")
+              }
+              defaultValue={[original.speciesUpdated] || ""}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -481,27 +536,6 @@ const All: React.FC = () => {
     [customColumns, customColumns2, getColumnsAccessor, tableData]
   );
 
-  const EditableCell: React.FC<any> = ({
-    value: initialValue,
-    row,
-    cell,
-    column: { id },
-  }) => {
-    const [value, setValue] = React.useState(initialValue);
-
-    const onChange = (e: any) => {
-      setValue(e.target.value);
-    };
-    const onBlur = (e: any) => {
-      if (e.target.value)
-        editItem(row.original.key, e.target.value, cell.column.id);
-    };
-    React.useEffect(() => {
-      setValue(initialValue);
-    }, [initialValue]);
-    return <input value={value} onChange={onChange} onBlur={onBlur} />;
-  };
-
   const tableInstance = useTable(
     {
       columns,
@@ -602,15 +636,22 @@ const All: React.FC = () => {
               });
 
               return (
-                <tr {...row.getRowProps()} key={row.original.key}>
+                <tr {...row.getRowProps()} key={row.id}>
                   {row.cells.map((cell) => {
                     return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      <td
+                        key={row.id + cell.column.id}
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render("Cell")}
+                      </td>
                     );
                   })}
                   <td className="sample-list">
                     {groupItems.map((i) => (
-                      <span className="sample">{i.isolateCode}</span>
+                      <span key={i.isolateCode} className="sample">
+                        {i.isolateCode}
+                      </span>
                     ))}
                   </td>
                 </tr>

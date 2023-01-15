@@ -48,6 +48,28 @@ const PcrPrograms: React.FC = () => {
     [db]
   );
 
+  const customComparator = (prevProps, nextProps) => {
+    return nextProps.value === prevProps.value;
+  };
+
+  const EditableCell = React.memo<React.FC<any>>(
+    ({ value: initialValue, row, cell }) => {
+      const [value, setValue] = React.useState(initialValue);
+      const onChange = (e: any) => {
+        setValue(e.target.value);
+      };
+      const onBlur = (e: any) => {
+        if (e.target.value)
+          editItem(row.original.key, e.target.value, cell.column.id);
+      };
+      React.useEffect(() => {
+        setValue(initialValue);
+      }, [initialValue]);
+      return <input value={value} onChange={onChange} onBlur={onBlur} />;
+    },
+    customComparator
+  );
+
   const columns = React.useMemo(
     () => [
       {
@@ -113,26 +135,6 @@ const PcrPrograms: React.FC = () => {
     ],
     []
   );
-
-  const EditableCell: React.FC<any> = ({
-    value: initialValue,
-    row,
-    cell,
-    column: { id },
-  }) => {
-    const [value, setValue] = React.useState(initialValue);
-    const onChange = (e: any) => {
-      setValue(e.target.value);
-    };
-    const onBlur = (e: any) => {
-      if (e.target.value)
-        editItem(row.original.key, e.target.value, cell.column.id);
-    };
-    React.useEffect(() => {
-      setValue(initialValue);
-    }, [initialValue]);
-    return <input value={value} onChange={onChange} onBlur={onBlur} />;
-  };
 
   const tableInstance = useTable(
     {
@@ -214,8 +216,8 @@ const PcrPrograms: React.FC = () => {
         )}
         <table className="table pcr" {...getTableProps()}>
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroups.map((headerGroup, index) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
                 <th></th>
                 {headerGroup.headers.map((column) => (
                   <th key={column.id}>

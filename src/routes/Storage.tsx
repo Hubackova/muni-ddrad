@@ -67,17 +67,24 @@ const Storage: React.FC = () => {
     [storage]
   );
 
+  const customComparator = (prevProps, nextProps) => {
+    return nextProps.value === prevProps.value;
+  };
+
   const columns: Column<any>[] = useMemo(
     () => [
       {
         Header: "Box name",
         accessor: "box",
-        Cell: ({ row: { original } }) => (
-          <input
-            onChange={(e) => (original.box = e.target.value)}
-            onBlur={(e) => editItem(original.key, e.target.value, "box")}
-            defaultValue={[original.box] || ""}
-          ></input>
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              onChange={(e) => (original.box = e.target.value)}
+              onBlur={(e) => editItem(original.key, e.target.value, "box")}
+              defaultValue={[original.box] || ""}
+            ></input>
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -85,20 +92,23 @@ const Storage: React.FC = () => {
       {
         Header: "Storage site",
         accessor: "storageSite",
-        Cell: ({ row: { original } }) => (
-          <CreatableSelectInput
-            options={storageOptions}
-            value={
-              original.storageSite
-                ? { value: original.storageSite, label: original.storageSite }
-                : null
-            }
-            onChange={(value: any) => {
-              editItem(original.key, value.value, "storageSite");
-            }}
-            isSearchable
-            className="narrow"
-          />
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <CreatableSelectInput
+              options={storageOptions}
+              value={
+                original.storageSite
+                  ? { value: original.storageSite, label: original.storageSite }
+                  : null
+              }
+              onChange={(value: any) => {
+                editItem(original.key, value.value, "storageSite");
+              }}
+              isSearchable
+              className="narrow"
+            />
+          ),
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -107,32 +117,10 @@ const Storage: React.FC = () => {
     [editItem, storageOptions]
   );
 
-  const EditableCell: React.FC<any> = ({
-    value: initialValue,
-    row,
-    cell,
-    column: { id },
-  }) => {
-    const [value, setValue] = React.useState(initialValue);
-
-    const onChange = (e: any) => {
-      setValue(e.target.value);
-    };
-    const onBlur = (e: any) => {
-      if (e.target.value)
-        editItem(row.original.key, e.target.value, cell.column.id);
-    };
-    React.useEffect(() => {
-      setValue(initialValue);
-    }, [initialValue]);
-    return <input value={value} onChange={onChange} onBlur={onBlur} />;
-  };
-
   const tableInstance = useTable(
     {
       columns,
       data: storage,
-      defaultColumn: { Cell: EditableCell, Filter: () => {} },
     },
     useGlobalFilter,
     useFilters,
@@ -228,12 +216,19 @@ const Storage: React.FC = () => {
                 <tr {...row.getRowProps()} key={row.original.key}>
                   {row.cells.map((cell) => {
                     return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      <td
+                        key={row.id + cell.column.id}
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render("Cell")}
+                      </td>
                     );
                   })}
                   <td className="sample-list">
-                    {samples.map((sample) => (
-                      <span className="sample">{sample.isolateCode}</span>
+                    {samples.map((sample, index) => (
+                      <span key={index} className="sample">
+                        {sample.isolateCode}
+                      </span>
                     ))}
                   </td>
                 </tr>
