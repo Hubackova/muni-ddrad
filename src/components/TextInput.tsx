@@ -14,6 +14,7 @@ type InputProps = {
   className?: string;
   validate?: any;
   maxLength?: any;
+  step?: any;
 };
 
 const TextInput = ({
@@ -27,6 +28,7 @@ const TextInput = ({
   onBlur,
   maxLength,
   type = "text",
+  step,
 }: InputProps) => (
   <div className="container">
     <label className="label">{label}</label>
@@ -34,6 +36,7 @@ const TextInput = ({
     <input
       className="input"
       type={type}
+      step={step}
       disabled={disabled}
       {...register(name, {
         required,

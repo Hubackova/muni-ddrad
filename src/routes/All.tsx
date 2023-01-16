@@ -1,58 +1,32 @@
 // @ts-nocheck
-import { getDatabase, onValue, ref, update } from "firebase/database";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { getDatabase, ref, update } from "firebase/database";
+import React, { useCallback, useMemo } from "react";
 import { CSVLink } from "react-csv";
 import {
-  Column,
-  useFilters,
-  useGlobalFilter,
-  useRowSelect,
-  useSortBy,
-  useTable,
+    Column,
+    useFilters,
+    useGlobalFilter,
+    useRowSelect,
+    useSortBy,
+    useTable
 } from "react-table";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
-import { LocationType } from "../types";
 
 interface DnaExtractionsProps {
   storage: StorageType[];
   extractions: DnaExtractionsType[];
 }
 
-const All: React.FC<DnaExtractionsProps> = () => {
-  const [extractions, setExtractions] = useState<LocationType[]>([]);
-  const [storage, setStorage] = useState<StorageType[]>([]);
+const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const db = getDatabase();
-
-  useEffect(() => {
-    onValue(ref(db, "extractions/"), (snapshot) => {
-      const items: any = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setExtractions(items);
-    });
-    onValue(ref(db, "storage/"), (snapshot) => {
-      const items: StorageType[] = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setStorage(items);
-    });
-  }, [db]);
-
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      if (!newValue) return;
       update(ref(db, "extractions/" + key), {
         [id]: newValue,
       });
@@ -80,8 +54,7 @@ const All: React.FC<DnaExtractionsProps> = () => {
         setValue(e.target.value);
       };
       const onBlur = (e: any) => {
-        if (e.target.value)
-          editItem(row.original.key, e.target.value, cell.column.id);
+        editItem(row.original.key, e.target.value, cell.column.id);
       };
       React.useEffect(() => {
         setValue(initialValue);
@@ -361,7 +334,7 @@ const All: React.FC<DnaExtractionsProps> = () => {
                 editItem(original.key, e.target.value, "speciesUpdated")
               }
               defaultValue={[original.speciesUpdated] || ""}
-            ></input>
+            />
           ),
           customComparator
         ),
@@ -383,6 +356,22 @@ const All: React.FC<DnaExtractionsProps> = () => {
       {
         Header: "ng/ul",
         accessor: "ngul",
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              type="number"
+              step=".00001"
+              onChange={(e) => {
+                original.ngul = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "ngul");
+              }}
+              defaultValue={[original.ngul] || ""}
+            />
+          ),
+          customComparator
+        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -498,7 +487,7 @@ const All: React.FC<DnaExtractionsProps> = () => {
   const tableData = React.useMemo(
     () =>
       extractions.map((ex) => {
-        const storageData = storage.find((i) => i.key === ex.box);
+        const storageData = storage.find((i) => i.box === ex.box);
         return {
           ...ex,
           box: storageData?.box,
@@ -608,9 +597,8 @@ const All: React.FC<DnaExtractionsProps> = () => {
                           : ""}
                       </span>
                     </span>
-                    <div className="filter-wrapper">
-                      {column.canFilter ? column.render("Filter") : null}
-                    </div>
+
+                    {column.canFilter ? column.render("Filter") : null}
                   </th>
                 ))}
                 <th>IsolateCode Group</th>

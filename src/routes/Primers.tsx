@@ -169,7 +169,7 @@ const Primers: React.FC = () => {
     selectedFlatRows,
     prepareRow,
   } = tableInstance;
-  if (!primers) return <div>loading...</div>;
+
   return (
     <>
       <div

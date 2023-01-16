@@ -1,7 +1,6 @@
 // @ts-nocheck
 import moment from "moment";
 import React, { useMemo, useState } from "react";
-import CreatableSelect from "react-select/creatable";
 import { useAsyncDebounce } from "react-table";
 import { ReactComponent as FilterIcon } from "../images/filter.svg";
 import "./Filter.scss";
@@ -35,16 +34,12 @@ export function multiSelectFilter(rows, columnIds, filterValue) {
         filterValue.includes(String(row.original[columnIds]))
       );
 }
-function arrayRemove(arr, value) {
-  return arr.filter(function (ele) {
-    return ele !== value;
-  });
-}
-function arrayRemoveArr(arr, valueArr) {
-  return arr.filter((el) => {
-    return !valueArr.includes(el);
-  });
-}
+const arrayRemove = (arr, value) => {
+  return arr.filter((ele) => ele !== value);
+};
+const arrayRemoveArr = (arr, valueArr) => {
+  return arr.filter((el) => !valueArr.includes(el));
+};
 
 export function Multi({
   column: { filterValue, setFilter, preFilteredRows, id },
@@ -66,7 +61,11 @@ export function Multi({
     });
     return [...options.values()];
   }, [id, preFilteredRows]);
-  const isValidDate = moment(options[0], "YYYY-MM-DD", true).isValid();
+  const isValidDate = moment(
+    options.find((i) => !!i),
+    "YYYY-MM-DD",
+    true
+  ).isValid();
 
   const allDate = useMemo(() => {
     if (!isValidDate) return [];
@@ -80,6 +79,7 @@ export function Multi({
       allMin = Math.min(row.values[id], allMin);
       allMax = Math.max(row.values[id], allMax);
     });
+
     setMin(allMin);
     setMax(allMax);
     return [allMin, allMax];
@@ -87,7 +87,6 @@ export function Multi({
 
   const [allMinDate, allMaxDate] = React.useMemo(() => {
     if (!isValidDate) return [];
-
     let allMinDate = moment.min(allDate).format("YYYY-MM-DD");
     let allMaxDate = moment.max(allDate).format("YYYY-MM-DD");
     setMinDate(allMinDate);
@@ -161,9 +160,9 @@ export function Multi({
                       const val = e.target.value;
                       const onlyNumbers = options.filter(
                         (element) =>
-                          typeof parseInt(element) === "number" &&
-                          element >= parseInt(val) &&
-                          element <= parseInt(max)
+                          typeof parseFloat(element) === "number" &&
+                          element >= parseFloat(val) &&
+                          element <= parseFloat(max)
                       );
 
                       setFilter(val ? onlyNumbers : []);
@@ -185,9 +184,9 @@ export function Multi({
                       const val = e.target.value;
                       const onlyNumbers = options.filter(
                         (element) =>
-                          typeof parseInt(element) === "number" &&
-                          element <= parseInt(val) &&
-                          element >= parseInt(min)
+                          typeof parseFloat(element) === "number" &&
+                          element <= parseFloat(val) &&
+                          element >= parseFloat(min)
                       );
 
                       setFilter(val ? onlyNumbers : []);
@@ -346,199 +345,6 @@ export function Multi({
           })}
         </div>
       )}
-    </div>
-    /*       <CreatableSelect
-        options={selectOptions}
-        isSearchable={true}
-        className="select-input-filter"
-        classNamePrefix="select"
-        menuPlacement="auto"
-        isMulti
-        formatCreateLabel={(userInput) => (
-          <div className="search-label">{`Search for "${userInput}"`}</div>
-        )}
-        value={filterValue ? filterValue.map((i) => ({ value: i, label: i })) : ""}
-        onChange={(e) => {
-          setFilter(e.length > 0 ? e.map((i) => i.value) : "");
-        }}
-      /> */
-
-    /*     <select
-        value={filterValue}
-        onChange={(e) => {
-          setFilter(e.target.value || undefined);
-        }}
-      >
-        <option value="">All</option>
-        {options.map((option, i) => (
-          <option key={i} value={option}>
-            {option}
-          </option>
-        ))}
-      </select> */
-  );
-}
-
-// Component for Default Column Filter
-export function DefaultFilterForColumn({
-  column: {
-    filterValue,
-    preFilteredRows: { length },
-    setFilter,
-  },
-}) {
-  return (
-    <input
-      value={filterValue || ""}
-      onChange={(e) => {
-        // Set undefined to remove the filter entirely
-        setFilter(e.target.value || undefined);
-      }}
-      placeholder={`Search ${length} records..`}
-    />
-  );
-}
-
-// Component for Default Column Filter Ediatble
-export function DefaultFilterForColumnEditable({
-  value: initialValue,
-  row,
-  cell,
-  column: {
-    filterValue,
-    preFilteredRows: { length },
-    setFilter,
-  },
-}) {
-  // We need to keep and update the state of the cell normally
-  const [value, setValue] = React.useState(initialValue);
-
-  const onChange = (e: any) => {
-    setValue(e.target.value);
-  };
-
-  // We'll only update the external data when the input is blurred
-  const onBlur = (e: any) => {
-    if (e.target.value)
-      editItem(row.original.key, e.target.value, cell.column.id);
-  };
-
-  // If the initialValue is changed external, sync it up with our state
-  React.useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
-  return (
-    <input
-      value={filterValue || value || ""}
-      onChange={(e) => {
-        // Set undefined to remove the filter entirely
-        setFilter(e.target.value || undefined);
-        onChange();
-      }}
-      onBlur={onBlur}
-      placeholder={`Search ${length} records..`}
-      style={{ marginTop: "10px" }}
-    />
-  );
-}
-
-// Component for Custom Select Filter
-export function SelectColumnFilter({
-  column: { filterValue, setFilter, preFilteredRows, id },
-}) {
-  // Use preFilteredRows to calculate the options
-  const options = useMemo(() => {
-    const options = new Set();
-    preFilteredRows.forEach((row) => {
-      options.add(row.values[id]);
-    });
-    return [...options.values()];
-  }, [id, preFilteredRows]);
-  const selectOptions = options.map((i) => ({ value: i, label: i }));
-  // UI for Multi-Select box
-  return (
-    <CreatableSelect
-      options={selectOptions}
-      isSearchable={true}
-      className="select-input-filter"
-      classNamePrefix="select"
-      menuPlacement="auto"
-      isMulti
-      formatCreateLabel={(userInput) => (
-        <div className="search-label">{`Search for "${userInput}"`}</div>
-      )}
-      value={
-        filterValue ? filterValue.map((i) => ({ value: i, label: i })) : ""
-      }
-      onChange={(e) => {
-        setFilter(e.length > 0 ? e.map((i) => i.value) : "");
-      }}
-    />
-
-    /*     <select
-        value={filterValue}
-        onChange={(e) => {
-          setFilter(e.target.value || undefined);
-        }}
-      >
-        <option value="">All</option>
-        {options.map((option, i) => (
-          <option key={i} value={option}>
-            {option}
-          </option>
-        ))}
-      </select> */
-  );
-}
-export function NumberRangeColumnFilter({
-  column: { filterValue = [], preFilteredRows, setFilter, id },
-}) {
-  const [min, max] = React.useMemo(() => {
-    let min = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
-    let max = preFilteredRows.length ? preFilteredRows[0].values[id] : 0;
-    preFilteredRows.forEach((row) => {
-      min = Math.min(row.values[id], min);
-      max = Math.max(row.values[id], max);
-    });
-    return [min, max];
-  }, [id, preFilteredRows]);
-
-  return (
-    <div>
-      <input
-        value={filterValue[0] || ""}
-        type="number"
-        onChange={(e) => {
-          const val = e.target.value;
-          setFilter((old = []) => [
-            val ? parseInt(val, 10) : undefined,
-            old[1],
-          ]);
-        }}
-        placeholder={`Min (${min})`}
-        style={{
-          width: "70px",
-          marginRight: "0.5rem",
-        }}
-      />
-      to
-      <input
-        value={filterValue[1] || ""}
-        type="number"
-        onChange={(e) => {
-          const val = e.target.value;
-          setFilter((old = []) => [
-            old[0],
-            val ? parseInt(val, 10) : undefined,
-          ]);
-        }}
-        placeholder={`Max (${max})`}
-        style={{
-          width: "70px",
-          marginLeft: "0.5rem",
-        }}
-      />
     </div>
   );
 }

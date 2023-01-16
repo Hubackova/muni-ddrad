@@ -58,8 +58,7 @@ const PcrPrograms: React.FC = () => {
         setValue(e.target.value);
       };
       const onBlur = (e: any) => {
-        if (e.target.value)
-          editItem(row.original.key, e.target.value, cell.column.id);
+        editItem(row.original.key, e.target.value, cell.column.id);
       };
       React.useEffect(() => {
         setValue(initialValue);

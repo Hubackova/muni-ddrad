@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { getDatabase, onValue, ref, update } from "firebase/database";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { getDatabase, ref, update } from "firebase/database";
+import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
   useFilters,
@@ -17,34 +17,18 @@ import { legend } from "../constants";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { ReactComponent as InfoIcon } from "../images/info.svg";
 import { DnaExtractionsType, StorageType } from "../types";
+interface DnaExtractionsProps {
+  storage: StorageType[];
+  extractions: DnaExtractionsType[];
+}
 
-const PcrGenomicLoci: React.FC = () => {
-  const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
-  const [storage, setStorage] = useState<StorageType[]>([]);
+const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
+  storage,
+  extractions,
+}) => {
   const [newColumn, setNewColumn] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState("");
   const db = getDatabase();
-
-  useEffect(() => {
-    onValue(ref(db, "extractions/"), (snapshot) => {
-      const items: any = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setExtractions(items);
-    });
-    onValue(ref(db, "storage/"), (snapshot) => {
-      const items: StorageType[] = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setStorage(items);
-    });
-  }, [db]);
 
   const tableData = React.useMemo(
     () =>
@@ -60,7 +44,7 @@ const PcrGenomicLoci: React.FC = () => {
           longitude,
           ...data
         } = ex;
-        const storageData = storage.find((i) => i.key === ex.box);
+        const storageData = storage.find((i) => i.box === ex.box);
         return {
           ...data,
           box: storageData?.box,
@@ -109,8 +93,7 @@ const PcrGenomicLoci: React.FC = () => {
         setValue(e.target.value);
       };
       const onBlur = (e: any) => {
-        if (e.target.value)
-          editItem(row.original.key, e.target.value, cell.column.id);
+        editItem(row.original.key, e.target.value, cell.column.id);
       };
       React.useEffect(() => {
         setValue(initialValue);
@@ -187,6 +170,22 @@ const PcrGenomicLoci: React.FC = () => {
       {
         Header: "ng/ul",
         accessor: "ngul",
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              type="number"
+              step=".00001"
+              onChange={(e) => {
+                original.ngul = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "ngul");
+              }}
+              defaultValue={[original.ngul] || ""}
+            />
+          ),
+          customComparator
+        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },

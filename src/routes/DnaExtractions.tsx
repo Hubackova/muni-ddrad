@@ -31,7 +31,6 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      if (!newValue) return;
       update(ref(db, "extractions/" + key), {
         [id]: newValue,
       });
@@ -61,8 +60,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
         setValue(e.target.value);
       };
       const onBlur = (e: any) => {
-        if (e.target.value)
-          editItem(row.original.key, e.target.value, cell.column.id);
+        editItem(row.original.key, e.target.value, cell.column.id);
       };
       React.useEffect(() => {
         setValue(initialValue);
@@ -120,6 +118,22 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
       {
         Header: "ng/ul",
         accessor: "ngul",
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              type="number"
+              step=".00001"
+              onChange={(e) => {
+                original.ngul = e.target.value;
+              }}
+              onBlur={(e) => {
+                editItem(original.key, e.target.value, "ngul");
+              }}
+              defaultValue={[original.ngul] || ""}
+            />
+          ),
+          customComparator
+        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -269,7 +283,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
   const tableData = React.useMemo(
     () =>
       extractions.map((ex) => {
-        const storageData = storage.find((i) => i.key === ex.box);
+        const storageData = storage.find((i) => i.box === ex.box);
         return {
           ...ex,
           box: storageData?.box,

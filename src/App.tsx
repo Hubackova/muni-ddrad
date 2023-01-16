@@ -52,22 +52,40 @@ const App: React.FC = () => {
           <Route
             path={routes.dnaExtractions}
             element={
-              extractions?.length ? (
+              extractions?.length > 0 && storage?.length > 0 ? (
                 <DnaExtractions storage={storage} extractions={extractions} />
               ) : (
-                <div> loading</div>
+                <div> no data</div>
               )
             }
           />
-          <Route path={routes.pcrGenomicLoci} element={<PcrGenomicLoci />} />
-          <Route path={routes.storage} element={<Storage />} />
+          <Route
+            path={routes.pcrGenomicLoci}
+            element={
+              extractions?.length > 0 && storage?.length > 0 ? (
+                <PcrGenomicLoci storage={storage} extractions={extractions} />
+              ) : (
+                <div> no data</div>
+              )
+            }
+          />
+          <Route
+            path={routes.storage}
+            element={
+              extractions?.length > 0 && storage?.length > 0 ? (
+                <Storage storage={storage} extractions={extractions} />
+              ) : (
+                <div> no data</div>
+              )
+            }
+          />
           <Route
             path={routes.all}
             element={
-              extractions?.length ? (
+              extractions?.length > 0 && storage?.length > 0 ? (
                 <All storage={storage} extractions={extractions} />
               ) : (
-                <div> loading</div>
+                <div> no data</div>
               )
             }
           />

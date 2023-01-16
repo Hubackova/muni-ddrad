@@ -43,20 +43,19 @@ const NewSampleForm: React.FC = () => {
 
   const addItem = (data: any) => {
     const { storageSite, ...sampleData } = data;
-    if (isCodes.includes(sampleData.isolateCode)) {
-      setError("isolateCode", {
-        type: "custom",
-        message: "Duplicate isolateCode",
-      });
-    }
     Object.keys(sampleData).forEach((key) => {
       if (sampleData[key] === undefined) {
         delete sampleData[key];
       }
     });
-    writeExtractionData({
-      ...sampleData,
-    });
+    writeExtractionData(
+      sampleData.ngul
+        ? {
+            ...sampleData,
+            ngul: parseFloat(sampleData.ngul),
+          }
+        : { ...sampleData }
+    );
     toast.success("Sample was added successfully");
   };
 
@@ -71,6 +70,7 @@ const NewSampleForm: React.FC = () => {
           "YYYY-MM-DD"
         ),
         isolateCode: i.isolateCode.toString(),
+        ngul: parseFloat(i.ngul) || "",
       })
     );
     toast.success("ok");
@@ -81,7 +81,6 @@ const NewSampleForm: React.FC = () => {
     control,
     formState: { errors },
     setValue,
-    setError,
     handleSubmit,
     clearErrors,
     watch,
@@ -271,6 +270,8 @@ const NewSampleForm: React.FC = () => {
           name="ngul"
           error={errors.ngul?.message}
           register={register}
+          type="number"
+          step=".00001"
         />
         <TextInput
           label="Kit"
@@ -461,13 +462,15 @@ const NewSampleForm: React.FC = () => {
       <button className="submit-btn" type="submit">
         Save
       </button>
-      {/*       <button
-        className="submit-btn"
-        type="button"
-        onClick={() => addItemsBackup()}
-      >
-        Backup
-      </button> */}
+      {
+        <button
+          className="submit-btn"
+          type="button"
+          onClick={() => addItemsBackup()}
+        >
+          Backup
+        </button>
+      }
     </form>
   );
 };

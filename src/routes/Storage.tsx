@@ -1,7 +1,7 @@
 // @ts-nocheck
 
-import { getDatabase, onValue, ref, update } from "firebase/database";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { getDatabase, ref, update } from "firebase/database";
+import React, { useCallback, useMemo } from "react";
 import { CSVLink } from "react-csv";
 import {
   Column,
@@ -17,32 +17,13 @@ import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
 
-const Storage: React.FC = () => {
-  const [storage, setStorage] = useState<StorageType[]>([]);
-  const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
+interface DnaExtractionsProps {
+  storage: StorageType[];
+  extractions: DnaExtractionsType[];
+}
+
+const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const db = getDatabase();
-
-  useEffect(() => {
-    onValue(ref(db, "storage/"), (snapshot) => {
-      const items: any = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setStorage(items);
-    });
-
-    onValue(ref(db, "extractions/"), (snapshot) => {
-      const items: DnaExtractionsType[] = [];
-      snapshot.forEach((child) => {
-        let childItem = child.val();
-        childItem.key = child.key;
-        items.push(childItem);
-      });
-      setExtractions(items);
-    });
-  }, [db]);
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
@@ -197,7 +178,7 @@ const Storage: React.FC = () => {
             {rows.map((row) => {
               prepareRow(row);
               const samples = extractions.filter((i) => {
-                return i.box === row.original.key;
+                return i.box === row.original.box;
               });
               return (
                 <tr {...row.getRowProps()} key={row.original.key}>
