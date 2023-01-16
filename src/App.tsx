@@ -29,7 +29,7 @@ const App: React.FC = () => {
         childItem.key = child.key;
         items.push(childItem);
       });
-      setExtractions(items);
+      setExtractions(items.reverse());
     });
     onValue(ref(db, "storage/"), (snapshot) => {
       const items: StorageType[] = [];

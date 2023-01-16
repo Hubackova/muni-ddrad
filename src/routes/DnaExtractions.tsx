@@ -335,7 +335,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
     setGlobalFilter,
     preGlobalFilteredRows,
   } = tableInstance;
-  const rowsShow = full ? rows : rows.slice(0, 49);
+  const rowsShow = full ? rows : rows.slice(0, 99);
   return (
     <>
       <div
@@ -413,9 +413,11 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             </div>
           </CSVLink>
         </div>
-        {rows.length > 50 && (
+        {rows.length > 100 && (
           <button onClick={() => setFull(!full)}>
-            {full ? "show less" : `show more -  ${rows.length - 50} items left`}
+            {full
+              ? "show less"
+              : `show more -  ${rows.length - 100} items left`}
           </button>
         )}
       </div>

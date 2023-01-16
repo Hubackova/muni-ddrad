@@ -569,7 +569,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     setGlobalFilter,
     preGlobalFilteredRows,
   } = tableInstance;
-  const rowsShow = full ? rows : rows.slice(0, 49);
+  const rowsShow = full ? rows : rows.slice(0, 99);
   return (
     <>
       <div
@@ -656,9 +656,11 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
-        {rows.length > 50 && (
+        {rows.length > 100 && (
           <button onClick={() => setFull(!full)}>
-            {full ? "show less" : `show more -  ${rows.length - 50} items left`}
+            {full
+              ? "show less"
+              : `show more -  ${rows.length - 100} items left`}
           </button>
         )}
       </div>
