@@ -1,14 +1,14 @@
 // @ts-nocheck
 import { getDatabase, ref, update } from "firebase/database";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-    Column,
-    useFilters,
-    useGlobalFilter,
-    useRowSelect,
-    useSortBy,
-    useTable
+  Column,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
 } from "react-table";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
@@ -24,7 +24,7 @@ interface DnaExtractionsProps {
 const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const db = getDatabase();
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
-
+  const [full, setFull] = useState(false);
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
       update(ref(db, "extractions/" + key), {
@@ -569,7 +569,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     setGlobalFilter,
     preGlobalFilteredRows,
   } = tableInstance;
-
+  const rowsShow = full ? rows : rows.slice(0, 49);
   return (
     <>
       <div
@@ -607,7 +607,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           </thead>
 
           <tbody {...getTableBodyProps()}>
-            {rows.map((row) => {
+            {rowsShow.map((row) => {
               prepareRow(row);
 
               const groupItems = extractions.filter((i) => {
@@ -656,6 +656,11 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
+        {!full && rows.length > 50 && (
+          <button onClick={() => setFull(!full)}>
+            {full ? "show less" : `show more -  ${rows.length - 50} items left`}
+          </button>
+        )}
       </div>
     </>
   );

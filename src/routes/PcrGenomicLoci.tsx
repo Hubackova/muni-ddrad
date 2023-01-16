@@ -28,6 +28,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
 }) => {
   const [newColumn, setNewColumn] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState("");
+  const [full, setFull] = useState(false);
   const db = getDatabase();
 
   const tableData = React.useMemo(
@@ -534,7 +535,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
     selectedFlatRows,
     prepareRow,
   } = tableInstance;
-
+  const rowsShow = full ? rows : rows.slice(0, 49);
   return (
     <>
       <div
@@ -575,7 +576,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
             ))}
           </thead>
           <tbody {...getTableBodyProps()}>
-            {rows.map((row) => {
+            {rowsShow.map((row) => {
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} key={row.id}>
@@ -637,6 +638,11 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
             {isPopoverOpen ? "hide legend" : "show legend"}
           </div>
         </div>
+        {!full && rows.length > 50 && (
+          <button onClick={() => setFull(!full)}>
+            {full ? "show less" : `show more -  ${rows.length - 50} items left`}
+          </button>
+        )}
       </div>
     </>
   );

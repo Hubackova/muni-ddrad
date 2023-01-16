@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { getDatabase, ref, update } from "firebase/database";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
   Column,
@@ -28,7 +28,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
   extractions,
 }) => {
   const db = getDatabase();
-
+  const [full, setFull] = useState(false);
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
       update(ref(db, "extractions/" + key), {
@@ -62,6 +62,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
       const onBlur = (e: any) => {
         editItem(row.original.key, e.target.value, cell.column.id);
       };
+      console.log("render", initialValue);
       React.useEffect(() => {
         setValue(initialValue);
       }, [initialValue]);
@@ -334,7 +335,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
     setGlobalFilter,
     preGlobalFilteredRows,
   } = tableInstance;
-
+  const rowsShow = full ? rows : rows.slice(0, 49);
   return (
     <>
       <div
@@ -375,7 +376,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             ))}
           </thead>
           <tbody {...getTableBodyProps()}>
-            {rows.map((row) => {
+            {rowsShow.map((row) => {
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} key={row.id}>
@@ -412,6 +413,11 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             </div>
           </CSVLink>
         </div>
+        {!full && rows.length > 50 && (
+          <button onClick={() => setFull(!full)}>
+            {full ? "show less" : `show more -  ${rows.length - 50} items left`}
+          </button>
+        )}
       </div>
     </>
   );
