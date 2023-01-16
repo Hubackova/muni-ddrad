@@ -638,7 +638,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
             {isPopoverOpen ? "hide legend" : "show legend"}
           </div>
         </div>
-        {!full && rows.length > 50 && (
+        {rows.length > 50 && (
           <button onClick={() => setFull(!full)}>
             {full ? "show less" : `show more -  ${rows.length - 50} items left`}
           </button>

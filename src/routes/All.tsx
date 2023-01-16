@@ -656,7 +656,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
-        {!full && rows.length > 50 && (
+        {rows.length > 50 && (
           <button onClick={() => setFull(!full)}>
             {full ? "show less" : `show more -  ${rows.length - 50} items left`}
           </button>
