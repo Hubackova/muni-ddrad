@@ -335,7 +335,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
     setGlobalFilter,
     preGlobalFilteredRows,
   } = tableInstance;
-  const rowsShow = full ? rows : rows.slice(0, 99);
+  const rowsShow = full ? rows : rows.slice(0, 100);
   return (
     <>
       <div

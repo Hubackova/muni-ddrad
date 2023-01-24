@@ -59,8 +59,9 @@ export function Multi({
     preFilteredRows.forEach((row) => {
       options.add(row.values[id]);
     });
-    return [...options.values()];
+    return [...options.values()].sort();
   }, [id, preFilteredRows]);
+
   const isValidDate = moment(
     options.find((i) => !!i),
     "YYYY-MM-DD",

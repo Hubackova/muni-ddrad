@@ -89,13 +89,31 @@ const NewSampleForm: React.FC = () => {
     mode: "all",
   });
 
-  const boxOptions = storage.map((i) => ({
-    value: i.key,
-    label: i.box,
-    storageSite: i.storageSite,
-  }));
+  const boxOptions = storage
+    .map((i) => ({
+      value: i.key,
+      label: i.box,
+      storageSite: i.storageSite,
+    }))
+    .sort(function (a, b) {
+      if (a.label < b.label) {
+        return -1;
+      }
+      if (a.label > b.label) {
+        return 1;
+      }
+      return 0;
+    });
 
-  const localityOptions = getLocalityOptions(extractions);
+  const localityOptions = getLocalityOptions(extractions).sort(function (a, b) {
+    if (a.label < b.label) {
+      return -1;
+    }
+    if (a.label > b.label) {
+      return 1;
+    }
+    return 0;
+  });
 
   const locItems = useMemo(
     () =>
@@ -135,10 +153,20 @@ const NewSampleForm: React.FC = () => {
           (acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }),
           {}
         )
-      ).map((i: any) => ({
-        value: i.speciesOrig,
-        label: i.speciesOrig,
-      })),
+      )
+        .map((i: any) => ({
+          value: i.speciesOrig,
+          label: i.speciesOrig,
+        }))
+        .sort(function (a, b) {
+          if (a.label < b.label) {
+            return -1;
+          }
+          if (a.label > b.label) {
+            return 1;
+          }
+          return 0;
+        }),
     [extractions]
   );
 

@@ -535,7 +535,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
     selectedFlatRows,
     prepareRow,
   } = tableInstance;
-  const rowsShow = full ? rows : rows.slice(0, 99);
+  const rowsShow = full ? rows : rows.slice(0, 100);
   return (
     <>
       <div
