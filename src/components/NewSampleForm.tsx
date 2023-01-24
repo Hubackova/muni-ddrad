@@ -330,7 +330,10 @@ const NewSampleForm: React.FC = () => {
                   clearErrors("country");
                   clearErrors("localityName");
                   clearErrors("collector");
-                  e?.value ? setIsDisabled(true) : setIsDisabled(false);
+                  e?.value &&
+                  !!localityOptions.find((i: any) => i.value === e?.value)
+                    ? setIsDisabled(true)
+                    : setIsDisabled(false);
                 }}
                 label="Locality code"
                 error={errors.localityCode?.message}
