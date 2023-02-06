@@ -37,6 +37,10 @@
   }
 
   @media (min-width: 1024px) {
+    min-width: 100px;
+  }
+
+  @media (min-width: 1280px) {
     min-width: 120px;
   }
 }

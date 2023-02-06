@@ -6,6 +6,7 @@ const routes = {
   all: "/all",
   primers: "/primers",
   pcrPrograms: "/pcrPrograms",
+  locations: "/locations",
 };
 
 export default routes;

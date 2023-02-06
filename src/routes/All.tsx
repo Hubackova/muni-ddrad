@@ -581,8 +581,8 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       >
         <table className="table" {...getTableProps()}>
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroups.map((headerGroup, index) => (
+              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
                 {headerGroup.headers.map((column) => (
                   <th key={column.id}>
                     <span

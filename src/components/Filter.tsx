@@ -1,9 +1,29 @@
 // @ts-nocheck
 import moment from "moment";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAsyncDebounce } from "react-table";
 import { ReactComponent as FilterIcon } from "../images/filter.svg";
 import "./Filter.scss";
+
+function useOutsideAlerter(ref, opened, setOpened) {
+  useEffect(() => {
+    /**
+     * Alert if clicked on outside of element
+     */
+    if (!opened) return;
+    function handleClickOutside(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setOpened(false);
+      }
+    }
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [opened, ref, setOpened]);
+}
 
 // Component for Global Filter
 export function GlobalFilter({ globalFilter, setGlobalFilter }) {
@@ -53,7 +73,8 @@ export function Multi({
   const [maxDate, setMaxDate] = useState(now);
   const [minDate, setMinDate] = useState(now);
   const [filterBy, setFilterBy] = useState(false);
-
+  const wrapperRef = useRef(null);
+  useOutsideAlerter(wrapperRef, opened, setOpened);
   const options = useMemo(() => {
     const options = new Set();
     preFilteredRows.forEach((row) => {
@@ -126,7 +147,7 @@ export function Multi({
         <FilterIcon />
       </button>
       {opened && (
-        <div className="filter-content">
+        <div className="filter-content" ref={wrapperRef}>
           <div
             {...column.getHeaderProps(column.getSortByToggleProps())}
             className="filter-link"

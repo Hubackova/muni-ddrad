@@ -79,6 +79,14 @@ const TopBar: React.FC = () => {
       >
         PCR programs
       </NavLink>
+      <NavLink
+        to={routes.locations}
+        className={({ isActive }) =>
+          isActive ? "topbar-item active" : "topbar-item"
+        }
+      >
+        Locations
+      </NavLink>
       <button className="export" onClick={() => handleDownload()}>
         Export all
       </button>

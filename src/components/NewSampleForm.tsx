@@ -176,7 +176,7 @@ const NewSampleForm: React.FC = () => {
       {}
     )
   )
-    .sort((a: any, b: any) => a.isolateCode.localeCompare(b.isolateCode))
+    .sort((a: any, b: any) => a.isolateCode?.localeCompare(b.isolateCode))
     .map((i: any, index) => (
       <div
         key={index}
