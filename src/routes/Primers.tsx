@@ -238,7 +238,9 @@ const Primers: React.FC = () => {
                         {showEditModal?.row.id === cell.row.id &&
                           showEditModal.id === cell.column.id && (
                             <ConfirmModal
-                              title="Do you want to continue?"
+                              title={`Do you want to change value from ${
+                                showEditModal.initialValue || "<empty>"
+                              } to ${showEditModal.newValue} ?`}
                               onConfirm={() => {
                                 setShowEditModal(null);
                                 update(
