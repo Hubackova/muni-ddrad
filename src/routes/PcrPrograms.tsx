@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { getDatabase, onValue, ref, remove, update } from "firebase/database";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
   useFilters,
@@ -21,6 +21,7 @@ const PcrPrograms: React.FC = () => {
   const [pcrPrograms, setPcrPrograms] = useState<PcrProgramsType[]>([]);
   const db = getDatabase();
   const [showModal, setShowModal] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(null);
 
   useEffect(() => {
     onValue(ref(db, "pcrPrograms/"), (snapshot) => {
@@ -38,15 +39,6 @@ const PcrPrograms: React.FC = () => {
     setShowModal(id);
   };
 
-  const editItem = useCallback(
-    (key: string, newValue: string, id: string) => {
-      update(ref(db, "pcrPrograms/" + key), {
-        [id]: newValue,
-      });
-    },
-    [db]
-  );
-
   const customComparator = (prevProps, nextProps) => {
     return nextProps.value === prevProps.value;
   };
@@ -58,11 +50,20 @@ const PcrPrograms: React.FC = () => {
         setValue(e.target.value);
       };
       const onBlur = (e: any) => {
-        editItem(row.original.key, e.target.value, cell.column.id);
+        if (initialValue !== e.target.value) {
+          setShowEditModal({
+            row,
+            newValue: e.target.value,
+            id: cell.column.id,
+            initialValue,
+            setValue,
+          });
+        }
       };
       React.useEffect(() => {
         setValue(initialValue);
       }, [initialValue]);
+
       return <input value={value} onChange={onChange} onBlur={onBlur} />;
     },
     customComparator
@@ -240,7 +241,35 @@ const PcrPrograms: React.FC = () => {
                   </td>
                   {row.cells.map((cell) => {
                     return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      <>
+                        {showEditModal?.row.id === cell.row.id &&
+                          showEditModal.id === cell.column.id && (
+                            <ConfirmModal
+                              title="Do you want to continue?"
+                              onConfirm={() => {
+                                setShowEditModal(null);
+                                update(
+                                  ref(
+                                    db,
+                                    "pcrPrograms/" +
+                                      showEditModal.row.original.key
+                                  ),
+                                  {
+                                    [showEditModal.id]: showEditModal.newValue,
+                                  }
+                                );
+                                toast.success("Field was edited successfully");
+                              }}
+                              onCancel={() => {
+                                showEditModal.setValue(
+                                  showEditModal.initialValue
+                                );
+                              }}
+                              onHide={() => setShowEditModal(null)}
+                            />
+                          )}
+                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      </>
                     );
                   })}
                 </tr>

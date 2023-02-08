@@ -20,9 +20,10 @@ import { PrimersType } from "../types";
 const Primers: React.FC = () => {
   const [primers, setPrimers] = useState<PrimersType[]>([]);
   const [showModal, setShowModal] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(null);
+  const db = getDatabase();
 
   useEffect(() => {
-    const db = getDatabase();
     onValue(ref(db, "primers/"), (snapshot) => {
       const items: any = [];
       snapshot.forEach((child) => {
@@ -38,12 +39,6 @@ const Primers: React.FC = () => {
     setShowModal(id);
   }, []);
 
-  const editItem = useCallback((key: string, newValue: string, id: string) => {
-    const db = getDatabase();
-    update(ref(db, "primers/" + key), {
-      [id]: newValue,
-    });
-  }, []);
   const customComparator = (prevProps, nextProps) => {
     return nextProps.value === prevProps.value;
   };
@@ -53,10 +48,19 @@ const Primers: React.FC = () => {
       const [value, setValue] = React.useState(initialValue);
       const onChange = (e: any) => {
         setValue(e.target.value);
+        row.original[cell.column.id] = e.target.value;
       };
       const onBlur = (e: any) => {
-        if (e.target.value)
-          editItem(row.original.key, e.target.value, cell.column.id);
+        console.log(initialValue, cell.value, e.target.value);
+        if (cell.value !== e.target.value) {
+          setShowEditModal({
+            row,
+            newValue: e.target.value,
+            id: cell.column.id,
+            initialValue,
+            setValue,
+          });
+        }
       };
       React.useEffect(() => {
         setValue(initialValue);
@@ -230,7 +234,35 @@ const Primers: React.FC = () => {
                   </td>
                   {row.cells.map((cell) => {
                     return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      <>
+                        {showEditModal?.row.id === cell.row.id &&
+                          showEditModal.id === cell.column.id && (
+                            <ConfirmModal
+                              title="Do you want to continue?"
+                              onConfirm={() => {
+                                setShowEditModal(null);
+                                update(
+                                  ref(
+                                    db,
+                                    "primers/" + showEditModal.row.original.key
+                                  ),
+                                  {
+                                    [showEditModal.id]: showEditModal.newValue,
+                                  }
+                                );
+                                showEditModal.setValue(showEditModal.newValue);
+                                toast.success("Field was edited successfully");
+                              }}
+                              onCancel={() => {
+                                showEditModal.setValue(
+                                  showEditModal.initialValue
+                                );
+                              }}
+                              onHide={() => setShowEditModal(null)}
+                            />
+                          )}
+                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      </>
                     );
                   })}
                 </tr>

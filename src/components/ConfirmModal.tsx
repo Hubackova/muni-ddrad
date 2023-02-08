@@ -10,6 +10,7 @@ interface ConfirmModalProps {
   icon?: React.ReactNode;
   error?: string;
   onConfirm: () => Promise<void> | void;
+  onCancel?: () => Promise<void> | void;
   onHide: () => void;
 }
 
@@ -20,6 +21,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   cancelLabel,
   icon,
   onConfirm,
+  onCancel,
   onHide,
   error,
   ...props
@@ -41,7 +43,13 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
         {error && <div className="error">{error}</div>}
         <div className="footer-container">
-          <button className="cancel-btn" onClick={onHide}>
+          <button
+            className="cancel-btn"
+            onClick={() => {
+              onCancel && onCancel();
+              onHide();
+            }}
+          >
             {cancelBtnLabel}
           </button>
 
