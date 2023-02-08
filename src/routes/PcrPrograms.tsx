@@ -270,7 +270,12 @@ const PcrPrograms: React.FC = () => {
                               onHide={() => setShowEditModal(null)}
                             />
                           )}
-                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                        <td
+                          key={row.id + cell.column.id}
+                          {...cell.getCellProps()}
+                        >
+                          {cell.render("Cell")}
+                        </td>
                       </>
                     );
                   })}

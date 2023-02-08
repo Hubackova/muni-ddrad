@@ -10,6 +10,8 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { toast } from "react-toastify";
+import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
@@ -24,6 +26,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
   const db = getDatabase();
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
   const [full, setFull] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(null);
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
@@ -51,7 +54,15 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         setValue(e.target.value);
       };
       const onBlur = (e: any) => {
-        editItem(row.original.localityCode, e.target.value, cell.column.id);
+        if (initialValue != e.target.value) {
+          setShowEditModal({
+            row,
+            newValue: e.target.value,
+            id: cell.column.id,
+            initialValue,
+            setValue,
+          });
+        }
       };
       React.useEffect(() => {
         setValue(initialValue);
@@ -92,17 +103,29 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Header: "Country",
         accessor: "country",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.country = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.localityCode, e.target.value, "country");
-              }}
-              defaultValue={[original.country] || ""}
-            ></input>
-          ),
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+              ></input>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
@@ -112,17 +135,29 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Header: "Latitude [°N]",
         accessor: "latitude",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.latitude = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.localityCode, e.target.value, "latitude");
-              }}
-              defaultValue={[original.latitude] || ""}
-            ></input>
-          ),
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+              ></input>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
@@ -132,17 +167,29 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Header: "Longitude [°E]",
         accessor: "longitude",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.longitude = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.localityCode, e.target.value, "longitude");
-              }}
-              defaultValue={[original.longitude] || ""}
-            ></input>
-          ),
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+              ></input>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
@@ -152,17 +199,29 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Header: "State/province",
         accessor: "state",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.state = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.localityCode, e.target.value, "state");
-              }}
-              defaultValue={[original.state] || ""}
-            ></input>
-          ),
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+              ></input>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
@@ -172,17 +231,29 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Header: "Locality name",
         accessor: "localityName",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.localityName = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.localityCode, e.target.value, "localityName");
-              }}
-              defaultValue={[original.localityName] || ""}
-            ></input>
-          ),
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+              ></input>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
@@ -192,17 +263,29 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Header: "Habitat",
         accessor: "habitat",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.habitat = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.localityCode, e.target.value, "habitat");
-              }}
-              defaultValue={[original.habitat] || ""}
-            ></input>
-          ),
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+              ></input>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
@@ -212,24 +295,36 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Header: "Altitude [m a.s.l.]",
         accessor: "altitude",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.altitude = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.localityCode, e.target.value, "altitude");
-              }}
-              defaultValue={[original.altitude] || ""}
-            ></input>
-          ),
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+              ></input>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
     ],
-    [editItem, localityOptions]
+    [localityOptions]
   );
 
   const tableData = React.useMemo(
@@ -352,12 +447,37 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                 <tr {...row.getRowProps()} key={row.id}>
                   {row.cells.map((cell) => {
                     return (
-                      <td
-                        key={row.id + cell.column.id}
-                        {...cell.getCellProps()}
-                      >
-                        {cell.render("Cell")}
-                      </td>
+                      <>
+                        {showEditModal?.row.id === cell.row.id &&
+                          showEditModal.id === cell.column.id && (
+                            <ConfirmModal
+                              title={`Do you want to change value from ${
+                                showEditModal.initialValue || "<empty>"
+                              } to ${showEditModal.newValue} ?`}
+                              onConfirm={() => {
+                                setShowEditModal(null);
+                                editItem(
+                                  showEditModal.row.original.localityCode,
+                                  showEditModal.newValue,
+                                  showEditModal.id
+                                );
+                                toast.success("Field was edited successfully");
+                              }}
+                              onCancel={() => {
+                                showEditModal.setValue(
+                                  showEditModal.initialValue
+                                );
+                              }}
+                              onHide={() => setShowEditModal(null)}
+                            />
+                          )}
+                        <td
+                          key={row.id + cell.column.id}
+                          {...cell.getCellProps()}
+                        >
+                          {cell.render("Cell")}
+                        </td>
+                      </>
                     );
                   })}
                   <td className="sample-list">
