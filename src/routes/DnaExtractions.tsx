@@ -428,7 +428,11 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             </div>
           </CSVLink>
         </div>
-        {last?.rowKey && <button onClick={handleRevert}>Revert</button>}
+        {last?.rowKey && (
+          <button className="revert" onClick={handleRevert}>
+            Revert
+          </button>
+        )}
         {rows.length > 100 && (
           <button onClick={() => setFull(!full)}>
             {full

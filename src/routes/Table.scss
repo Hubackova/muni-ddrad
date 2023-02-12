@@ -140,6 +140,14 @@ form {
   }
 }
 
+.revert {
+  background-color: rgb(178, 56, 56);
+  color: white;
+  border: none;
+  border-radius: 2px;
+  padding: 4px 8px;
+}
+
 .download {
   display: flex;
   gap: 15px;
