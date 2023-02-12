@@ -36,6 +36,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
   const [newColumn, setNewColumn] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState("");
   const [full, setFull] = useState(false);
+  const [last, setLast] = useState(false);
   const db = getDatabase();
 
   const tableData = React.useMemo(
@@ -92,7 +93,12 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
 
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
-      <EditableCell initialValue={value} row={row} cell={cell} />
+      <EditableCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        setLast={setLast}
+      />
     ),
     customComparator
   );
@@ -159,7 +165,12 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         accessor: "dateIsolation",
         Cell: React.memo<React.FC<any>>(
           ({ value: initialValue, row, cell }) => (
-            <DateCell initialValue={initialValue} row={row} cell={cell} />
+            <DateCell
+              initialValue={initialValue}
+              row={row}
+              cell={cell}
+              saveLast={setLast}
+            />
           ),
           customComparator
         ),

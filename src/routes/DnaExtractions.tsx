@@ -37,6 +37,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
 }) => {
   const db = getDatabase();
   const [full, setFull] = useState(false);
+  const [last, setLast] = useState(false);
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
       update(ref(db, "extractions/" + key), {
@@ -60,10 +61,22 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
 
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
-      <EditableCell initialValue={value} row={row} cell={cell} />
+      <EditableCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        saveLast={setLast}
+      />
     ),
     customComparator
   );
+
+  const handleRevert = () => {
+    update(ref(db, "extractions/" + last.rowKey), {
+      [last.cellId]: last.initialValue,
+    });
+    setLast(false);
+  };
 
   const LocalityCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
@@ -108,7 +121,12 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
         accessor: "dateIsolation",
         Cell: React.memo<React.FC<any>>(
           ({ value: initialValue, row, cell }) => (
-            <DateCell initialValue={initialValue} row={row} cell={cell} />
+            <DateCell
+              initialValue={initialValue}
+              row={row}
+              cell={cell}
+              saveLast={setLast}
+            />
           ),
           customComparator
         ),
@@ -410,6 +428,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             </div>
           </CSVLink>
         </div>
+        {last?.rowKey && <button onClick={handleRevert}>Revert</button>}
         {rows.length > 100 && (
           <button onClick={() => setFull(!full)}>
             {full

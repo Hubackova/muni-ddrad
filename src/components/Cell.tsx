@@ -18,7 +18,12 @@ export const customLocalityComparator = (prevProps, nextProps) => {
   );
 };
 
-export const DateCell: React.FC<any> = ({ initialValue, row, cell }) => {
+export const DateCell: React.FC<any> = ({
+  initialValue,
+  row,
+  cell,
+  saveLast = () => {},
+}) => {
   const db = getDatabase();
   const [showEditModal, setShowEditModal] = useState(null);
   const [value, setValue] = React.useState(initialValue);
@@ -34,6 +39,11 @@ export const DateCell: React.FC<any> = ({ initialValue, row, cell }) => {
         callback: () => {
           update(ref(db, "extractions/" + row.original.key), {
             [cell.column.id]: e.target.value,
+          });
+          saveLast({
+            rowKey: row.original.key,
+            cellId: cell.column.id,
+            initialValue,
           });
         },
       });
@@ -73,6 +83,7 @@ export const EditableCell: React.FC<any> = ({
   cell,
   disabled = false,
   dbName = "extractions/",
+  saveLast = () => {},
   ...props
 }) => {
   const db = getDatabase();
@@ -92,6 +103,11 @@ export const EditableCell: React.FC<any> = ({
         callback: () => {
           update(ref(db, dbName + row.original.key), {
             [cell.column.id]: e.target.value,
+          });
+          saveLast({
+            rowKey: row.original.key,
+            cellId: cell.column.id,
+            initialValue,
           });
         },
       });

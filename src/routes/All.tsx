@@ -33,7 +33,8 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const db = getDatabase();
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
   const [full, setFull] = useState(false);
-  console.log(extractions);
+  const [last, setLast] = useState(false);
+
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
       update(ref(db, "extractions/" + key), {
@@ -54,7 +55,12 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
 
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
-      <EditableCell initialValue={value} row={row} cell={cell} />
+      <EditableCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        saveLast={setLast}
+      />
     ),
     customComparator
   );
@@ -66,6 +72,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         row={row}
         cell={cell}
         disabled={row.original.localityCode}
+        saveLast={setLast}
       />
     ),
     customLocalityComparator
@@ -265,7 +272,12 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         accessor: "dateIsolation",
         Cell: React.memo<React.FC<any>>(
           ({ value: initialValue, row, cell }) => (
-            <DateCell initialValue={initialValue} row={row} cell={cell} />
+            <DateCell
+              initialValue={initialValue}
+              row={row}
+              cell={cell}
+              saveLast={setLast}
+            />
           ),
           customComparator
         ),
@@ -283,6 +295,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               cell={cell}
               type="number"
               step=".00001"
+              saveLast={setLast}
             />
           ),
           customLocalityComparator
@@ -300,6 +313,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               row={row}
               cell={cell}
               options={boxOptions}
+              saveLast={setLast}
             />
           ),
           customLocalityComparator
