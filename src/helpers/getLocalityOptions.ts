@@ -12,7 +12,9 @@ export const getLocalityOptions = (extractions: DnaExtractionsType[]) => {
         .sort(
           (a: any, b: any) =>
             a.localityCode &&
-            a.localityCode.toString()?.localeCompare(b.localityCode.toString())
+            a.localityCode
+              ?.toString()
+              ?.localeCompare(b.localityCode?.toString())
         )
         .map((i: any) => ({
           value: i.localityCode,

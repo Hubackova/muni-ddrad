@@ -10,6 +10,14 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import {
+  customComparator,
+  customLocalityComparator,
+  DateCell,
+  EditableCell,
+  SelectCell,
+} from "../components/Cell";
+import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
@@ -25,6 +33,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const db = getDatabase();
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
   const [full, setFull] = useState(false);
+  console.log(extractions);
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
       update(ref(db, "extractions/" + key), {
@@ -43,25 +52,23 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     [storage]
   );
 
-  const customComparator = (prevProps, nextProps) => {
-    return nextProps.value === prevProps.value;
-  };
-
-  const EditableCell = React.memo<React.FC<any>>(
-    ({ value: initialValue, row, cell }) => {
-      const [value, setValue] = React.useState(initialValue);
-      const onChange = (e: any) => {
-        setValue(e.target.value);
-      };
-      const onBlur = (e: any) => {
-        editItem(row.original.key, e.target.value, cell.column.id);
-      };
-      React.useEffect(() => {
-        setValue(initialValue);
-      }, [initialValue]);
-      return <input value={value} onChange={onChange} onBlur={onBlur} />;
-    },
+  const DefaultCell = React.memo<React.FC<any>>(
+    ({ value, row, cell }) => (
+      <EditableCell initialValue={value} row={row} cell={cell} />
+    ),
     customComparator
+  );
+
+  const LocalityCell = React.memo<React.FC<any>>(
+    ({ value, row, cell }) => (
+      <EditableCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        disabled={row.original.localityCode}
+      />
+    ),
+    customLocalityComparator
   );
 
   const customColumns: Column<any>[] = useMemo(
@@ -82,33 +89,85 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         Header: "Locality code",
         accessor: "localityCode",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <SelectInput
-              options={localityOptions}
-              value={
-                original.localityCode
-                  ? {
-                      value: original.localityCode,
-                      label: original.localityCode,
-                    }
-                  : null
+          ({ value: initialValue, row, cell, row: { original } }) => {
+            const [showEditModal, setShowEditModal] = useState(null);
+            const [value, setValue] = React.useState(
+              original.localityCode
+                ? {
+                    value: original.localityCode,
+                    label: original.localityCode,
+                  }
+                : null
+            );
+            const onChange = (value: any) => {
+              setValue({
+                value: value.value,
+                label: value.value,
+              });
+              if (initialValue !== value.value) {
+                setShowEditModal({
+                  row,
+                  newValue: value.value,
+                  id: cell.column.id,
+                  initialValue,
+                  setValue: (value) =>
+                    setValue({
+                      value: value,
+                      label: value,
+                    }),
+                  callback: () => {
+                    editItem(original.key, value.value, "localityCode");
+                    editItem(original.key, value.country || "", "country");
+                    editItem(original.key, value.state || "", "state");
+                    editItem(
+                      original.key,
+                      value.localityName || "",
+                      "localityName"
+                    );
+                    editItem(original.key, value.latitude || "", "latitude");
+                    editItem(original.key, value.longitude || "", "longitude");
+                    editItem(original.key, value.altitude || "", "altitude");
+                    editItem(original.key, value.habitat || "", "habitat");
+                    editItem(
+                      original.key,
+                      value.dateCollection || "",
+                      "dateCollection"
+                    );
+                    editItem(original.key, value.collector || "", "collector");
+                  },
+                });
               }
-              onChange={(value: any) => {
-                editItem(original.key, value.value, "localityCode");
-                editItem(original.key, value.country, "country");
-                editItem(original.key, value.state, "state");
-                editItem(original.key, value.localityName, "localityName");
-                editItem(original.key, value.latitude, "latitude");
-                editItem(original.key, value.longitude, "longitude");
-                editItem(original.key, value.altitude, "altitude");
-                editItem(original.key, value.habitat, "habitat");
-                editItem(original.key, value.dateCollection, "dateCollection");
-                editItem(original.key, value.collector, "collector");
-              }}
-              isSearchable
-              className="narrow"
-            />
-          ),
+            };
+
+            return (
+              <>
+                <SelectInput
+                  options={localityOptions}
+                  value={value}
+                  onChange={onChange}
+                  isSearchable
+                  className="narrow"
+                />
+                {showEditModal?.row.id === cell.row.id &&
+                  showEditModal.id === cell.column.id && (
+                    <ConfirmModal
+                      title={`Do you want to change value from ${
+                        showEditModal.initialValue || "<empty>"
+                      } to ${showEditModal.newValue} ?`}
+                      onConfirm={async () => {
+                        await showEditModal.callback();
+                        setShowEditModal(null);
+                        toast.success("Field was edited successfully");
+                      }}
+                      onCancel={() => {
+                        showEditModal.setValue(showEditModal.initialValue);
+                      }}
+                      onHide={() => setShowEditModal(null)}
+                    />
+                  )}
+              </>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
@@ -128,216 +187,70 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "Country",
         accessor: "country",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.country = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "country");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.country] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Latitude [°N]",
         accessor: "latitude",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.latitude = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "latitude");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.latitude] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Longitude [°E]",
         accessor: "longitude",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.longitude = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "longitude");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.longitude] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "State/province",
         accessor: "state",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.state = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "state");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.state] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Locality name",
         accessor: "localityName",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.localityName = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "localityName");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.localityName] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Habitat",
         accessor: "habitat",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.habitat = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "habitat");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.habitat] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Altitude [m a.s.l.]",
         accessor: "altitude",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.altitude = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "altitude");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.altitude] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Date collection",
         accessor: "dateCollection",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.dateCollection = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "dateCollection");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.dateCollection] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Collector",
         accessor: "collector",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.collector = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "collector");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.collector] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Species, updated name",
         accessor: "speciesUpdated",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original.speciesUpdated = e.target.value)}
-              onBlur={(e) =>
-                editItem(original.key, e.target.value, "speciesUpdated")
-              }
-              defaultValue={[original.speciesUpdated] || ""}
-            />
-          ),
-          customComparator
-        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -350,25 +263,9 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "Isolation date",
         accessor: "dateIsolation",
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "ng/ul",
-        accessor: "ngul",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              type="number"
-              step=".00001"
-              onChange={(e) => {
-                original.ngul = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "ngul");
-              }}
-              defaultValue={[original.ngul] || ""}
-            />
+          ({ value: initialValue, row, cell }) => (
+            <DateCell initialValue={initialValue} row={row} cell={cell} />
           ),
           customComparator
         ),
@@ -376,25 +273,38 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
+        Header: "ng/ul",
+        accessor: "ngul",
+        Cell: React.memo<React.FC<any>>(
+          ({ value, row, cell }) => (
+            <EditableCell
+              initialValue={value}
+              row={row}
+              cell={cell}
+              type="number"
+              step=".00001"
+            />
+          ),
+          customLocalityComparator
+        ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
         Header: "Box name",
         accessor: "box",
-        Cell: ({ row: { original } }) => {
-          return (
-            <SelectInput
+        Cell: React.memo<React.FC<any>>(
+          ({ value, row, cell }) => (
+            <SelectCell
+              initialValue={value}
+              row={row}
+              cell={cell}
               options={boxOptions}
-              value={
-                original.box
-                  ? { value: original.box, label: original.box }
-                  : null
-              }
-              onChange={(value: any) => {
-                editItem(original.key, value.value, "box");
-              }}
-              isSearchable
-              className="narrow"
             />
-          );
-        },
+          ),
+          customLocalityComparator
+        ),
+
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -487,7 +397,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const tableData = React.useMemo(
     () =>
       extractions.map((ex) => {
-        const storageData = storage.find((i) => i.box === ex.box);
+        const storageData = storage.find((i) => i.key === ex.box);
         return {
           ...ex,
           box: storageData?.box,
@@ -533,7 +443,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     {
       columns,
       data: tableData,
-      defaultColumn: { Cell: EditableCell, Filter: () => {} },
+      defaultColumn: { Cell: DefaultCell, Filter: () => {} },
     },
     useGlobalFilter,
     useFilters,
