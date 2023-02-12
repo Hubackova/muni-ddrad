@@ -11,7 +11,11 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import CreatableSelectInput from "../components/CreatableSelectInput";
+import {
+  CreatableSelectCell,
+  customComparator,
+  EditableCell,
+} from "../components/Cell";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
@@ -47,25 +51,24 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     [storage]
   );
 
-  const customComparator = (prevProps, nextProps) => {
-    return nextProps.value === prevProps.value;
-  };
+  const DefaultCell = React.memo<React.FC<any>>(
+    ({ value, row, cell }) => (
+      <EditableCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        dbName="storage/"
+      />
+    ),
+    customComparator
+  );
 
   const columns: Column<any>[] = useMemo(
     () => [
       {
         Header: "Box name",
         accessor: "box",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original.box = e.target.value)}
-              onBlur={(e) => editItem(original.key, e.target.value, "box")}
-              defaultValue={[original.box] || ""}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: DefaultCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -73,19 +76,13 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         Header: "Storage site",
         accessor: "storageSite",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <CreatableSelectInput
+          ({ value, row, cell }) => (
+            <CreatableSelectCell
+              initialValue={value}
+              row={row}
+              cell={cell}
               options={storageOptions}
-              value={
-                original.storageSite
-                  ? { value: original.storageSite, label: original.storageSite }
-                  : null
-              }
-              onChange={(value: any) => {
-                editItem(original.key, value.value, "storageSite");
-              }}
-              isSearchable
-              className="narrow"
+              dbName="storage/"
             />
           ),
           customComparator
@@ -178,7 +175,7 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
             {rows.map((row) => {
               prepareRow(row);
               const samples = extractions.filter((i) => {
-                return i.box === row.original.box;
+                return i.box === row.original.key;
               });
               return (
                 <tr {...row.getRowProps()} key={row.original.key}>

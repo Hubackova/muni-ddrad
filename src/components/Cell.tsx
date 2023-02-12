@@ -4,7 +4,9 @@ import { getDatabase, ref, update } from "firebase/database";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import ConfirmModal from "./ConfirmModal";
+import CreatableSelectInput from "./CreatableSelectInput";
 import SelectInput from "./SelectInput";
+
 export const customComparator = (prevProps, nextProps) => {
   return nextProps.value === prevProps.value;
 };
@@ -70,6 +72,7 @@ export const EditableCell: React.FC<any> = ({
   row,
   cell,
   disabled = false,
+  dbName = "extractions/",
   ...props
 }) => {
   const db = getDatabase();
@@ -87,7 +90,7 @@ export const EditableCell: React.FC<any> = ({
         initialValue,
         setValue,
         callback: () => {
-          update(ref(db, "extractions/" + row.original.key), {
+          update(ref(db, dbName + row.original.key), {
             [cell.column.id]: e.target.value,
           });
         },
@@ -183,6 +186,73 @@ export const SelectCell: React.FC<any> = ({
           />
         )}
       <SelectInput
+        options={options}
+        value={value}
+        onChange={onChange}
+        isSearchable
+        className="narrow"
+      />
+    </>
+  );
+};
+
+export const CreatableSelectCell: React.FC<any> = ({
+  initialValue,
+  row,
+  cell,
+  options,
+  dbName = "extractions/",
+}) => {
+  const db = getDatabase();
+  const { original } = row;
+  const [showEditModal, setShowEditModal] = useState(null);
+  const [value, setValue] = React.useState(
+    original[cell.column.id]
+      ? { value: initialValue, label: initialValue }
+      : null
+  );
+  const onChange = (value: any) => {
+    setValue({ value: value.value, label: value.label });
+    if (initialValue !== value.value) {
+      setShowEditModal({
+        row,
+        newValue: value.value,
+        id: cell.column.id,
+        initialValue,
+        setValue,
+        callback: () => {
+          update(ref(db, dbName + row.original.key), {
+            [cell.column.id]: value.value,
+          });
+        },
+      });
+    }
+  };
+
+  return (
+    <>
+      {showEditModal?.row.id === cell.row.id &&
+        showEditModal.id === cell.column.id && (
+          <ConfirmModal
+            title={`Do you want to change value from ${
+              initialValue || "<empty>"
+            } to ${value.label} ?`}
+            onConfirm={async () => {
+              await showEditModal.callback();
+              setShowEditModal(null);
+              toast.success("Field was edited successfully");
+            }}
+            onCancel={() => {
+              showEditModal.setValue({
+                value: initialValue,
+                label: initialValue,
+              });
+            }}
+            onHide={() => setShowEditModal(null)}
+          />
+        )}
+
+      <CreatableSelectInput
         options={options}
         value={value}
         onChange={onChange}
