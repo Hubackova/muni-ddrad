@@ -11,7 +11,6 @@ import { DnaExtractionsType, StorageType } from "../types";
 import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
-
 const NewSampleForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
@@ -60,9 +59,12 @@ const NewSampleForm: React.FC = () => {
   };
 
   const addItemsBackup = () => {
-    backup.forEach((i: any) =>
+    backup.forEach((i: any) => {
+      const storageData = storage.find((storage) => storage.box === i.box);
+
       writeExtractionData({
         ...i,
+        box: storageData?.key || "",
         dateCollection: moment(i.dateCollection, "DD.MM.YYYY").format(
           "YYYY-MM-DD"
         ),
@@ -71,8 +73,8 @@ const NewSampleForm: React.FC = () => {
         ),
         isolateCode: i.isolateCode.toString(),
         ngul: parseFloat(i.ngul) || "",
-      })
-    );
+      });
+    });
     toast.success("ok");
   };
 
@@ -494,13 +496,13 @@ const NewSampleForm: React.FC = () => {
         Save
       </button>
 
-      {/*         <button
-          className="submit-btn"
-          type="button"
-          onClick={() => addItemsBackup()}
-        >
-          Backup
-        </button> */}
+      {/*       <button
+        className="submit-btn"
+        type="button"
+        onClick={() => addItemsBackup()}
+      >
+        Backup
+      </button> */}
     </form>
   );
 };
