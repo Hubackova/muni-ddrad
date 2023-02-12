@@ -10,13 +10,20 @@ import {
   useTable,
 } from "react-table";
 import { toast } from "react-toastify";
+import {
+  customComparator,
+  customLocalityComparator,
+  DateCell,
+  EditableCell,
+  SelectCell,
+} from "../components/Cell";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
-import SelectInput from "../components/SelectInput";
 import { legend } from "../constants";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { ReactComponent as InfoIcon } from "../images/info.svg";
 import { DnaExtractionsType, StorageType } from "../types";
+
 interface DnaExtractionsProps {
   storage: StorageType[];
   extractions: DnaExtractionsType[];
@@ -45,7 +52,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
           longitude,
           ...data
         } = ex;
-        const storageData = storage.find((i) => i.box === ex.box);
+        const storageData = storage.find((i) => i.key === ex.box);
         return {
           ...data,
           box: storageData?.box,
@@ -83,25 +90,23 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
     [storage]
   );
 
-  const customComparator = (prevProps, nextProps) => {
-    return nextProps.value === prevProps.value;
-  };
-
-  const EditableCell = React.memo<React.FC<any>>(
-    ({ value: initialValue, row, cell }) => {
-      const [value, setValue] = React.useState(initialValue);
-      const onChange = (e: any) => {
-        setValue(e.target.value);
-      };
-      const onBlur = (e: any) => {
-        editItem(row.original.key, e.target.value, cell.column.id);
-      };
-      React.useEffect(() => {
-        setValue(initialValue);
-      }, [initialValue]);
-      return <input value={value} onChange={onChange} onBlur={onBlur} />;
-    },
+  const DefaultCell = React.memo<React.FC<any>>(
+    ({ value, row, cell }) => (
+      <EditableCell initialValue={value} row={row} cell={cell} />
+    ),
     customComparator
+  );
+
+  const LocalityCell = React.memo<React.FC<any>>(
+    ({ value, row, cell }) => (
+      <EditableCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        disabled={row.original.localityCode}
+      />
+    ),
+    customLocalityComparator
   );
 
   const customColumns = React.useMemo(
@@ -153,15 +158,8 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         Header: "Isolation date",
         accessor: "dateIsolation",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              type="date"
-              onChange={(e) => (original.dateIsolation = e.target.value)}
-              onBlur={(e) =>
-                editItem(original.key, e.target.value, "dateIsolation")
-              }
-              defaultValue={[original.dateIsolation] || ""}
-            ></input>
+          ({ value: initialValue, row, cell }) => (
+            <DateCell initialValue={initialValue} row={row} cell={cell} />
           ),
           customComparator
         ),
@@ -172,20 +170,16 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         Header: "ng/ul",
         accessor: "ngul",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
+          ({ value, row, cell }) => (
+            <EditableCell
+              initialValue={value}
+              row={row}
+              cell={cell}
               type="number"
               step=".00001"
-              onChange={(e) => {
-                original.ngul = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "ngul");
-              }}
-              defaultValue={[original.ngul] || ""}
             />
           ),
-          customComparator
+          customLocalityComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -194,96 +188,47 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         Header: "Box name",
         accessor: "box",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <SelectInput
+          ({ value, row, cell }) => (
+            <SelectCell
+              initialValue={value}
+              row={row}
+              cell={cell}
               options={boxOptions}
-              value={
-                original.box
-                  ? { value: original.box, label: original.box }
-                  : null
-              }
-              onChange={(value: any) => {
-                editItem(original.key, value.value, "box");
-              }}
-              isSearchable
-              className="narrow"
             />
           ),
-          customComparator
+          customLocalityComparator
         ),
+
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Storage site",
         accessor: "storageSite",
-        Cell: ({ row: { original } }) => <span>{original.storageSite}</span>,
+        Cell: ({ row: { original } }) => {
+          return <span>{original?.storageSite}</span>;
+        },
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Country",
         accessor: "country",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.country = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "country");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.country] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "State/province",
         accessor: "state",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.state = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "state");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.state] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Locality name",
         accessor: "localityName",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => {
-                original.localityName = e.target.value;
-              }}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "localityName");
-                editItem(original.key, "", "localityCode");
-              }}
-              defaultValue={[original.localityName] || ""}
-              disabled={original.localityCode}
-            ></input>
-          ),
-          customComparator
-        ),
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -310,60 +255,18 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
       {
         Header: "16S",
         accessor: "16S",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original["16S"] = e.target.value)}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "16S");
-                setIsPopoverOpen(false);
-              }}
-              onFocus={() => setIsPopoverOpen(true)}
-              defaultValue={[original["16S"]] || ""}
-            ></input>
-          ),
-          customComparator
-        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "COI",
         accessor: "COI",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original.COI = e.target.value)}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "COI");
-                setIsPopoverOpen(false);
-              }}
-              onFocus={() => setIsPopoverOpen(true)}
-              defaultValue={[original.COI] || ""}
-            ></input>
-          ),
-          customComparator
-        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "COII",
         accessor: "COII",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original.COII = e.target.value)}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "COII");
-                setIsPopoverOpen(false);
-              }}
-              onFocus={() => setIsPopoverOpen(true)}
-              defaultValue={[original.COII] || ""}
-            ></input>
-          ),
-          customComparator
-        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -371,60 +274,18 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
       {
         Header: "ITS1",
         accessor: "ITS1",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original.ITS1 = e.target.value)}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "ITS1");
-                setIsPopoverOpen(false);
-              }}
-              onFocus={() => setIsPopoverOpen(true)}
-              defaultValue={[original.ITS1] || ""}
-            ></input>
-          ),
-          customComparator
-        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "ITS2",
         accessor: "ITS2",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original.ITS2 = e.target.value)}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "ITS2");
-                setIsPopoverOpen(false);
-              }}
-              onFocus={() => setIsPopoverOpen(true)}
-              defaultValue={[original.ITS2] || ""}
-            ></input>
-          ),
-          customComparator
-        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "ELAV",
         accessor: "ELAV",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original.ELAV = e.target.value)}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "ELAV");
-                setIsPopoverOpen(false);
-              }}
-              onFocus={() => setIsPopoverOpen(true)}
-              defaultValue={[original.ELAV] || ""}
-            ></input>
-          ),
-          customComparator
-        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -498,7 +359,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
       columns,
       data: tableData,
       initialState: { hiddenColumns: ["localityCode"] },
-      defaultColumn: { Cell: EditableCell, Filter: () => {} },
+      defaultColumn: { Cell: DefaultCell, Filter: () => {} },
     },
 
     useGlobalFilter,

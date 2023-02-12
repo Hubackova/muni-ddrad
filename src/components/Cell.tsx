@@ -82,7 +82,7 @@ export const EditableCell: React.FC<any> = ({
     setValue(e.target.value);
   };
   const onBlur = (e: any) => {
-    if (initialValue.toString() !== e.target.value.toString()) {
+    if (initialValue?.toString() !== e.target.value?.toString()) {
       setShowEditModal({
         row,
         newValue: e.target.value,
