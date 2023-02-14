@@ -19,7 +19,7 @@ export const customLocalityComparator = (prevProps, nextProps) => {
 };
 
 export const DateCell: React.FC<any> = ({
-  initialValue,
+  initialValue = "",
   row,
   cell,
   saveLast = () => {},
@@ -29,7 +29,9 @@ export const DateCell: React.FC<any> = ({
   const [value, setValue] = React.useState(initialValue);
   const onChange = (e: any) => {
     setValue(e.target.value);
-    if (initialValue !== e.target.value) {
+    if (
+      (initialValue?.toString() || "") !== (e.target.value?.toString() || "")
+    ) {
       setShowEditModal({
         row,
         newValue: e.target.value,
@@ -78,7 +80,7 @@ export const DateCell: React.FC<any> = ({
 };
 
 export const EditableCell: React.FC<any> = ({
-  initialValue,
+  initialValue = "",
   row,
   cell,
   disabled = false,
@@ -93,7 +95,9 @@ export const EditableCell: React.FC<any> = ({
     setValue(e.target.value);
   };
   const onBlur = (e: any) => {
-    if (initialValue?.toString() !== e.target.value?.toString()) {
+    if (
+      (initialValue?.toString() || "") !== (e.target.value?.toString() || "")
+    ) {
       setShowEditModal({
         row,
         newValue: e.target.value,
@@ -148,10 +152,12 @@ export const EditableCell: React.FC<any> = ({
 };
 
 export const SelectCell: React.FC<any> = ({
-  initialValue,
+  initialValue = "",
   row,
   cell,
   options,
+  saveLast = () => {},
+  initialKey,
 }) => {
   const db = getDatabase();
   const { original } = row;
@@ -163,7 +169,7 @@ export const SelectCell: React.FC<any> = ({
   );
   const onChange = (value: any) => {
     setValue({ value: value.value, label: value.label });
-    if (initialValue !== value.value) {
+    if ((initialValue?.toString() || "") !== (value.value?.toString() || "")) {
       setShowEditModal({
         row,
         newValue: value.value,
@@ -171,8 +177,16 @@ export const SelectCell: React.FC<any> = ({
         initialValue,
         setValue,
         callback: () => {
+          console.log(value.value, initialKey, initialValue);
           update(ref(db, "extractions/" + row.original.key), {
             [cell.column.id]: value.value,
+          });
+          saveLast({
+            rowKey: row.original.key,
+            cellId: cell.column.id,
+            initialValue: initialKey || initialValue,
+            setValue: () =>
+              setValue({ value: initialValue, label: initialValue }),
           });
         },
       });
@@ -213,11 +227,12 @@ export const SelectCell: React.FC<any> = ({
 };
 
 export const CreatableSelectCell: React.FC<any> = ({
-  initialValue,
+  initialValue = "",
   row,
   cell,
   options,
   dbName = "extractions/",
+  saveLast = () => {},
 }) => {
   const db = getDatabase();
   const { original } = row;
@@ -229,7 +244,7 @@ export const CreatableSelectCell: React.FC<any> = ({
   );
   const onChange = (value: any) => {
     setValue({ value: value.value, label: value.label });
-    if (initialValue !== value.value) {
+    if ((initialValue?.toString() || "") !== (value.value?.toString() || "")) {
       setShowEditModal({
         row,
         newValue: value.value,
@@ -239,6 +254,11 @@ export const CreatableSelectCell: React.FC<any> = ({
         callback: () => {
           update(ref(db, dbName + row.original.key), {
             [cell.column.id]: value.value,
+          });
+          saveLast({
+            rowKey: row.original.key,
+            cellId: cell.column.id,
+            initialValue,
           });
         },
       });

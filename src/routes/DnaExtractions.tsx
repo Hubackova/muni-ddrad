@@ -38,6 +38,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
   const db = getDatabase();
   const [full, setFull] = useState(false);
   const [last, setLast] = useState(false);
+
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
       update(ref(db, "extractions/" + key), {
@@ -75,6 +76,8 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
     update(ref(db, "extractions/" + last.rowKey), {
       [last.cellId]: last.initialValue,
     });
+    last.setValue &&
+      last.setValue({ value: last.initialValue, label: last.initialValue });
     setLast(false);
   };
 
@@ -85,6 +88,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
         row={row}
         cell={cell}
         disabled={row.original.localityCode}
+        saveLast={setLast}
       />
     ),
     customLocalityComparator
@@ -146,7 +150,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
               step=".00001"
             />
           ),
-          customLocalityComparator
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -154,17 +158,20 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
       {
         Header: "Box name",
         accessor: "box",
-        Cell: React.memo<React.FC<any>>(
-          ({ value, row, cell }) => (
+        Cell: ({ value, row, cell }) => {
+          const storageData = storage.find((i) => i.box === value);
+          return (
             <SelectCell
               initialValue={value}
+              initialKey={storageData?.key}
               row={row}
               cell={cell}
               options={boxOptions}
+              saveLast={setLast}
+              handleForceupdateMethod={() => forceUpdate()}
             />
-          ),
-          customLocalityComparator
-        ),
+          );
+        },
 
         Filter: Multi,
         filter: multiSelectFilter,
@@ -194,7 +201,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             );
             const onChange = (value: any) => {
               setValue({
-                value: value.value,
+                value: v,
                 label: value.value,
               });
               if (initialValue !== value.value) {
@@ -227,6 +234,11 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
                       "dateCollection"
                     );
                     editItem(original.key, value.collector || "", "collector");
+                    saveLast({
+                      rowKey: row.original.key,
+                      cellId: cell.column.id,
+                      initialValue,
+                    });
                   },
                 });
               }
@@ -276,6 +288,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
       {
         Header: "State/province",
         accessor: "state",
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -289,6 +302,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
       {
         Header: "Locality name",
         accessor: "localityName",
+        Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -395,10 +409,10 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} key={row.id}>
-                  {row.cells.map((cell) => {
+                  {row.cells.map((cell, index) => {
                     return (
                       <td
-                        key={row.id + cell.column.id}
+                        key={row.id + cell.column.id + index}
                         {...cell.getCellProps()}
                       >
                         {cell.render("Cell")}
