@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { getDatabase, ref, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
@@ -11,6 +10,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { toast } from "react-toastify";
 import {
   customComparator,
   customLocalityComparator,
@@ -168,7 +168,6 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
               cell={cell}
               options={boxOptions}
               saveLast={setLast}
-              handleForceupdateMethod={() => forceUpdate()}
             />
           );
         },
@@ -201,7 +200,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             );
             const onChange = (value: any) => {
               setValue({
-                value: v,
+                value: value.value,
                 label: value.value,
               });
               if (initialValue !== value.value) {
@@ -234,7 +233,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
                       "dateCollection"
                     );
                     editItem(original.key, value.collector || "", "collector");
-                    saveLast({
+                    setLast({
                       rowKey: row.original.key,
                       cellId: cell.column.id,
                       initialValue,
@@ -442,7 +441,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             </div>
           </CSVLink>
         </div>
-        {last?.rowKey && (
+        {last?.rowKey && last.cellId !== "localityCode" && (
           <button className="revert" onClick={handleRevert}>
             Revert
           </button>

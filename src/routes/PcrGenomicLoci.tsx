@@ -97,11 +97,20 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         initialValue={value}
         row={row}
         cell={cell}
-        setLast={setLast}
+        saveLast={setLast}
       />
     ),
     customComparator
   );
+
+  const handleRevert = () => {
+    update(ref(db, "extractions/" + last.rowKey), {
+      [last.cellId]: last.initialValue,
+    });
+    last.setValue &&
+      last.setValue({ value: last.initialValue, label: last.initialValue });
+    setLast(false);
+  };
 
   const LocalityCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
@@ -110,6 +119,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         row={row}
         cell={cell}
         disabled={row.original.localityCode}
+        saveLast={setLast}
       />
     ),
     customLocalityComparator
@@ -188,9 +198,10 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
               cell={cell}
               type="number"
               step=".00001"
+              saveLast={setLast}
             />
           ),
-          customLocalityComparator
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -198,17 +209,19 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
       {
         Header: "Box name",
         accessor: "box",
-        Cell: React.memo<React.FC<any>>(
-          ({ value, row, cell }) => (
+        Cell: ({ value, row, cell }) => {
+          const storageData = storage.find((i) => i.box === value);
+          return (
             <SelectCell
               initialValue={value}
+              initialKey={storageData?.key}
               row={row}
               cell={cell}
               options={boxOptions}
+              saveLast={setLast}
             />
-          ),
-          customLocalityComparator
-        ),
+          );
+        },
 
         Filter: Multi,
         filter: multiSelectFilter,
@@ -246,20 +259,6 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
       {
         Header: "cytB",
         accessor: "cytB",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              onChange={(e) => (original.cytB = e.target.value)}
-              onBlur={(e) => {
-                editItem(original.key, e.target.value, "cytB");
-                setIsPopoverOpen(false);
-              }}
-              onFocus={() => setIsPopoverOpen(true)}
-              defaultValue={[original.cytB] || ""}
-            ></input>
-          ),
-          customComparator
-        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -510,6 +509,11 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
             {isPopoverOpen ? "hide legend" : "show legend"}
           </div>
         </div>
+        {last?.rowKey && last.cellId !== "localityCode" && (
+          <button className="revert" onClick={handleRevert}>
+            Revert
+          </button>
+        )}
         {rows.length > 100 && (
           <button onClick={() => setFull(!full)}>
             {full

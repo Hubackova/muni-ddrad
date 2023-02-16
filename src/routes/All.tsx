@@ -52,7 +52,14 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       })),
     [storage]
   );
-
+  const handleRevert = () => {
+    update(ref(db, "extractions/" + last.rowKey), {
+      [last.cellId]: last.initialValue,
+    });
+    last.setValue &&
+      last.setValue({ value: last.initialValue, label: last.initialValue });
+    setLast(false);
+  };
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
       <EditableCell
@@ -141,6 +148,11 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                       "dateCollection"
                     );
                     editItem(original.key, value.collector || "", "collector");
+                    setLast({
+                      rowKey: row.original.key,
+                      cellId: cell.column.id,
+                      initialValue,
+                    });
                   },
                 });
               }
@@ -298,7 +310,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               saveLast={setLast}
             />
           ),
-          customLocalityComparator
+          customComparator
         ),
         Filter: Multi,
         filter: multiSelectFilter,
@@ -306,18 +318,19 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "Box name",
         accessor: "box",
-        Cell: React.memo<React.FC<any>>(
-          ({ value, row, cell }) => (
+        Cell: ({ value, row, cell }) => {
+          const storageData = storage.find((i) => i.box === value);
+          return (
             <SelectCell
               initialValue={value}
+              initialKey={storageData?.key}
               row={row}
               cell={cell}
               options={boxOptions}
               saveLast={setLast}
             />
-          ),
-          customLocalityComparator
-        ),
+          );
+        },
 
         Filter: Multi,
         filter: multiSelectFilter,
@@ -580,6 +593,11 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
+        {last?.rowKey && last.cellId !== "localityCode" && (
+          <button className="revert" onClick={handleRevert}>
+            Revert
+          </button>
+        )}
         {rows.length > 100 && (
           <button onClick={() => setFull(!full)}>
             {full
