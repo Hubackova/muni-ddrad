@@ -11,6 +11,7 @@ import {
   useTable,
 } from "react-table";
 import { toast } from "react-toastify";
+import { EditableCell } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
@@ -22,7 +23,7 @@ const PcrPrograms: React.FC = () => {
   const db = getDatabase();
   const [showModal, setShowModal] = useState(null);
   const [showEditModal, setShowEditModal] = useState(null);
-
+  const [last, setLast] = useState(false);
   useEffect(() => {
     onValue(ref(db, "pcrPrograms/"), (snapshot) => {
       const items: any = [];
@@ -42,30 +43,25 @@ const PcrPrograms: React.FC = () => {
   const customComparator = (prevProps, nextProps) => {
     return nextProps.value === prevProps.value;
   };
+  const handleRevert = () => {
+    update(ref(db, "pcrPrograms/" + last.rowKey), {
+      [last.cellId]: last.initialValue,
+    });
+    last.setValue &&
+      last.setValue({ value: last.initialValue, label: last.initialValue });
+    setLast(false);
+  };
 
-  const EditableCell = React.memo<React.FC<any>>(
-    ({ value: initialValue, row, cell }) => {
-      const [value, setValue] = React.useState(initialValue);
-      const onChange = (e: any) => {
-        setValue(e.target.value);
-      };
-      const onBlur = (e: any) => {
-        if (initialValue !== e.target.value) {
-          setShowEditModal({
-            row,
-            newValue: e.target.value,
-            id: cell.column.id,
-            initialValue,
-            setValue,
-          });
-        }
-      };
-      React.useEffect(() => {
-        setValue(initialValue);
-      }, [initialValue]);
-
-      return <input value={value} onChange={onChange} onBlur={onBlur} />;
-    },
+  const DefaultCell = React.memo<React.FC<any>>(
+    ({ value, row, cell }) => (
+      <EditableCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        dbName="pcrPrograms/"
+        saveLast={setLast}
+      />
+    ),
     customComparator
   );
 
@@ -139,7 +135,7 @@ const PcrPrograms: React.FC = () => {
     {
       columns,
       data: pcrPrograms,
-      defaultColumn: { Cell: EditableCell, Filter: () => {} },
+      defaultColumn: { Cell: DefaultCell, Filter: () => {} },
     },
     useGlobalFilter,
     useFilters,
@@ -302,6 +298,11 @@ const PcrPrograms: React.FC = () => {
             </div>
           </CSVLink>
         </div>
+        {last?.rowKey && last.cellId !== "localityCode" && (
+          <button className="revert" onClick={handleRevert}>
+            Back
+          </button>
+        )}
       </div>
     </>
   );

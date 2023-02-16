@@ -148,6 +148,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
               cell={cell}
               type="number"
               step=".00001"
+              saveLast={setLast}
             />
           ),
           customComparator
@@ -443,7 +444,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
         </div>
         {last?.rowKey && last.cellId !== "localityCode" && (
           <button className="revert" onClick={handleRevert}>
-            Revert
+            Back
           </button>
         )}
         {rows.length > 100 && (

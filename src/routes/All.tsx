@@ -595,7 +595,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         />
         {last?.rowKey && last.cellId !== "localityCode" && (
           <button className="revert" onClick={handleRevert}>
-            Revert
+            Back
           </button>
         )}
         {rows.length > 100 && (

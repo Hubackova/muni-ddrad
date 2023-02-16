@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { getDatabase, ref, update } from "firebase/database";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
   Column,
@@ -28,7 +28,7 @@ interface DnaExtractionsProps {
 
 const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const db = getDatabase();
-
+  const [last, setLast] = useState(false);
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
       update(ref(db, "storage/" + key), {
@@ -50,6 +50,14 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       })),
     [storage]
   );
+  const handleRevert = () => {
+    update(ref(db, "storage/" + last.rowKey), {
+      [last.cellId]: last.initialValue,
+    });
+    last.setValue &&
+      last.setValue({ value: last.initialValue, label: last.initialValue });
+    setLast(false);
+  };
 
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
@@ -58,6 +66,7 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         row={row}
         cell={cell}
         dbName="storage/"
+        saveLast={setLast}
       />
     ),
     customComparator
@@ -83,6 +92,7 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               cell={cell}
               options={storageOptions}
               dbName="storage/"
+              saveLast={setLast}
             />
           ),
           customComparator
@@ -219,6 +229,11 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
+        {last?.rowKey && last.cellId !== "localityCode" && (
+          <button className="revert" onClick={handleRevert}>
+            Back
+          </button>
+        )}
       </div>
     </>
   );
