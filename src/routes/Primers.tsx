@@ -11,6 +11,7 @@ import {
   useTable,
 } from "react-table";
 import { toast } from "react-toastify";
+import { EditableCell } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
@@ -22,7 +23,7 @@ const Primers: React.FC = () => {
   const [showModal, setShowModal] = useState(null);
   const [showEditModal, setShowEditModal] = useState(null);
   const db = getDatabase();
-
+  const [last, setLast] = useState(false);
   useEffect(() => {
     onValue(ref(db, "primers/"), (snapshot) => {
       const items: any = [];
@@ -43,32 +44,28 @@ const Primers: React.FC = () => {
     return nextProps.value === prevProps.value;
   };
 
-  const EditableCell = React.memo<React.FC<any>>(
-    ({ value: initialValue, row, cell }) => {
-      const [value, setValue] = React.useState(initialValue);
-      const onChange = (e: any) => {
-        setValue(e.target.value);
-        row.original[cell.column.id] = e.target.value;
-      };
-      const onBlur = (e: any) => {
-        console.log(initialValue, cell.value, e.target.value);
-        if (cell.value !== e.target.value) {
-          setShowEditModal({
-            row,
-            newValue: e.target.value,
-            id: cell.column.id,
-            initialValue,
-            setValue,
-          });
-        }
-      };
-      React.useEffect(() => {
-        setValue(initialValue);
-      }, [initialValue]);
-      return <input value={value} onChange={onChange} onBlur={onBlur} />;
-    },
+  const handleRevert = () => {
+    update(ref(db, "primers/" + last.rowKey), {
+      [last.cellId]: last.initialValue,
+    });
+    last.setValue &&
+      last.setValue({ value: last.initialValue, label: last.initialValue });
+    setLast(false);
+  };
+
+  const DefaultCell = React.memo<React.FC<any>>(
+    ({ value, row, cell }) => (
+      <EditableCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        dbName="primers/"
+        saveLast={setLast}
+      />
+    ),
     customComparator
   );
+
   const columns = React.useMemo(
     () => [
       {
@@ -134,7 +131,7 @@ const Primers: React.FC = () => {
     {
       columns,
       data: primers,
-      defaultColumn: { Cell: EditableCell, Filter: () => {} },
+      defaultColumn: { Cell: DefaultCell, Filter: () => {} },
     },
     useGlobalFilter,
     useFilters,
@@ -295,6 +292,11 @@ const Primers: React.FC = () => {
             </div>
           </CSVLink>
         </div>
+        {last?.rowKey && last.cellId !== "localityCode" && (
+          <button className="revert" onClick={handleRevert}>
+            Back
+          </button>
+        )}
       </div>
     </>
   );
