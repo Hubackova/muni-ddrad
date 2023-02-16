@@ -454,6 +454,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                               title={`Do you want to change value from ${
                                 showEditModal.initialValue || "<empty>"
                               } to ${showEditModal.newValue} ?`}
+                              description="The change will be made in all samples with the given locality code and cannot be undone using the back button"
                               onConfirm={() => {
                                 setShowEditModal(null);
                                 editItem(

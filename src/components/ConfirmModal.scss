@@ -14,6 +14,15 @@
     background: white;
     padding: 20px;
     max-width: 480px;
+
+    .title {
+      font-weight: 400;
+    }
+
+    .description {
+      color: rgb(66, 66, 66);
+      font-size: 14px;
+    }
   }
 
   .footer-container {

@@ -259,6 +259,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
                       title={`Do you want to change value from ${
                         showEditModal.initialValue || "<empty>"
                       } to ${showEditModal.newValue} ?`}
+                      description="This change cannont be undone using the back button"
                       onConfirm={async () => {
                         await showEditModal.callback();
                         setShowEditModal(null);
