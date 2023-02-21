@@ -15,6 +15,7 @@ import {
   customLocalityComparator,
   DateCell,
   EditableCell,
+  EditableNoConfirmCell,
   SelectCell,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
@@ -83,6 +84,18 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       />
     ),
     customLocalityComparator
+  );
+
+  const NoConfirmCell = React.memo<React.FC<any>>(
+    ({ value, row, cell }) => (
+      <EditableNoConfirmCell
+        initialValue={value}
+        row={row}
+        cell={cell}
+        saveLast={setLast}
+      />
+    ),
+    customComparator
   );
 
   const customColumns: Column<any>[] = useMemo(
@@ -347,24 +360,28 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "cytB",
         accessor: "cytB",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "16S",
         accessor: "16S",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "COI",
         accessor: "COI",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "COII",
         accessor: "COII",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -372,18 +389,21 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "ITS1",
         accessor: "ITS1",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "ITS2",
         accessor: "ITS2",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "ELAV",
         accessor: "ELAV",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },

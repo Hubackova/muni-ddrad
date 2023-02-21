@@ -151,6 +151,49 @@ export const EditableCell: React.FC<any> = ({
   );
 };
 
+export const EditableNoConfirmCell: React.FC<any> = ({
+  initialValue = "",
+  row,
+  cell,
+  disabled = false,
+  dbName = "extractions/",
+  saveLast = () => {},
+  ...props
+}) => {
+  const db = getDatabase();
+  const [value, setValue] = useState(initialValue);
+  const onChange = (e: any) => {
+    setValue(e.target.value);
+  };
+  const onBlur = (e: any) => {
+    if (
+      (initialValue?.toString() || "") !== (e.target.value?.toString() || "")
+    ) {
+      update(ref(db, dbName + row.original.key), {
+        [cell.column.id]: e.target.value,
+      });
+      saveLast({
+        rowKey: row.original.key,
+        cellId: cell.column.id,
+        initialValue,
+      });
+    }
+  };
+  React.useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  return (
+    <input
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      disabled={disabled}
+      {...props}
+    />
+  );
+};
+
 export const SelectCell: React.FC<any> = ({
   initialValue = "",
   row,
