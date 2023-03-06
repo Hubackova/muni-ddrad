@@ -48,11 +48,10 @@ export function GlobalFilter({ globalFilter, setGlobalFilter }) {
 }
 
 export function multiSelectFilter(rows, columnIds, filterValue) {
+  console.log(filterValue);
   return filterValue.length === 0
     ? rows
-    : rows.filter((row) =>
-        filterValue.includes(String(row.original[columnIds]))
-      );
+    : rows.filter((row) => filterValue.includes(row.original[columnIds]));
 }
 const arrayRemove = (arr, value) => {
   return arr.filter((ele) => ele !== value);
@@ -75,12 +74,18 @@ export function Multi({
   const [filterBy, setFilterBy] = useState(false);
   const wrapperRef = useRef(null);
   useOutsideAlerter(wrapperRef, opened, setOpened);
+
   const options = useMemo(() => {
     const options = new Set();
     preFilteredRows.forEach((row) => {
       options.add(row.values[id]);
     });
-    return [...options.values()].sort();
+    const optValues = [...options.values()];
+    if (!isNaN(optValues[0])) {
+      return optValues.sort((a, b) => {
+        return a - b;
+      });
+    } else return optValues.sort();
   }, [id, preFilteredRows]);
 
   const isValidDate = moment(

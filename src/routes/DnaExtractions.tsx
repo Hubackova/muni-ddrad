@@ -143,7 +143,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
         Cell: React.memo<React.FC<any>>(
           ({ value, row, cell }) => (
             <EditableCell
-              initialValue={value}
+              initialValue={parseFloat(value)}
               row={row}
               cell={cell}
               type="number"
