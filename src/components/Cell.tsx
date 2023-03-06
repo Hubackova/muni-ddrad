@@ -23,6 +23,7 @@ export const DateCell: React.FC<any> = ({
   row,
   cell,
   saveLast = () => {},
+  maxChars = 22,
 }) => {
   const db = getDatabase();
   const [showEditModal, setShowEditModal] = useState(null);
@@ -74,7 +75,12 @@ export const DateCell: React.FC<any> = ({
             onHide={() => setShowEditModal(null)}
           />
         )}
-      <input value={value} onChange={onChange} type="date" />
+      <input
+        value={value}
+        onChange={onChange}
+        type="date"
+        title={value.length > maxChars ? value : ""}
+      />
     </>
   );
 };
@@ -84,6 +90,7 @@ export const EditableCell: React.FC<any> = ({
   row,
   cell,
   disabled = false,
+  maxChars = 22,
   dbName = "extractions/",
   saveLast = () => {},
   ...props
@@ -142,6 +149,7 @@ export const EditableCell: React.FC<any> = ({
         )}
       <input
         value={value}
+        title={value.length > maxChars ? value : ""}
         onChange={onChange}
         onBlur={onBlur}
         disabled={disabled}
@@ -158,6 +166,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
   disabled = false,
   dbName = "extractions/",
   saveLast = () => {},
+  maxChars = 22,
   ...props
 }) => {
   const db = getDatabase();
@@ -190,6 +199,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
       onBlur={onBlur}
       disabled={disabled}
       {...props}
+      title={value.length > maxChars ? value : ""}
     />
   );
 };
@@ -201,6 +211,7 @@ export const SelectCell: React.FC<any> = ({
   options,
   saveLast = () => {},
   initialKey,
+  maxChars = 22,
 }) => {
   const db = getDatabase();
   const { original } = row;
@@ -263,6 +274,7 @@ export const SelectCell: React.FC<any> = ({
         onChange={onChange}
         isSearchable
         className="narrow"
+        title={value?.value?.length > maxChars ? value : ""}
       />
     </>
   );
@@ -275,6 +287,7 @@ export const CreatableSelectCell: React.FC<any> = ({
   options,
   dbName = "extractions/",
   saveLast = () => {},
+  maxChars = 22,
 }) => {
   const db = getDatabase();
   const { original } = row;
@@ -336,6 +349,7 @@ export const CreatableSelectCell: React.FC<any> = ({
         onChange={onChange}
         isSearchable
         className="narrow"
+        title={value?.value?.length > maxChars ? value : ""}
       />
     </>
   );
