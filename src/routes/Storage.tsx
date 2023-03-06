@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { getDatabase, ref, update } from "firebase/database";
+import { getDatabase, ref, remove, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
@@ -11,11 +11,13 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import { toast } from "react-toastify";
 import {
   CreatableSelectCell,
   customComparator,
   EditableCell,
 } from "../components/Cell";
+import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
@@ -28,6 +30,7 @@ interface DnaExtractionsProps {
 
 const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const db = getDatabase();
+  const [showModal, setShowModal] = useState(null);
   const [last, setLast] = useState(false);
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
@@ -58,6 +61,10 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       last.setValue({ value: last.initialValue, label: last.initialValue });
     setLast(false);
   };
+
+  const removeItem = useCallback((id: string) => {
+    setShowModal(id);
+  }, []);
 
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
@@ -153,10 +160,22 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           overflow: "auto",
         }}
       >
+        {showModal && (
+          <ConfirmModal
+            title="Do you want to continue?"
+            onConfirm={() => {
+              setShowModal(null);
+              remove(ref(db, "storage/" + showModal));
+              toast.success("Box was removed successfully");
+            }}
+            onHide={() => setShowModal(null)}
+          />
+        )}
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                <th></th>
                 {headerGroup.headers.map((column) => (
                   <th key={column.id}>
                     <span
@@ -189,6 +208,11 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               });
               return (
                 <tr {...row.getRowProps()} key={row.original.key}>
+                  <td role="cell" className="remove">
+                    <button onClick={() => removeItem(row.original.key)}>
+                      X
+                    </button>
+                  </td>
                   {row.cells.map((cell) => {
                     return (
                       <td
