@@ -13,10 +13,16 @@
     height: 40px;
   }
 
-  .input:disabled {
+  .input:disabled,
+  .select--is-disabled {
+    background-color: rgb(235, 235, 235);
+    border-radius: 4px;
+  }
+  .select--is-disabled * {
+    color: rgb(97, 97, 97);
+    border-color: rgb(97, 97, 97);
     background-color: rgb(235, 235, 235);
   }
-
   .side-panel {
     position: fixed;
     right: 0;

@@ -92,11 +92,13 @@ const NewSampleForm: React.FC = () => {
   });
 
   const boxOptions = storage
-    .map((i) => ({
-      value: i.key,
-      label: i.box,
-      storageSite: i.storageSite,
-    }))
+    .map((i) => {
+      return {
+        value: i.key,
+        label: i.box,
+        storageSite: i.storageSite,
+      };
+    })
     .sort(function (a, b) {
       if (a.label < b.label) {
         return -1;
@@ -148,17 +150,18 @@ const NewSampleForm: React.FC = () => {
     [clearErrors, localityOptions, setValue]
   );
 
-  const speciesOptions = useMemo(
-    () =>
+  const getOptions = React.useCallback(
+    (key: string) =>
       Object.values(
         extractions.reduce(
-          (acc, cur) => Object.assign(acc, { [cur.speciesOrig]: cur }),
+          /* @ts-ignore */
+          (acc, cur) => Object.assign(acc, { [cur[key]]: cur }),
           {}
         )
       )
         .map((i: any) => ({
-          value: i.speciesOrig,
-          label: i.speciesOrig,
+          value: i[key],
+          label: i[key],
         }))
         .sort(function (a, b) {
           if (a.label < b.label) {
@@ -171,6 +174,7 @@ const NewSampleForm: React.FC = () => {
         }),
     [extractions]
   );
+  const speciesOptions = getOptions("speciesOrig");
 
   const codeItems = Object.values(
     extractions.reduce(
@@ -279,12 +283,22 @@ const NewSampleForm: React.FC = () => {
         />
       </div>
       <div className="row">
-        <TextInput
-          label="Project"
+        <Controller
+          render={({ field: { onChange, value } }) => (
+            <CreatableSelectInput
+              options={getOptions("project")}
+              value={value ? { value, label: value } : null}
+              onChange={(e: any) => {
+                onChange(e?.value);
+              }}
+              label="Project"
+              error={errors.project?.message}
+              isSearchable
+              required="This field is required"
+            />
+          )}
+          control={control}
           name="project"
-          required="This field is required"
-          error={errors.project?.message}
-          register={register}
         />
         <TextInput
           label="Date of Isolation"
@@ -303,29 +317,50 @@ const NewSampleForm: React.FC = () => {
           type="number"
           step=".00001"
         />
-        <TextInput
-          label="Kit"
+        <Controller
+          render={({ field: { onChange, value } }) => (
+            <CreatableSelectInput
+              options={getOptions("kit")}
+              value={value ? { value, label: value } : null}
+              onChange={(e: any) => {
+                onChange(e?.value);
+              }}
+              label="Kit"
+              error={errors.kit?.message}
+              isSearchable
+              required="This field is required"
+            />
+          )}
+          control={control}
           name="kit"
-          error={errors.kit?.message}
-          register={register}
-          required="This field is required"
         />
       </div>
       <div className="row">
         <Controller
-          render={({ field: { onChange, value, name } }) => (
-            <SelectInput
-              options={boxOptions}
-              value={value ? { value, label: name } : null}
-              onChange={(e: any) => {
-                onChange(e?.value);
-                setValue("storageSite", e.storageSite);
-              }}
-              label="Box"
-              error={errors.box?.message}
-              isSearchable
-            />
-          )}
+          render={({ field: { onChange, value } }) => {
+            return (
+              <SelectInput
+                options={boxOptions}
+                value={
+                  value
+                    ? {
+                        // @ts-ignore
+                        value: value.value,
+                        // @ts-ignore
+                        label: value.label,
+                      }
+                    : null
+                }
+                onChange={(e: any) => {
+                  onChange(e.value);
+                  setValue("storageSite", e.storageSite);
+                }}
+                label="Box"
+                error={errors.box?.message}
+                isSearchable
+              />
+            );
+          }}
           control={control}
           name="box"
         />
@@ -394,16 +429,24 @@ const NewSampleForm: React.FC = () => {
             )}
           </div>
         </div>
-        <TextInput
-          label="Country"
+        <Controller
+          render={({ field: { onChange, value } }) => (
+            <CreatableSelectInput
+              options={getOptions("country")}
+              value={value ? { value, label: value } : null}
+              onChange={(e: any) => {
+                onChange(e?.value);
+                setValue("isolateCodeGroup", "");
+              }}
+              label="Country"
+              error={errors.country?.message}
+              isSearchable
+              required="This field is required"
+              isDisabled={isDisabled}
+            />
+          )}
+          control={control}
           name="country"
-          error={errors.country?.message}
-          required="This field is required"
-          onBlur={() => {
-            setValue("isolateCodeGroup", "");
-          }}
-          disabled={isDisabled}
-          register={register}
         />
       </div>
       <div className="row">
