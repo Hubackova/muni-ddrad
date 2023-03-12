@@ -344,10 +344,8 @@ const NewSampleForm: React.FC = () => {
                 value={
                   value
                     ? {
-                        // @ts-ignore
-                        value: value.value,
-                        // @ts-ignore
-                        label: value.label,
+                        value,
+                        label: boxOptions.find((i) => i.value === value)?.label,
                       }
                     : null
                 }
