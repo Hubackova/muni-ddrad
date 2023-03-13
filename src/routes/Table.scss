@@ -89,6 +89,9 @@
     input {
       height: 20px;
       max-height: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &:disabled {
         background-color: #eee;

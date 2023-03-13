@@ -7,6 +7,28 @@ import ConfirmModal from "./ConfirmModal";
 import CreatableSelectInput from "./CreatableSelectInput";
 import SelectInput from "./SelectInput";
 
+export const useIsOverflow = (ref, callback) => {
+  const [isOverflow, setIsOverflow] = React.useState(undefined);
+
+  React.useLayoutEffect(() => {
+    const { current } = ref;
+
+    const trigger = () => {
+      const hasOverflow = current.scrollWidth > current.clientWidth;
+
+      setIsOverflow(hasOverflow);
+
+      if (callback) callback(hasOverflow);
+    };
+
+    if (current) {
+      trigger();
+    }
+  }, [callback, ref]);
+
+  return isOverflow;
+};
+
 export const customComparator = (prevProps, nextProps) => {
   return nextProps.value === prevProps.value;
 };
@@ -28,6 +50,7 @@ export const DateCell: React.FC<any> = ({
   const db = getDatabase();
   const [showEditModal, setShowEditModal] = useState(null);
   const [value, setValue] = React.useState(initialValue);
+
   const onChange = (e: any) => {
     setValue(e.target.value);
     if (
@@ -124,9 +147,13 @@ export const EditableCell: React.FC<any> = ({
       });
     }
   };
+  const ref = React.useRef();
+  const isOverflow = useIsOverflow(ref);
+
   React.useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
+  if (!cell) return;
 
   return (
     <>
@@ -149,7 +176,8 @@ export const EditableCell: React.FC<any> = ({
         )}
       <input
         value={value}
-        title={value.length > maxChars ? value : ""}
+        ref={ref}
+        title={isOverflow ? value : ""}
         onChange={onChange}
         onBlur={onBlur}
         disabled={disabled}
@@ -192,6 +220,9 @@ export const EditableNoConfirmCell: React.FC<any> = ({
     setValue(initialValue);
   }, [initialValue]);
 
+  const ref = React.useRef();
+  const isOverflow = useIsOverflow(ref);
+
   return (
     <input
       value={value}
@@ -199,7 +230,8 @@ export const EditableNoConfirmCell: React.FC<any> = ({
       onBlur={onBlur}
       disabled={disabled}
       {...props}
-      title={value.length > maxChars ? value : ""}
+      ref={ref}
+      title={isOverflow ? value : ""}
     />
   );
 };
@@ -246,6 +278,9 @@ export const SelectCell: React.FC<any> = ({
     }
   };
 
+  const ref = React.useRef();
+  const isOverflow = useIsOverflow(ref);
+
   return (
     <>
       {showEditModal?.row.id === cell.row.id &&
@@ -274,7 +309,8 @@ export const SelectCell: React.FC<any> = ({
         onChange={onChange}
         isSearchable
         className="narrow"
-        title={value?.value?.length > maxChars ? value : ""}
+        title={isOverflow ? value : ""}
+        ref={ref}
       />
     </>
   );
@@ -319,7 +355,8 @@ export const CreatableSelectCell: React.FC<any> = ({
       });
     }
   };
-
+  const ref = React.useRef();
+  const isOverflow = useIsOverflow(ref);
   return (
     <>
       {showEditModal?.row.id === cell.row.id &&
@@ -344,12 +381,13 @@ export const CreatableSelectCell: React.FC<any> = ({
         )}
 
       <CreatableSelectInput
+        ref={ref}
         options={options}
         value={value}
         onChange={onChange}
         isSearchable
         className="narrow"
-        title={value?.value?.length > maxChars ? value : ""}
+        title={isOverflow ? value : ""}
       />
     </>
   );
