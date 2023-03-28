@@ -60,17 +60,16 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
 
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
 
-  const DefaultCell = React.memo<React.FC<any>>(
-    ({ value, row, cell }) => (
+  const DefaultCell = React.memo<React.FC<any>>(({ value, row, cell }) => {
+    return (
       <EditableCell
         initialValue={value}
         row={row}
         cell={cell}
         saveLast={setLast}
       />
-    ),
-    customComparator
-  );
+    );
+  }, customComparator);
 
   const handleRevert = () => {
     update(ref(db, "extractions/" + last.rowKey), {

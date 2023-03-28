@@ -155,6 +155,20 @@ export const EditableCell: React.FC<any> = ({
   }, [initialValue]);
   if (!cell) return;
 
+  const isNarrow = [
+    "isolateCodeGroup",
+    "ngul",
+    "isolateCode",
+    "kit",
+    /*     "cytB",
+    "16S",
+    "COI",
+    "COII",
+    "ITS1",
+    "ITS2",
+    "ELAV", */
+  ].includes(cell.column.id);
+  const isWide = ["localityName"].includes(cell.column.id);
   return (
     <>
       {showEditModal?.row.id === cell.row.id &&
@@ -181,6 +195,7 @@ export const EditableCell: React.FC<any> = ({
         onChange={onChange}
         onBlur={onBlur}
         disabled={disabled}
+        className={isNarrow ? "narrow" : isWide ? "wide" : ""}
         {...props}
       />
     </>
@@ -222,7 +237,15 @@ export const EditableNoConfirmCell: React.FC<any> = ({
 
   const ref = React.useRef();
   const isOverflow = useIsOverflow(ref);
-
+  const isNarrow = [
+    "cytB",
+    "16S",
+    "COI",
+    "COII",
+    "ITS1",
+    "ITS2",
+    "ELAV",
+  ].includes(cell.column.id);
   return (
     <input
       value={value}
@@ -232,6 +255,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
       {...props}
       ref={ref}
       title={isOverflow ? value : ""}
+      className={isNarrow ? "narrow" : ""}
     />
   );
 };

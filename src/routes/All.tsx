@@ -105,7 +105,11 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         accessor: "isolateCode",
         Cell: React.memo<React.FC<any>>(
           ({ row: { original } }) => (
-            <input defaultValue={[original.isolateCode] || ""} disabled></input>
+            <input
+              defaultValue={[original.isolateCode] || ""}
+              disabled
+              className="narrow"
+            ></input>
           ),
           customComparator
         ),
@@ -461,8 +465,9 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         (i) => i.accessor
       );
       const tableDataKeys = Object.keys(tableData[0]);
-
+      console.log(tableDataKeys);
       return tableDataKeys
+        .filter((i) => i !== "isolateCodeGroup")
         .map((i) => {
           if (customKeys.includes(i)) return null;
           return {

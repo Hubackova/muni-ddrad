@@ -145,20 +145,9 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         accessor: "isolateCode",
         Cell: React.memo<React.FC<any>>(
           ({ row: { original } }) => (
-            <input defaultValue={[original.isolateCode] || ""} disabled></input>
-          ),
-          customComparator
-        ),
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Isolate code group",
-        accessor: "isolateCodeGroup",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
             <input
-              defaultValue={[original.isolateCodeGroup] || ""}
+              defaultValue={[original.isolateCode] || ""}
+              className={"narrow"}
               disabled
             ></input>
           ),
@@ -266,6 +255,22 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         Header: "Locality name",
         accessor: "localityName",
         Cell: LocalityCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Isolate group",
+        accessor: "isolateCodeGroup",
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              defaultValue={[original.isolateCodeGroup] || ""}
+              disabled
+              className={"narrow"}
+            ></input>
+          ),
+          customComparator
+        ),
         Filter: Multi,
         filter: multiSelectFilter,
       },

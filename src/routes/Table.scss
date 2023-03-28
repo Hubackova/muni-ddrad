@@ -98,6 +98,14 @@
         border: 1px solid grey;
         color: black;
       }
+
+      &.narrow {
+        max-width: 105px;
+      }
+
+      &.wide {
+        min-width: 300px;
+      }
     }
 
     > span:not(.sample) {
