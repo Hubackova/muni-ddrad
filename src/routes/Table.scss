@@ -102,9 +102,16 @@
       &.narrow {
         max-width: 105px;
       }
+      &.semi-narrow {
+        max-width: 135px;
+      }
 
       &.wide {
         min-width: 300px;
+      }
+
+      &.semi-wide {
+        min-width: 250px;
       }
     }
 

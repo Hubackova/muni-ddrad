@@ -74,7 +74,7 @@ const PcrPrograms: React.FC = () => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Initial Denaturation",
+        Header: "Init. Denaturation",
         accessor: "initialDenaturation",
         Filter: Multi,
         filter: multiSelectFilter,

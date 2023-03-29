@@ -123,6 +123,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                 }}
                 onChange={onChange}
                 value={value}
+                className="semi-narrow"
               ></input>
             );
           },
@@ -155,6 +156,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                 }}
                 onChange={onChange}
                 value={value}
+                className="semi-narrow"
               ></input>
             );
           },
@@ -187,6 +189,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                 }}
                 onChange={onChange}
                 value={value}
+                className="semi-narrow"
               ></input>
             );
           },
@@ -219,6 +222,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                 }}
                 onChange={onChange}
                 value={value}
+                className="semi-narrow"
               ></input>
             );
           },
@@ -251,6 +255,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                 }}
                 onChange={onChange}
                 value={value}
+                className="wide"
               ></input>
             );
           },

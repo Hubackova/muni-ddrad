@@ -160,6 +160,12 @@ export const EditableCell: React.FC<any> = ({
     "ngul",
     "isolateCode",
     "kit",
+    "status",
+    "marker",
+    "anneal",
+    "annealing",
+    "extension",
+    "latitude",
     /*     "cytB",
     "16S",
     "COI",
@@ -168,7 +174,14 @@ export const EditableCell: React.FC<any> = ({
     "ITS2",
     "ELAV", */
   ].includes(cell.column.id);
-  const isWide = ["localityName"].includes(cell.column.id);
+  const isWide = ["localityName", "note"].includes(cell.column.id);
+  const isSemiWide = ["sequence"].includes(cell.column.id);
+  const isSemiNarrow = [
+    "initialDenaturation",
+    "finalExtension",
+    "numberCycles",
+    "end",
+  ].includes(cell.column.id);
   return (
     <>
       {showEditModal?.row.id === cell.row.id &&
@@ -195,7 +208,17 @@ export const EditableCell: React.FC<any> = ({
         onChange={onChange}
         onBlur={onBlur}
         disabled={disabled}
-        className={isNarrow ? "narrow" : isWide ? "wide" : ""}
+        className={
+          isNarrow
+            ? "narrow"
+            : isWide
+            ? "wide"
+            : isSemiWide
+            ? "semi-wide"
+            : isSemiNarrow
+            ? "semi-narrow"
+            : ""
+        }
         {...props}
       />
     </>
