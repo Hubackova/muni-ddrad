@@ -147,8 +147,8 @@ export const EditableCell: React.FC<any> = ({
       });
     }
   };
-  const ref = React.useRef();
-  const isOverflow = useIsOverflow(ref);
+  const inputRef = React.useRef();
+  const isOverflow = useIsOverflow(inputRef);
 
   React.useEffect(() => {
     setValue(initialValue);
@@ -203,7 +203,7 @@ export const EditableCell: React.FC<any> = ({
         )}
       <input
         value={value}
-        ref={ref}
+        ref={inputRef}
         title={isOverflow ? value : ""}
         onChange={onChange}
         onBlur={onBlur}
@@ -258,8 +258,8 @@ export const EditableNoConfirmCell: React.FC<any> = ({
     setValue(initialValue);
   }, [initialValue]);
 
-  const ref = React.useRef();
-  const isOverflow = useIsOverflow(ref);
+  const inputRef = React.useRef();
+  const isOverflow = useIsOverflow(inputRef);
   const isNarrow = [
     "cytB",
     "16S",
@@ -276,7 +276,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
       onBlur={onBlur}
       disabled={disabled}
       {...props}
-      ref={ref}
+      ref={inputRef}
       title={isOverflow ? value : ""}
       className={isNarrow ? "narrow" : ""}
     />
@@ -310,6 +310,7 @@ export const SelectCell: React.FC<any> = ({
         initialValue,
         setValue,
         callback: () => {
+          console.log(value);
           update(ref(db, "extractions/" + row.original.key), {
             [cell.column.id]: value.value,
           });
@@ -325,8 +326,8 @@ export const SelectCell: React.FC<any> = ({
     }
   };
 
-  const ref = React.useRef();
-  const isOverflow = useIsOverflow(ref);
+  const inputRef = React.useRef();
+  const isOverflow = useIsOverflow(inputRef);
 
   return (
     <>
@@ -357,7 +358,7 @@ export const SelectCell: React.FC<any> = ({
         isSearchable
         className="narrow"
         title={isOverflow ? value : ""}
-        ref={ref}
+        ref={inputRef}
       />
     </>
   );
@@ -402,8 +403,8 @@ export const CreatableSelectCell: React.FC<any> = ({
       });
     }
   };
-  const ref = React.useRef();
-  const isOverflow = useIsOverflow(ref);
+  const inputRef = React.useRef();
+  const isOverflow = useIsOverflow(inputRef);
   return (
     <>
       {showEditModal?.row.id === cell.row.id &&
@@ -428,7 +429,7 @@ export const CreatableSelectCell: React.FC<any> = ({
         )}
 
       <CreatableSelectInput
-        ref={ref}
+        ref={inputRef}
         options={options}
         value={value}
         onChange={onChange}
