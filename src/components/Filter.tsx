@@ -1,4 +1,5 @@
 // @ts-nocheck
+import cx from "classnames";
 import moment from "moment";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAsyncDebounce } from "react-table";
@@ -148,7 +149,12 @@ export function Multi({
   // UI for Multi-Select box
   return (
     <div className="filter-wrapper">
-      <button onClick={() => setOpened(!opened)} className="filter-btn">
+      <button
+        onClick={() => setOpened(!opened)}
+        className={cx("filter-btn", {
+          active: filterValue && filterValue.length,
+        })}
+      >
         <FilterIcon />
       </button>
       {opened && (

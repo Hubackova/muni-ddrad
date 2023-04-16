@@ -11,12 +11,12 @@ import {
   useTable,
 } from "react-table";
 import {
-  customComparator,
-  customLocalityComparator,
   DateCell,
   EditableCell,
   EditableNoConfirmCell,
   SelectCell,
+  customComparator,
+  customLocalityComparator,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
@@ -420,24 +420,28 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "note on PCR",
         accessor: "notePCR",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "note on sequencing",
         accessor: "noteSequencing",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "General Note",
         accessor: "noteGeneral",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "STATUS",
         accessor: "status",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },

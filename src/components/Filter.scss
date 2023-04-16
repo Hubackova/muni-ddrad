@@ -33,13 +33,20 @@
   text-align: left;
   font-weight: 400;
   margin-bottom: -5px;
+
   .filter-btn {
     border: none;
     background-color: inherit;
     cursor: pointer;
+    margin-left: 2px;
+
+    &.active {
+      background-color: rgb(238, 239, 236);
+      border: 1px solid greenyellow;
+    }
 
     svg {
-      width: 22px;
+      width: 18px;
     }
   }
 

@@ -24,6 +24,7 @@ interface LocationsProps {
 
 const Locations: React.FC<LocationsProps> = ({ extractions }) => {
   const db = getDatabase();
+  console.log(extractions);
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
   const [full, setFull] = useState(false);
   const [showEditModal, setShowEditModal] = useState(null);
@@ -435,7 +436,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                     {column.canFilter ? column.render("Filter") : null}
                   </th>
                 ))}
-                <th>IsolateCode Group</th>
+                <th>IsolateCode with Loc.</th>
               </tr>
             ))}
           </thead>
@@ -452,7 +453,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                 <tr {...row.getRowProps()} key={row.id}>
                   {row.cells.map((cell) => {
                     return (
-                      <>
+                      <React.Fragment key={cell.column.id + cell.row.id}>
                         {showEditModal?.row.id === cell.row.id &&
                           showEditModal.id === cell.column.id && (
                             <ConfirmModal
@@ -483,7 +484,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                         >
                           {cell.render("Cell")}
                         </td>
-                      </>
+                      </React.Fragment>
                     );
                   })}
                   <td className="sample-list">

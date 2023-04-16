@@ -11,12 +11,12 @@ import {
 } from "react-table";
 import { toast } from "react-toastify";
 import {
-  customComparator,
-  customLocalityComparator,
   DateCell,
   EditableCell,
   EditableNoConfirmCell,
   SelectCell,
+  customComparator,
+  customLocalityComparator,
 } from "../components/Cell";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
@@ -333,24 +333,28 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
       {
         Header: "note on PCR",
         accessor: "notePCR",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "note on sequencing",
         accessor: "noteSequencing",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "General Note",
         accessor: "noteGeneral",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "STATUS",
         accessor: "status",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
