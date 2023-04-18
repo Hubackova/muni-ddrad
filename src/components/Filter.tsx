@@ -49,7 +49,6 @@ export function GlobalFilter({ globalFilter, setGlobalFilter }) {
 }
 
 export function multiSelectFilter(rows, columnIds, filterValue) {
-  console.log(filterValue);
   return filterValue.length === 0
     ? rows
     : rows.filter((row) => filterValue.includes(row.original[columnIds]));

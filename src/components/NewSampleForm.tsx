@@ -52,6 +52,7 @@ const NewSampleForm: React.FC = () => {
         ? {
             ...sampleData,
             ngul: parseFloat(sampleData.ngul),
+            isolateCodeGroup: sampleData.isolateCodeGroup.trim(),
           }
         : { ...sampleData }
     );
@@ -235,7 +236,7 @@ const NewSampleForm: React.FC = () => {
             register={register}
             required="This field is required"
             validate={() =>
-              !isCodes.includes(getValues("isolateCode")) ||
+              !isCodes.includes(getValues("isolateCode").trim()) ||
               "Duplicate isolateCode"
             }
           />

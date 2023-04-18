@@ -469,7 +469,6 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         (i) => i.accessor
       );
       const tableDataKeys = Object.keys(tableData[0]);
-      console.log(tableDataKeys);
       return tableDataKeys
         .filter((i) => i !== "isolateCodeGroup")
         .map((i) => {
@@ -577,7 +576,9 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               prepareRow(row);
 
               const groupItems = extractions.filter((i) => {
-                return i.isolateCodeGroup === row.original.isolateCode;
+                return (
+                  i.isolateCodeGroup.trim() === row.original.isolateCode.trim()
+                );
               });
 
               return (

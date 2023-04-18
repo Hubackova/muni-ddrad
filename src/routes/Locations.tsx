@@ -24,7 +24,6 @@ interface LocationsProps {
 
 const Locations: React.FC<LocationsProps> = ({ extractions }) => {
   const db = getDatabase();
-  console.log(extractions);
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
   const [full, setFull] = useState(false);
   const [showEditModal, setShowEditModal] = useState(null);

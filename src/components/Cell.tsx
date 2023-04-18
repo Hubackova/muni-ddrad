@@ -310,7 +310,6 @@ export const SelectCell: React.FC<any> = ({
         initialValue,
         setValue,
         callback: () => {
-          console.log(value);
           update(ref(db, "extractions/" + row.original.key), {
             [cell.column.id]: value.value,
           });
