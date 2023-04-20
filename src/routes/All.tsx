@@ -575,11 +575,14 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
             {rowsShow.map((row) => {
               prepareRow(row);
 
-              const groupItems = extractions.filter((i) => {
-                return (
-                  i.isolateCodeGroup.trim() === row.original.isolateCode.trim()
-                );
-              });
+              const isolateCodeGroup = row.original.isolateCodeGroup
+                ? extractions
+                    .filter(
+                      (i) =>
+                        i.isolateCodeGroup === row.original.isolateCodeGroup
+                    )
+                    .map((i) => i.isolateCode)
+                : [];
 
               return (
                 <tr {...row.getRowProps()} key={row.id}>
@@ -594,9 +597,9 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                     );
                   })}
                   <td className="sample-list">
-                    {groupItems.map((i) => (
-                      <span key={i.isolateCode} className="sample">
-                        {i.isolateCode}
+                    {isolateCodeGroup.map((i) => (
+                      <span key={i} className="sample">
+                        {i}
                       </span>
                     ))}
                   </td>

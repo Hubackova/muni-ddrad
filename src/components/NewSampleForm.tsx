@@ -1,4 +1,4 @@
-import { getDatabase, onValue, ref } from "firebase/database";
+import { getDatabase, onValue, ref, update } from "firebase/database";
 import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -11,12 +11,14 @@ import { DnaExtractionsType, StorageType } from "../types";
 import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
+
 const NewSampleForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
   const [showModalLoc, setShowModalLoc] = useState(false);
   const [showModalCode, setShowModalCode] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isolateGroup, setIsolateGroup] = useState<any | null>(null);
   const db = getDatabase();
 
   useEffect(() => {
@@ -47,18 +49,25 @@ const NewSampleForm: React.FC = () => {
         delete sampleData[key];
       }
     });
-    writeExtractionData(
-      sampleData.ngul
-        ? {
-            ...sampleData,
-            ngul: parseFloat(sampleData.ngul),
-            isolateCodeGroup: sampleData.isolateCodeGroup.trim(),
-          }
-        : { ...sampleData }
-    );
+
+    writeExtractionData({
+      ...sampleData,
+      ngul: sampleData.ngul ? parseFloat(sampleData.ngul) : "",
+      isolateCodeGroup: isolateGroup
+        ? isolateGroup?.isolateCodeGroup || isolateGroup?.isolateCode
+        : "",
+    });
+    if (
+      sampleData.isolateCodeGroup &&
+      isolateGroup.key &&
+      !isolateGroup.isolateCodeGroup
+    ) {
+      update(ref(db, "extractions/" + isolateGroup.key), {
+        isolateCodeGroup: isolateGroup.isolateCode,
+      });
+    }
     toast.success("Sample was added successfully");
   };
-
   const addItemsBackup = () => {
     backup.forEach((i: any) => {
       const storageData = storage.find((storage) => storage.box === i.box);
@@ -213,6 +222,7 @@ const NewSampleForm: React.FC = () => {
             shouldValidate: true,
           });
           setValue("isolateCodeGroup", i.isolateCode);
+          setIsolateGroup(i);
           clearErrors("country");
           clearErrors("localityName");
           clearErrors("collector");

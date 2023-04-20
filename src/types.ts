@@ -18,7 +18,7 @@ export interface DnaExtractionsType {
   habitat: string;
   dateCollection: string;
   collector: string;
-  isolateCodeGroup: string;
+  isolateCodeGroup: string[] | "";
 }
 
 export interface StorageType {

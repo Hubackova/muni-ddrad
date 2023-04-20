@@ -166,13 +166,6 @@ export const EditableCell: React.FC<any> = ({
     "annealing",
     "extension",
     "latitude",
-    /*     "cytB",
-    "16S",
-    "COI",
-    "COII",
-    "ITS1",
-    "ITS2",
-    "ELAV", */
   ].includes(cell.column.id);
   const isWide = ["localityName", "note"].includes(cell.column.id);
   const isSemiWide = ["sequence"].includes(cell.column.id);
@@ -290,7 +283,6 @@ export const SelectCell: React.FC<any> = ({
   options,
   saveLast = () => {},
   initialKey,
-  maxChars = 22,
 }) => {
   const db = getDatabase();
   const { original } = row;
