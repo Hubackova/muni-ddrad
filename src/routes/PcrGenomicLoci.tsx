@@ -399,6 +399,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
       data: tableData,
       initialState: { hiddenColumns: ["localityCode"] },
       defaultColumn: { Cell: DefaultCell, Filter: () => {} },
+      autoResetFilters: false,
     },
 
     useGlobalFilter,

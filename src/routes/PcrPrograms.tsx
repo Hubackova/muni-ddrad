@@ -136,6 +136,7 @@ const PcrPrograms: React.FC = () => {
       columns,
       data: pcrPrograms,
       defaultColumn: { Cell: DefaultCell, Filter: () => {} },
+      autoResetFilters: false,
     },
     useGlobalFilter,
     useFilters,

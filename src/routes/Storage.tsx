@@ -14,8 +14,8 @@ import {
 import { toast } from "react-toastify";
 import {
   CreatableSelectCell,
-  customComparator,
   EditableCell,
+  customComparator,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
@@ -115,6 +115,7 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     {
       columns,
       data: storage,
+      autoResetFilters: false,
     },
     useGlobalFilter,
     useFilters,

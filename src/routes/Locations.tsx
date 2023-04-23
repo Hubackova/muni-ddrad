@@ -368,6 +368,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
       columns,
       data: reducedData,
       defaultColumn: { Cell: EditableCell, Filter: () => {} },
+      autoResetFilters: false,
     },
     useGlobalFilter,
     useFilters,

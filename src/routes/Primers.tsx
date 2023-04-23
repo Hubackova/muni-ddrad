@@ -132,6 +132,7 @@ const Primers: React.FC = () => {
       columns,
       data: primers,
       defaultColumn: { Cell: DefaultCell, Filter: () => {} },
+      autoResetFilters: false,
     },
     useGlobalFilter,
     useFilters,

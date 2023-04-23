@@ -499,6 +499,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       columns,
       data: tableData,
       defaultColumn: { Cell: DefaultCell, Filter: () => {} },
+      autoResetFilters: false,
     },
     useGlobalFilter,
     useFilters,

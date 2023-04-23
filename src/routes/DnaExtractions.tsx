@@ -12,11 +12,11 @@ import {
 } from "react-table";
 import { toast } from "react-toastify";
 import {
-  customComparator,
-  customLocalityComparator,
   DateCell,
   EditableCell,
   SelectCell,
+  customComparator,
+  customLocalityComparator,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
@@ -329,6 +329,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
       data: tableData,
       defaultColumn: { Cell: DefaultCell, Filter: () => {} },
       autoResetPage: false,
+      autoResetFilters: false,
     },
     useGlobalFilter,
     useFilters,
