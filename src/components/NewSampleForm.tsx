@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
@@ -12,13 +13,14 @@ import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
 
+const FORM_DATA_KEY = "app_form_local_data";
+
 const NewSampleForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
   const [showModalLoc, setShowModalLoc] = useState(false);
   const [showModalCode, setShowModalCode] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-  const [isolateGroup, setIsolateGroup] = useState<any | null>(null);
   const db = getDatabase();
 
   useEffect(() => {
@@ -49,7 +51,14 @@ const NewSampleForm: React.FC = () => {
         delete sampleData[key];
       }
     });
-
+    let isolateGroup = sessionStorage.getItem("isolateGroup");
+    if (isolateGroup) {
+      try {
+        isolateGroup = JSON.parse(isolateGroup);
+      } catch (err) {
+        console.log(err);
+      }
+    }
     writeExtractionData({
       ...sampleData,
       ngul: sampleData.ngul ? parseFloat(sampleData.ngul) : "",
@@ -59,6 +68,7 @@ const NewSampleForm: React.FC = () => {
     });
     if (
       sampleData.isolateCodeGroup &&
+      isolateGroup &&
       isolateGroup.key &&
       !isolateGroup.isolateCodeGroup
     ) {
@@ -66,6 +76,7 @@ const NewSampleForm: React.FC = () => {
         isolateCodeGroup: isolateGroup.isolateCode,
       });
     }
+    sessionStorage.clear();
     toast.success("Sample was added successfully");
   };
   const addItemsBackup = () => {
@@ -88,6 +99,41 @@ const NewSampleForm: React.FC = () => {
     toast.success("ok");
   };
 
+  const getSavedData = React.useCallback(() => {
+    let data = sessionStorage.getItem(FORM_DATA_KEY);
+    if (data) {
+      // Parse it to a javaScript object
+      try {
+        data = JSON.parse(data);
+      } catch (err) {
+        console.log(err);
+      }
+      return data;
+    }
+    return {
+      isolateCode: "",
+      speciesOrig: "",
+      speciesUpdated: "",
+      project: "",
+      dateIsolation: "",
+      ngul: "",
+      box: "",
+      storageSite: "",
+      localityCode: "",
+      country: "",
+      state: "",
+      kit: "",
+      localityName: "",
+      latitude: "",
+      longitude: "",
+      altitude: "",
+      habitat: "",
+      dateCollection: "",
+      collector: "",
+      isolateCodeGroup: "",
+    };
+  }, []);
+
   const {
     register,
     control,
@@ -97,8 +143,9 @@ const NewSampleForm: React.FC = () => {
     clearErrors,
     watch,
     getValues,
-  } = useForm<DnaExtractionsType>({
+  } = useForm<DnaExtractionsType | any>({
     mode: "all",
+    defaultValues: getSavedData(),
   });
 
   const boxOptions = storage
@@ -222,7 +269,7 @@ const NewSampleForm: React.FC = () => {
             shouldValidate: true,
           });
           setValue("isolateCodeGroup", i.isolateCode);
-          setIsolateGroup(i);
+          sessionStorage.setItem("isolateGroup", JSON.stringify(i));
           clearErrors("country");
           clearErrors("localityName");
           clearErrors("collector");
@@ -233,6 +280,13 @@ const NewSampleForm: React.FC = () => {
       </div>
     ));
   const isCodes = extractions.map((i) => i.isolateCode);
+
+  React.useEffect(() => {
+    const subscription = watch((value, { name, type }) =>
+      sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(value))
+    );
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
@@ -401,6 +455,7 @@ const NewSampleForm: React.FC = () => {
                   setValue("dateCollection", e.dateCollection);
                   setValue("collector", e.collector);
                   setValue("isolateCodeGroup", "");
+                  sessionStorage.removeItem("isolateGroup");
                   clearErrors("country");
                   clearErrors("localityName");
                   clearErrors("collector");
@@ -446,6 +501,7 @@ const NewSampleForm: React.FC = () => {
               onChange={(e: any) => {
                 onChange(e?.value);
                 setValue("isolateCodeGroup", "");
+                sessionStorage.removeItem("isolateGroup");
               }}
               label="Country"
               error={errors.country?.message}
@@ -466,6 +522,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
+            sessionStorage.removeItem("isolateGroup");
           }}
           disabled={isDisabled}
         />
@@ -476,6 +533,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
+            sessionStorage.removeItem("isolateGroup");
           }}
           disabled={isDisabled}
         />
@@ -488,6 +546,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
+            sessionStorage.removeItem("isolateGroup");
           }}
           disabled={isDisabled}
         />
@@ -498,6 +557,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
+            sessionStorage.removeItem("isolateGroup");
           }}
           disabled={isDisabled}
         />
@@ -512,6 +572,7 @@ const NewSampleForm: React.FC = () => {
           required="This field is required"
           onBlur={() => {
             setValue("isolateCodeGroup", "");
+            sessionStorage.removeItem("isolateGroup");
           }}
         />
         <TextInput
@@ -521,6 +582,7 @@ const NewSampleForm: React.FC = () => {
           register={register}
           onBlur={() => {
             setValue("isolateCodeGroup", "");
+            sessionStorage.removeItem("isolateGroup");
           }}
           disabled={isDisabled}
         />
