@@ -123,7 +123,7 @@ export function Multi({
 
   const selectOptions = searchValue
     ? options
-        .filter((i) => i.includes(searchValue))
+        .filter((i) => i.toLowerCase().includes(searchValue.toLowerCase()))
         .map((i) => ({ value: i, label: i }))
     : options.map((i) => ({ value: i, label: i }));
 
@@ -349,7 +349,7 @@ export function Multi({
           <input
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            placeholder={`Search records..`}
+            placeholder={`Search records...`}
           />
           {selectOptions.map((i) => {
             const isChecked =
