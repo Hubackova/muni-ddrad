@@ -81,7 +81,8 @@ export function Multi({
       options.add(row.values[id]);
     });
     const optValues = [...options.values()];
-    if (!isNaN(optValues[0])) {
+    const isAnystring = optValues.some((i) => typeof i === "string");
+    if (!isAnystring) {
       return optValues.sort((a, b) => {
         return a - b;
       });
@@ -123,7 +124,11 @@ export function Multi({
 
   const selectOptions = searchValue
     ? options
-        .filter((i) => i.toLowerCase().includes(searchValue.toLowerCase()))
+        .filter((i) => {
+          if (!i) return false;
+          const lower = i.toString().toLowerCase();
+          return lower.includes(searchValue);
+        })
         .map((i) => ({ value: i, label: i }))
     : options.map((i) => ({ value: i, label: i }));
 
@@ -348,7 +353,13 @@ export function Multi({
           </div>
           <input
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) =>
+              setSearchValue(
+                typeof e.target.value === "string"
+                  ? e.target.value.toLowerCase()
+                  : e.target.value
+              )
+            }
             placeholder={`Search records...`}
           />
           {selectOptions.map((i) => {
