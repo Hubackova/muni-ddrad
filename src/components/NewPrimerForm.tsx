@@ -8,6 +8,8 @@ import { backup } from "../content/primers";
 import { writePrimersData } from "../firebase/firebase";
 import { PrimersType } from "../types";
 
+const FORM_DATA_KEY = "primers";
+
 const NewPrimerForm: React.FC = () => {
   const [primers, setPrimers] = useState<PrimersType[]>([]);
   const db = getDatabase();
@@ -26,6 +28,7 @@ const NewPrimerForm: React.FC = () => {
 
   const addItem = (data: any) => {
     writePrimersData(data);
+    sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Primer was added successfully");
   };
 
@@ -34,14 +37,47 @@ const NewPrimerForm: React.FC = () => {
     toast.success("ok");
   };
 
+  const getSavedData = React.useCallback(() => {
+    let data = sessionStorage.getItem(FORM_DATA_KEY);
+    if (data) {
+      // Parse it to a javaScript object
+      try {
+        data = JSON.parse(data);
+      } catch (err) {
+        console.log(err);
+      }
+      return data;
+    }
+    return {
+      name: "",
+      country: "",
+      marker: "",
+      specificity: "",
+      sequence: "",
+      author: "",
+      anneal: "",
+      lengthPCR: "",
+      work: "",
+      noteOnUse: "",
+    };
+  }, []);
+
   const {
     register,
     formState: { errors },
     handleSubmit,
     getValues,
-  } = useForm<PrimersType>({});
+    watch,
+  } = useForm<PrimersType>({ defaultValues: getSavedData() });
 
   const primersNames = primers.map((i) => i.name);
+
+  React.useEffect(() => {
+    const subscription = watch((value) =>
+      sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(value))
+    );
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>

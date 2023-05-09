@@ -9,6 +9,8 @@ import { backup } from "../content/pcrprograms";
 import { writePcrProgramsData } from "../firebase/firebase";
 import { PcrProgramsType } from "../types";
 
+const FORM_DATA_KEY = "pcrPrograms";
+
 const NewPcrProgramsForm: React.FC = () => {
   const [pcrPrograms, setPcrPrograms] = useState<PcrProgramsType[]>([]);
   const db = getDatabase();
@@ -27,6 +29,7 @@ const NewPcrProgramsForm: React.FC = () => {
 
   const addItem = (data: any) => {
     writePcrProgramsData(data);
+    sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Pcr-Program was added successfully");
   };
 
@@ -35,14 +38,49 @@ const NewPcrProgramsForm: React.FC = () => {
     toast.success("ok");
   };
 
+  const getSavedData = React.useCallback(() => {
+    let data = sessionStorage.getItem(FORM_DATA_KEY);
+    if (data) {
+      // Parse it to a javaScript object
+      try {
+        data = JSON.parse(data);
+      } catch (err) {
+        console.log(err);
+      }
+      return data;
+    }
+    return {
+      name: "",
+      initialDenaturation: "",
+      denaturation: "",
+      annealing: "",
+      extension: "",
+      numberCycles: "",
+      finalExtension: "",
+      end: "",
+      pcrProductSize: "",
+      note: "",
+    };
+  }, []);
+
   const {
     register,
     formState: { errors },
     handleSubmit,
+    watch,
   } = useForm<PcrProgramsType>({
     mode: "all",
+    defaultValues: getSavedData(),
   });
   const names = pcrPrograms.map((i) => i.name);
+
+  React.useEffect(() => {
+    const subscription = watch((value) =>
+      sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(value))
+    );
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new pcr program:</h5>

@@ -76,7 +76,8 @@ const NewSampleForm: React.FC = () => {
         isolateCodeGroup: isolateGroup.isolateCode,
       });
     }
-    sessionStorage.clear();
+    sessionStorage.removeItem("isolateGroup");
+    sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Sample was added successfully");
   };
   const addItemsBackup = () => {
@@ -282,7 +283,7 @@ const NewSampleForm: React.FC = () => {
   const isCodes = extractions.map((i) => i.isolateCode);
 
   React.useEffect(() => {
-    const subscription = watch((value, { name, type }) =>
+    const subscription = watch((value) =>
       sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(value))
     );
     return () => subscription.unsubscribe();

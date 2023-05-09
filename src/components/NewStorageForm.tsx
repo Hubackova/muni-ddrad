@@ -8,6 +8,8 @@ import { backup } from "../content/storage";
 import { writeStorageData } from "../firebase/firebase";
 import { StorageType } from "../types";
 
+const FORM_DATA_KEY = "storage";
+
 const NewStorageForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
   const db = getDatabase();
@@ -40,6 +42,7 @@ const NewStorageForm: React.FC = () => {
 
   const addItem = (data: any) => {
     writeStorageData(data);
+    sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Box was added successfully");
   };
 
@@ -48,15 +51,43 @@ const NewStorageForm: React.FC = () => {
     toast.success("ok");
   };
 
+  const getSavedData = React.useCallback(() => {
+    let data = sessionStorage.getItem(FORM_DATA_KEY);
+    if (data) {
+      // Parse it to a javaScript object
+      try {
+        data = JSON.parse(data);
+      } catch (err) {
+        console.log(err);
+      }
+      return data;
+    }
+    return {
+      box: "",
+      storageSite: "",
+    };
+  }, []);
+
   const {
     register,
     formState: { errors },
     handleSubmit,
     control,
+    watch,
   } = useForm<StorageType>({
     mode: "all",
+    defaultValues: getSavedData() as any,
   });
+
   const boxes = storage.map((i) => i.box);
+
+  React.useEffect(() => {
+    const subscription = watch((value) =>
+      sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(value))
+    );
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new box:</h5>
