@@ -185,6 +185,12 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
         filter: multiSelectFilter,
       },
       {
+        Header: "Kit",
+        accessor: "kit",
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
         Header: "Locality code",
         accessor: "localityCode",
         Cell: React.memo<React.FC<any>>(
@@ -292,13 +298,6 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
         Filter: Multi,
         filter: multiSelectFilter,
       },
-      {
-        Header: "Kit",
-        accessor: "kit",
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-
       {
         Header: "Locality name",
         accessor: "localityName",
