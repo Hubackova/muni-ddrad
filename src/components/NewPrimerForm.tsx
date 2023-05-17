@@ -157,6 +157,14 @@ const NewPrimerForm: React.FC = () => {
           register={register}
         />
       </div>
+      <div className="row">
+        <TextInput
+          label="Box"
+          name="box"
+          error={errors.box?.message}
+          register={register}
+        />
+      </div>
       <button className="submit-btn" type="submit">
         Save
       </button>

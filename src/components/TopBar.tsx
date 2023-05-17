@@ -11,13 +11,21 @@ const TopBar: React.FC = () => {
 
   const handleDownload = () => {
     onValue(ref(db, "/"), (snapshot) => {
-      let dataStr = JSON.stringify(snapshot);
-      let dataUri =
-        "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-      let link = document.createElement("a");
-      link.download = "db-mollusca-backup.json";
-      link.href = dataUri;
+      const data = JSON.stringify(snapshot);
+      const link = document.createElement("a");
+
+      link.setAttribute(
+        "href",
+        "data:text/plain;charset=utf-8," + encodeURIComponent(data)
+      );
+      link.setAttribute("download", "db-mollusca-backup.json");
+      link.style.display = "none";
+
+      document.body.appendChild(link);
+
       link.click();
+
+      document.body.removeChild(link);
     });
   };
 

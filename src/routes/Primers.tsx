@@ -123,6 +123,12 @@ const Primers: React.FC = () => {
         Filter: Multi,
         filter: multiSelectFilter,
       },
+      {
+        Header: "Box",
+        accessor: "box",
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
     ],
     []
   );
