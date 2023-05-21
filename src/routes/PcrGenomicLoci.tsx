@@ -259,22 +259,6 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
         filter: multiSelectFilter,
       },
       {
-        Header: "Isolate group",
-        accessor: "isolateCodeGroup",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <input
-              defaultValue={[original.isolateCodeGroup] || ""}
-              disabled
-              className={"narrow"}
-            ></input>
-          ),
-          customComparator
-        ),
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
         Header: "cytB",
         accessor: "cytB",
         Cell: NoConfirmCell,
@@ -331,28 +315,28 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
   const customColumns2 = React.useMemo(
     () => [
       {
-        Header: "note on PCR",
+        Header: "Note on PCR",
         accessor: "notePCR",
         Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
-        Header: "note on sequencing",
+        Header: "Note on sequencing",
         accessor: "noteSequencing",
         Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
-        Header: "General Note",
+        Header: "General nte",
         accessor: "noteGeneral",
         Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
-        Header: "STATUS",
+        Header: "Status",
         accessor: "status",
         Cell: NoConfirmCell,
         Filter: Multi,
@@ -370,6 +354,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
       );
       const tableDataKeys = Object.keys(tableData[0]);
       return tableDataKeys
+        .filter((i) => i !== "isolateCodeGroup")
         .map((i) => {
           if (customKeys.includes(i)) return null;
           return {
@@ -473,12 +458,23 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
                     </th>
                   );
                 })}
+                <th>Isolate group</th>
               </tr>
             ))}
           </thead>
           <tbody {...getTableBodyProps()}>
             {rowsShow.map((row) => {
               prepareRow(row);
+
+              const isolateCodeGroup = row.original.isolateCodeGroup
+                ? extractions
+                    .filter(
+                      (i) =>
+                        i.isolateCodeGroup === row.original.isolateCodeGroup
+                    )
+                    .map((i) => i.isolateCode)
+                : [];
+
               return (
                 <tr {...row.getRowProps()} key={row.id}>
                   {row.cells.map((cell) => {
@@ -491,6 +487,13 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
                       </td>
                     );
                   })}
+                  <td className="sample-list">
+                    {isolateCodeGroup.map((i) => (
+                      <span key={i} className="sample">
+                        {i}
+                      </span>
+                    ))}
+                  </td>
                 </tr>
               );
             })}

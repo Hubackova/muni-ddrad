@@ -328,6 +328,71 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Filter: Multi,
         filter: multiSelectFilter,
       },
+      {
+        Header: "Date collection",
+        accessor: "dateCollection",
+        Cell: React.memo<React.FC<any>>(
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+                type="date"
+              ></input>
+            );
+          },
+          customComparator
+        ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Collector",
+        accessor: "collector",
+        Cell: React.memo<React.FC<any>>(
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+              ></input>
+            );
+          },
+          customComparator
+        ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
     ],
     [localityOptions]
   );
@@ -346,6 +411,8 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
             localityName: ex.localityName,
             habitat: ex.habitat,
             altitude: ex.altitude,
+            dateCollection: ex.dateCollection,
+            collector: ex.collector,
             key: ex.key,
           };
         }),
@@ -472,7 +539,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                               }}
                               onCancel={() => {
                                 showEditModal.setValue(
-                                  showEditModal.initialValue
+                                  showEditModal.initialValue || ""
                                 );
                               }}
                               onHide={() => setShowEditModal(null)}

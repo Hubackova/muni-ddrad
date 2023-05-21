@@ -418,28 +418,28 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const customColumns2: Column<any>[] = useMemo(
     () => [
       {
-        Header: "note on PCR",
+        Header: "Note on PCR",
         accessor: "notePCR",
         Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
-        Header: "note on sequencing",
+        Header: "Note on sequencing",
         accessor: "noteSequencing",
         Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
-        Header: "General Note",
+        Header: "General note",
         accessor: "noteGeneral",
         Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
-        Header: "STATUS",
+        Header: "Status",
         accessor: "status",
         Cell: NoConfirmCell,
         Filter: Multi,
@@ -567,7 +567,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                     {column.canFilter ? column.render("Filter") : null}
                   </th>
                 ))}
-                <th>IsolateCode Group</th>
+                <th>Isolate group</th>
               </tr>
             ))}
           </thead>

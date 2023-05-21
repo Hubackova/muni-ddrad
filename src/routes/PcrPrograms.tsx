@@ -116,7 +116,7 @@ const PcrPrograms: React.FC = () => {
         filter: multiSelectFilter,
       },
       {
-        Header: "PCR Product Size",
+        Header: "PCR product size",
         accessor: "pcrProductSize",
         Filter: Multi,
         filter: multiSelectFilter,
