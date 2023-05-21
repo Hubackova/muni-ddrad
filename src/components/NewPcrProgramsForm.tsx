@@ -168,13 +168,13 @@ const NewPcrProgramsForm: React.FC = () => {
       <button className="submit-btn" type="submit">
         Save
       </button>
-      <button
+      {/*       <button
         className="submit-btn"
         type="button"
         onClick={() => addItemsBackup()}
       >
         Backup
-      </button>
+      </button> */}
     </form>
   );
 };
