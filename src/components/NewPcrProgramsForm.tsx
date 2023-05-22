@@ -153,7 +153,7 @@ const NewPcrProgramsForm: React.FC = () => {
       </div>
       <div className="row">
         <TextInput
-          label="PCR Product Size"
+          label="PCR product size"
           name="pcrProductSize"
           error={errors.pcrProductSize?.message}
           register={register}

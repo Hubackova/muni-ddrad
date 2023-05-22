@@ -367,7 +367,7 @@ const NewSampleForm: React.FC = () => {
           name="project"
         />
         <TextInput
-          label="Date of Isolation"
+          label="Date of isolation"
           name="dateIsolation"
           error={errors.dateIsolation?.message}
           register={register}
@@ -430,7 +430,7 @@ const NewSampleForm: React.FC = () => {
         />
 
         <TextInput
-          label="Storage Site"
+          label="Storage site"
           name="storageSite"
           error={errors.storageSite?.message}
           register={register}
