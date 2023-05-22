@@ -114,7 +114,7 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const tableInstance = useTable(
     {
       columns,
-      data: storage,
+      data: storage.sort((a, b) => a.box.localeCompare(b.box)),
       autoResetFilters: false,
     },
     useGlobalFilter,

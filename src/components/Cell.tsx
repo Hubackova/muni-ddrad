@@ -167,7 +167,7 @@ export const EditableCell: React.FC<any> = ({
     "extension",
     "latitude",
   ].includes(cell.column.id);
-  const isWide = ["localityName", "note"].includes(cell.column.id);
+  const isWide = ["localityName", "note", "noteOnUse"].includes(cell.column.id);
   const isSemiWide = ["sequence"].includes(cell.column.id);
   const isSemiNarrow = [
     "initialDenaturation",

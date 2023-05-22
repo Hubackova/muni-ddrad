@@ -50,7 +50,6 @@ const NewPrimerForm: React.FC = () => {
     }
     return {
       name: "",
-      country: "",
       marker: "",
       specificity: "",
       sequence: "",
@@ -94,27 +93,19 @@ const NewPrimerForm: React.FC = () => {
           }
         />
         <TextInput
-          label="Country"
-          name="country"
-          error={errors.country?.message}
-          register={register}
-        />
-      </div>
-      <div className="row">
-        <TextInput
           label="Marker"
           name="marker"
           error={errors.marker?.message}
           register={register}
         />
+      </div>
+      <div className="row">
         <TextInput
           label="Specificity"
           name="specificity"
           error={errors.specificity?.message}
           register={register}
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Sequence"
           name="sequence"
@@ -122,42 +113,42 @@ const NewPrimerForm: React.FC = () => {
           register={register}
           required="This field is required"
         />
+      </div>
+      <div className="row">
         <TextInput
           label="Author"
           name="author"
           error={errors.author?.message}
           register={register}
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Anneal T [°C]"
           name="anneal"
           error={errors.anneal?.message}
           register={register}
         />
+      </div>
+      <div className="row">
         <TextInput
           label="Length of PCR product"
           name="lengthPCR"
           error={errors.lengthPCR?.message}
           register={register}
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Work?"
           name="work"
           error={errors.work?.message}
           register={register}
         />
+      </div>
+      <div className="row">
         <TextInput
           label="Note on use"
           name="noteOnUse"
           error={errors.noteOnUse?.message}
           register={register}
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Box"
           name="box"
@@ -165,6 +156,7 @@ const NewPrimerForm: React.FC = () => {
           register={register}
         />
       </div>
+
       <button className="submit-btn" type="submit">
         Save
       </button>
