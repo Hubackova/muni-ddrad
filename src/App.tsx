@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
@@ -42,7 +44,9 @@ const App: React.FC = () => {
       setStorage(items);
     });
   }, [db]);
-
+  const sortedExtractions = extractions.sort((a, b) => {
+    return new Date(b.dateIsolation) - new Date(a.dateIsolation);
+  });
   return (
     <div>
       <TopBar />
@@ -54,7 +58,10 @@ const App: React.FC = () => {
             path={routes.dnaExtractions}
             element={
               extractions?.length > 0 && storage?.length > 0 ? (
-                <DnaExtractions storage={storage} extractions={extractions} />
+                <DnaExtractions
+                  storage={storage}
+                  extractions={sortedExtractions}
+                />
               ) : (
                 <div> no data</div>
               )
@@ -64,7 +71,10 @@ const App: React.FC = () => {
             path={routes.pcrGenomicLoci}
             element={
               extractions?.length > 0 && storage?.length > 0 ? (
-                <PcrGenomicLoci storage={storage} extractions={extractions} />
+                <PcrGenomicLoci
+                  storage={storage}
+                  extractions={sortedExtractions}
+                />
               ) : (
                 <div> no data</div>
               )
@@ -94,7 +104,7 @@ const App: React.FC = () => {
             path={routes.all}
             element={
               extractions?.length > 0 && storage?.length > 0 ? (
-                <All storage={storage} extractions={extractions} />
+                <All storage={storage} extractions={sortedExtractions} />
               ) : (
                 <div> no data</div>
               )

@@ -25,12 +25,12 @@ import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { ReactComponent as InfoIcon } from "../images/info.svg";
 import { DnaExtractionsType, StorageType } from "../types";
 
-interface DnaExtractionsProps {
+interface PcrGenomicLociProps {
   storage: StorageType[];
   extractions: DnaExtractionsType[];
 }
 
-const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
+const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
   storage,
   extractions,
 }) => {
@@ -468,11 +468,7 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
 
               const isolateCodeGroup = row.original.isolateCodeGroup
                 ? extractions
-                    .sort((a, b) => {
-                      return (
-                        new Date(b.dateIsolation) - new Date(a.dateIsolation)
-                      );
-                    })
+
                     .filter(
                       (i) =>
                         i.isolateCodeGroup === row.original.isolateCodeGroup
