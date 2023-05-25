@@ -451,14 +451,18 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
 
   const tableData = React.useMemo(
     () =>
-      extractions.map((ex) => {
-        const storageData = storage.find((i) => i.key === ex.box);
-        return {
-          ...ex,
-          box: storageData?.box,
-          storageSite: storageData?.storageSite,
-        };
-      }),
+      extractions
+        .sort((a, b) => {
+          return new Date(b.dateIsolation) - new Date(a.dateIsolation);
+        })
+        .map((ex) => {
+          const storageData = storage.find((i) => i.key === ex.box);
+          return {
+            ...ex,
+            box: storageData?.box,
+            storageSite: storageData?.storageSite,
+          };
+        }),
     [extractions, storage]
   );
 

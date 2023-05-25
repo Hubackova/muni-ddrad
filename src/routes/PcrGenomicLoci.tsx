@@ -468,6 +468,11 @@ const PcrGenomicLoci: React.FC<DnaExtractionsProps> = ({
 
               const isolateCodeGroup = row.original.isolateCodeGroup
                 ? extractions
+                    .sort((a, b) => {
+                      return (
+                        new Date(b.dateIsolation) - new Date(a.dateIsolation)
+                      );
+                    })
                     .filter(
                       (i) =>
                         i.isolateCodeGroup === row.original.isolateCodeGroup
