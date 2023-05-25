@@ -275,6 +275,9 @@ const NewSampleForm: React.FC = () => {
           clearErrors("localityName");
           clearErrors("collector");
           clearErrors("project");
+          if (i.localityCode) {
+            setIsDisabled(true);
+          } else setIsDisabled(false);
         }}
       >
         {i.isolateCode}
@@ -500,9 +503,11 @@ const NewSampleForm: React.FC = () => {
               options={getOptions("country")}
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
-                onChange(e?.value);
-                setValue("isolateCodeGroup", "");
-                sessionStorage.removeItem("isolateGroup");
+                if (e?.value !== getValues("country")) {
+                  onChange(e?.value);
+                  setValue("isolateCodeGroup", "");
+                  sessionStorage.removeItem("isolateGroup");
+                }
               }}
               label="Country"
               error={errors.country?.message}
@@ -521,9 +526,11 @@ const NewSampleForm: React.FC = () => {
           name="latitude"
           error={errors.latitude?.message}
           register={register}
-          onBlur={() => {
-            setValue("isolateCodeGroup", "");
-            sessionStorage.removeItem("isolateGroup");
+          onBlur={(e: any) => {
+            if (e.target.value !== getValues("latitude")) {
+              setValue("isolateCodeGroup", "");
+              sessionStorage.removeItem("isolateGroup");
+            }
           }}
           disabled={isDisabled}
         />
@@ -532,9 +539,11 @@ const NewSampleForm: React.FC = () => {
           name="longitude"
           error={errors.longitude?.message}
           register={register}
-          onBlur={() => {
-            setValue("isolateCodeGroup", "");
-            sessionStorage.removeItem("isolateGroup");
+          onBlur={(e: any) => {
+            if (e.target.value !== getValues("longitude")) {
+              setValue("isolateCodeGroup", "");
+              sessionStorage.removeItem("isolateGroup");
+            }
           }}
           disabled={isDisabled}
         />
@@ -545,9 +554,11 @@ const NewSampleForm: React.FC = () => {
           name="altitude"
           error={errors.altitude?.message}
           register={register}
-          onBlur={() => {
-            setValue("isolateCodeGroup", "");
-            sessionStorage.removeItem("isolateGroup");
+          onBlur={(e: any) => {
+            if (e.target.value !== getValues("altitude")) {
+              setValue("isolateCodeGroup", "");
+              sessionStorage.removeItem("isolateGroup");
+            }
           }}
           disabled={isDisabled}
         />
@@ -556,9 +567,11 @@ const NewSampleForm: React.FC = () => {
           name="state"
           error={errors.state?.message}
           register={register}
-          onBlur={() => {
-            setValue("isolateCodeGroup", "");
-            sessionStorage.removeItem("isolateGroup");
+          onBlur={(e: any) => {
+            if (e.target.value !== getValues("state")) {
+              setValue("isolateCodeGroup", "");
+              sessionStorage.removeItem("isolateGroup");
+            }
           }}
           disabled={isDisabled}
         />
@@ -571,9 +584,11 @@ const NewSampleForm: React.FC = () => {
           disabled={isDisabled}
           register={register}
           required="This field is required"
-          onBlur={() => {
-            setValue("isolateCodeGroup", "");
-            sessionStorage.removeItem("isolateGroup");
+          onBlur={(e: any) => {
+            if (e.target.value !== getValues("localityName")) {
+              setValue("isolateCodeGroup", "");
+              sessionStorage.removeItem("isolateGroup");
+            }
           }}
         />
         <TextInput
@@ -581,9 +596,11 @@ const NewSampleForm: React.FC = () => {
           name="habitat"
           error={errors.habitat?.message}
           register={register}
-          onBlur={() => {
-            setValue("isolateCodeGroup", "");
-            sessionStorage.removeItem("isolateGroup");
+          onBlur={(e: any) => {
+            if (e.target.value !== getValues("habitat")) {
+              setValue("isolateCodeGroup", "");
+              sessionStorage.removeItem("isolateGroup");
+            }
           }}
           disabled={isDisabled}
         />
@@ -596,6 +613,12 @@ const NewSampleForm: React.FC = () => {
           register={register}
           type="date"
           disabled={isDisabled}
+          onBlur={(e: any) => {
+            if (e.target.value !== getValues("dateCollection")) {
+              setValue("isolateCodeGroup", "");
+              sessionStorage.removeItem("isolateGroup");
+            }
+          }}
         />
         <TextInput
           label="Collector"
@@ -604,6 +627,12 @@ const NewSampleForm: React.FC = () => {
           register={register}
           disabled={isDisabled}
           required="This field is required"
+          onBlur={(e: any) => {
+            if (e.target.value !== getValues("collector")) {
+              setValue("isolateCodeGroup", "");
+              sessionStorage.removeItem("isolateGroup");
+            }
+          }}
         />
       </div>
       <div className="row"></div>
