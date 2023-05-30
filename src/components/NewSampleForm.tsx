@@ -340,6 +340,8 @@ const NewSampleForm: React.FC = () => {
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
                 onChange(e?.value);
+                setValue("isolateCodeGroup", "");
+                sessionStorage.removeItem("isolateGroup");
               }}
               label="Species (original det.)"
               error={errors.speciesOrig?.message}
@@ -359,6 +361,8 @@ const NewSampleForm: React.FC = () => {
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
                 onChange(e?.value);
+                setValue("isolateCodeGroup", "");
+                sessionStorage.removeItem("isolateGroup");
               }}
               label="Project"
               error={errors.project?.message}
