@@ -3,20 +3,20 @@ import { getDatabase, ref, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-  Column,
-  useFilters,
-  useGlobalFilter,
-  useRowSelect,
-  useSortBy,
-  useTable,
+    Column,
+    useFilters,
+    useGlobalFilter,
+    useRowSelect,
+    useSortBy,
+    useTable,
 } from "react-table";
 import { toast } from "react-toastify";
 import {
-  DateCell,
-  EditableCell,
-  SelectCell,
-  customComparator,
-  customLocalityComparator,
+    DateCell,
+    EditableCell,
+    SelectCell,
+    customComparator,
+    customLocalityComparator,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
@@ -95,12 +95,22 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
 
   const columns: Column<any>[] = useMemo(
     () => [
-      {
-        Header: "Isolate code",
-        accessor: "isolateCode",
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
+        {
+            Header: "Isolate code",
+            accessor: "isolateCode",
+            Cell: React.memo<React.FC<any>>(
+              ({ row: { original } }) => (
+                <input
+                  defaultValue={[original.isolateCode] || ""}
+                  className={"narrow"}
+                  disabled
+                ></input>
+              ),
+              customComparator
+            ),
+            Filter: Multi,
+            filter: multiSelectFilter,
+          },
       {
         Header: "Species (original det.)",
         accessor: "speciesOrig",
