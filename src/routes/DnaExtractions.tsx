@@ -3,20 +3,20 @@ import { getDatabase, ref, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-    Column,
-    useFilters,
-    useGlobalFilter,
-    useRowSelect,
-    useSortBy,
-    useTable,
+  Column,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
 } from "react-table";
 import { toast } from "react-toastify";
 import {
-    DateCell,
-    EditableCell,
-    SelectCell,
-    customComparator,
-    customLocalityComparator,
+  DateCell,
+  EditableCell,
+  SelectCell,
+  customComparator,
+  customLocalityComparator,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
@@ -36,6 +36,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
   extractions,
 }) => {
   const db = getDatabase();
+  const [showModal, setShowModal] = useState(null);
   const [full, setFull] = useState(false);
   const [last, setLast] = useState(false);
 
@@ -59,6 +60,10 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
   );
 
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
+
+  const removeItem = useCallback((id: string) => {
+    setShowModal(id);
+  }, []);
 
   const DefaultCell = React.memo<React.FC<any>>(({ value, row, cell }) => {
     return (
@@ -95,22 +100,22 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
 
   const columns: Column<any>[] = useMemo(
     () => [
-        {
-            Header: "Isolate code",
-            accessor: "isolateCode",
-            Cell: React.memo<React.FC<any>>(
-              ({ row: { original } }) => (
-                <input
-                  defaultValue={[original.isolateCode] || ""}
-                  className={"narrow"}
-                  disabled
-                ></input>
-              ),
-              customComparator
-            ),
-            Filter: Multi,
-            filter: multiSelectFilter,
-          },
+      {
+        Header: "Isolate code",
+        accessor: "isolateCode",
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => (
+            <input
+              defaultValue={[original.isolateCode] || ""}
+              className={"narrow"}
+              disabled
+            ></input>
+          ),
+          customComparator
+        ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
       {
         Header: "Species (original det.)",
         accessor: "speciesOrig",
@@ -384,10 +389,23 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
           overflow: "auto", // Make it scroll!
         }}
       >
+        {showModal && (
+          <ConfirmModal
+            title="Do you really want to delete the sample?"
+            needPassword
+            onConfirm={() => {
+              setShowModal(null);
+              remove(ref(db, "extractions/" + showModal));
+              toast.success("Sample was removed successfully");
+            }}
+            onHide={() => setShowModal(null)}
+          />
+        )}
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                <th></th>
                 {headerGroup.headers.map((column) => {
                   return (
                     <th key={column.id}>
@@ -419,6 +437,11 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
               prepareRow(row);
               return (
                 <tr {...row.getRowProps()} key={row.id}>
+                  <td role="cell" className="remove">
+                    <button onClick={() => removeItem(row.original.key)}>
+                      X
+                    </button>
+                  </td>
                   {row.cells.map((cell, index) => {
                     return (
                       <td

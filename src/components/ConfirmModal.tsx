@@ -1,9 +1,10 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { Modal } from "react-bootstrap";
 import "./ConfirmModal.scss";
 
 interface ConfirmModalProps {
   title: string;
+  needPassword?: boolean;
   description: string;
   confirmLabel?: string;
   cancelLabel?: string;
@@ -16,6 +17,7 @@ interface ConfirmModalProps {
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
   title,
+  needPassword = false,
   description,
   confirmLabel,
   cancelLabel,
@@ -28,7 +30,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 }) => {
   const cancelBtnLabel = cancelLabel || "Cancel";
   const confirmBtnLabel = confirmLabel || "Confirm";
-
+  const [password, setPassword] = useState("");
   const handleConfirm = useCallback(() => {
     onConfirm();
   }, [onConfirm]);
@@ -40,7 +42,12 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <h4 className="title">{title}</h4>
           <p className="description">{description}</p>
         </div>
-
+        <input
+          className="password-input"
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
         {error && <div className="error">{error}</div>}
         <div className="footer-container">
           <button
@@ -53,7 +60,11 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             {cancelBtnLabel}
           </button>
 
-          <button className="btn btn-primary" onClick={handleConfirm}>
+          <button
+            className="btn btn-primary"
+            onClick={handleConfirm}
+            disabled={needPassword && password !== "malclam"}
+          >
             {confirmBtnLabel}
           </button>
         </div>
