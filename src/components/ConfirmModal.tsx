@@ -42,12 +42,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <h4 className="title">{title}</h4>
           <p className="description">{description}</p>
         </div>
-        <input
-          className="password-input"
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        {needPassword && (
+          <input
+            className="password-input"
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        )}
         {error && <div className="error">{error}</div>}
         <div className="footer-container">
           <button
