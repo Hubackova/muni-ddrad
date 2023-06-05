@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getDatabase, ref, update } from "firebase/database";
+import { getDatabase, ref, remove, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
@@ -396,6 +396,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             onConfirm={() => {
               setShowModal(null);
               remove(ref(db, "extractions/" + showModal));
+              window.location.reload();
               toast.success("Sample was removed successfully");
             }}
             onHide={() => setShowModal(null)}
