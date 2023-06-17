@@ -3,20 +3,20 @@ import { getDatabase, ref, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-    useFilters,
-    useGlobalFilter,
-    useRowSelect,
-    useSortBy,
-    useTable,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
 } from "react-table";
 import { toast } from "react-toastify";
 import {
-    DateCell,
-    EditableCell,
-    EditableNoConfirmCell,
-    SelectCell,
-    customComparator,
-    customLocalityComparator,
+  DateCell,
+  EditableCell,
+  EditableNoConfirmCell,
+  SelectCell,
+  customComparator,
+  customLocalityComparator,
 } from "../components/Cell";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
@@ -437,42 +437,55 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
         )
       )
         .sort((a: any, b: any) => a.isolateCode?.localeCompare(b.isolateCode))
-        .map((i: any, index) => {
-          const currentItem = extractions.find((i) => i.key === showModalCode);
+        .map((item: any, index) => {
+          const currentItem = extractions.find(
+            (extraction) => extraction.key === showModalCode
+          );
           if (
-            currentItem?.isolateCodeGroup.includes(i.isolateCode) ||
-            currentItem?.isolateCode === i.isolateCode
+            currentItem?.isolateCodeGroup.includes(item.isolateCode) ||
+            currentItem?.isolateCode === item.isolateCode
           )
             return null;
+
+          const newIsolateCodeGroup = item?.isolateCodeGroup
+            ? [
+                ...item?.isolateCodeGroup,
+                currentItem.isolateCode,
+                item.isolateCode,
+              ]
+            : [currentItem.isolateCode, item.isolateCode];
+
+          const newIsolateCodeGroupUnique = newIsolateCodeGroup
+            ? [...new Set(newIsolateCodeGroup)]
+            : "";
+
           return (
             <div
               key={index}
               className="item"
               onClick={() => {
                 update(ref(db, EXTRACTIONS + showModalCode), {
-                  isolateCodeGroup: [
-                    ...i.isolateCodeGroup,
-                    currentItem?.isolateCode,
-                  ],
+                  isolateCodeGroup: newIsolateCodeGroupUnique,
                 });
                 const groupKeys = extractions
-                  .filter((i) => i.isolateCodeGroup && i.isolateCodeGroup.includes(i.isolateCode))
+                  .filter(
+                    (extraction) =>
+                      (extraction.isolateCodeGroup &&
+                        extraction.isolateCodeGroup.includes(
+                          item.isolateCode
+                        )) ||
+                      extraction.isolateCode === item.isolateCode
+                  )
                   .map((i) => i.key);
                 groupKeys.forEach((groupKey) =>
                   update(ref(db, EXTRACTIONS + groupKey), {
-                    isolateCodeGroup: [
-                      ...new Set([
-                        ...i.isolateCodeGroup,
-                        ...currentItem?.isolateCodeGroup,
-                        currentItem?.isolateCode,
-                      ]),
-                    ],
+                    isolateCodeGroup: newIsolateCodeGroupUnique,
                   })
                 );
                 setShowModalCode(false);
               }}
             >
-              {i.isolateCode}
+              {item.isolateCode}
             </div>
           );
         });
@@ -537,9 +550,11 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
             {rowsShow.map((row) => {
               prepareRow(row);
 
-              const isolateCodeGroup = row.original.isolateCodeGroup && Array.isArray(row.original.isolateCodeGroup)
-                ? row.original.isolateCodeGroup.map((i) => i)
-                : [];
+              const isolateCodeGroup =
+                row.original.isolateCodeGroup &&
+                Array.isArray(row.original.isolateCodeGroup)
+                  ? row.original.isolateCodeGroup.map((i) => i)
+                  : [];
 
               return (
                 <tr {...row.getRowProps()} key={row.id}>
