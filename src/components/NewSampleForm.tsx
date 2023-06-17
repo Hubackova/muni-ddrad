@@ -100,7 +100,6 @@ const NewSampleForm: React.FC = () => {
         })
       );
     }
-    sessionStorage.removeItem("isolateGroupItem");
     sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Sample was added successfully");
   };
@@ -671,14 +670,14 @@ const NewSampleForm: React.FC = () => {
       <button className="submit-btn" type="submit">
         Save
       </button>
-
+      {/* 
       <button
         className="submit-btn"
         type="button"
         onClick={() => addItemsBackup()}
       >
         Backup
-      </button>
+      </button> */}
     </form>
   );
 };
