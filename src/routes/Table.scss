@@ -134,6 +134,12 @@
       border-radius: 4px;
       font-size: 12px;
       padding: 2px 4px;
+
+      &.add {
+        border: 1px solid green;
+        color: green;
+        cursor: pointer;
+      }
     }
   }
 }
@@ -243,5 +249,46 @@ form {
   @media (min-width: 576px) {
     flex-direction: row;
     align-items: center;
+  }
+}
+
+.side-panel {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 9999999;
+
+  .body {
+    padding: 20px;
+    max-height: 100vh;
+    width: 360px;
+    background: white;
+    border-left: 1px solid grey;
+    border-bottom: 1px solid grey;
+    position: relative;
+
+    .items {
+      min-height: 0;
+      max-height: 86vh;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+    .item {
+      padding: 8px;
+      text-align: left;
+      cursor: pointer;
+      color: rgb(97, 97, 97);
+      &:hover {
+        color: black;
+      }
+    }
+    .cancel-btn {
+      position: absolute;
+      bottom: 30px;
+    }
   }
 }

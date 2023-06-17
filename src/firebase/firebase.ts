@@ -2,6 +2,7 @@
 
 import { initializeApp } from "firebase/app";
 import { child, getDatabase, push, ref, set } from "firebase/database";
+import { EXTRACTIONS } from "../constants";
 import { DnaExtractionsType, StorageType } from "../types";
 // TODO: Add SDKs for Firebase products that you want to use
 
@@ -16,7 +17,8 @@ const firebaseConfig = {
 
   authDomain: "dna-mollusca.firebaseapp.com",
 
-  databaseURL: "https://dna-mollusca-default-rtdb.europe-west1.firebasedatabase.app",
+  databaseURL:
+    "https://dna-mollusca-default-rtdb.europe-west1.firebasedatabase.app",
 
   projectId: "dna-mollusca",
 
@@ -33,14 +35,14 @@ const firebaseConfig = {
 
 initializeApp(firebaseConfig);
 const db = getDatabase();
-const extractions = ref(db, "extractions/");
+const extractions = ref(db, EXTRACTIONS);
 const storage = ref(db, "storage/");
 const locations = ref(db, "locations/");
 
 function writeExtractionData(extractionItem: DnaExtractionsType) {
   const db = getDatabase();
   const newKey = push(child(ref(db), "extractions")).key;
-  set(ref(db, "extractions/" + newKey), extractionItem);
+  set(ref(db, EXTRACTIONS + newKey), extractionItem);
 }
 function writeStorageData(storageItem: StorageType) {
   const db = getDatabase();
@@ -67,11 +69,11 @@ function writePcrProgramsData(primer: any) {
 
 export {
   extractions,
-  storage,
   locations,
+  storage,
   writeExtractionData,
-  writeStorageData,
   writeLocationData,
-  writePrimersData,
   writePcrProgramsData,
+  writePrimersData,
+  writeStorageData,
 };

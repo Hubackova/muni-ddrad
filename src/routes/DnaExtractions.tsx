@@ -3,25 +3,26 @@ import { getDatabase, ref, remove, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-  Column,
-  useFilters,
-  useGlobalFilter,
-  useRowSelect,
-  useSortBy,
-  useTable,
+    Column,
+    useFilters,
+    useGlobalFilter,
+    useRowSelect,
+    useSortBy,
+    useTable,
 } from "react-table";
 import { toast } from "react-toastify";
 import {
-  DateCell,
-  EditableCell,
-  SelectCell,
-  customComparator,
-  customLocalityComparator,
+    DateCell,
+    EditableCell,
+    SelectCell,
+    customComparator,
+    customLocalityComparator,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
+import { EXTRACTIONS } from "../constants";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
@@ -42,7 +43,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      update(ref(db, "extractions/" + key), {
+      update(ref(db, EXTRACTIONS + key), {
         [id]: newValue,
       });
     },
@@ -77,7 +78,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
   }, customComparator);
 
   const handleRevert = () => {
-    update(ref(db, "extractions/" + last.rowKey), {
+    update(ref(db, EXTRACTIONS + last.rowKey), {
       [last.cellId]: last.initialValue,
     });
     last.setValue &&
@@ -395,7 +396,21 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             needPassword
             onConfirm={() => {
               setShowModal(null);
-              remove(ref(db, "extractions/" + showModal));
+              remove(ref(db, EXTRACTIONS + showModal));
+              const currentItem = extractions.find((i) => i.key === showModal);
+              const group = extractions.filter(
+                (i) =>
+                i.isolateCodeGroup && i.isolateCodeGroup.includes(i.isolateCode) &&
+                  i.key !== showModal
+              );
+
+              group.forEach((group) =>
+                update(ref(db, EXTRACTIONS + group.key), {
+                  isolateCodeGroup: group.isolateCodeGroup.filter(
+                    (i) => i !== currentItem.isolateCode
+                  ),
+                })
+              );
               window.location.reload();
               toast.success("Sample was removed successfully");
             }}

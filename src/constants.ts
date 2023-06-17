@@ -11,3 +11,5 @@ export const legend = [
   "J,M,V,Er,EM,T = sequences will be processed by Jeff / Markéta / Verča / Erika / Eva M. / Takumi",
   "D = done and put to Habay alignments",
 ];
+
+export const EXTRACTIONS = "testextractions/";

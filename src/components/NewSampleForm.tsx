@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import CreatableSelectInput from "../components/CreatableSelectInput";
+import { EXTRACTIONS } from "../constants";
 import { backup } from "../content/all";
 import { writeExtractionData } from "../firebase/firebase";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
@@ -12,7 +13,6 @@ import { DnaExtractionsType, StorageType } from "../types";
 import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
-
 const FORM_DATA_KEY = "app_form_local_data";
 
 const NewSampleForm: React.FC = () => {
@@ -24,7 +24,16 @@ const NewSampleForm: React.FC = () => {
   const db = getDatabase();
 
   useEffect(() => {
-    onValue(ref(db, "extractions/"), (snapshot) => {
+    if (sessionStorage.getItem("alert") !== "true") {
+      alert(
+        "v databazi probihaji upravy a probiha testovaci provoz, prosim, nedelejte zadne zmeny dokud toto varovani nezmizi"
+      );
+      sessionStorage.setItem("alert", "true");
+    }
+  }, []);
+
+  useEffect(() => {
+    onValue(ref(db, EXTRACTIONS), (snapshot) => {
       const items: DnaExtractionsType[] = [];
       snapshot.forEach((child) => {
         let childItem = child.val();
@@ -51,32 +60,47 @@ const NewSampleForm: React.FC = () => {
         delete sampleData[key];
       }
     });
-    let isolateGroup = sessionStorage.getItem("isolateGroup");
-    if (isolateGroup) {
+
+    let isolateGroupItem = sessionStorage.getItem("isolateGroupItem");
+    if (isolateGroupItem) {
       try {
-        isolateGroup = JSON.parse(isolateGroup);
+        isolateGroupItem = JSON.parse(isolateGroupItem);
       } catch (err) {
         console.log(err);
       }
     }
+
+    const newIsolateCodeGroup = isolateGroupItem
+      ? isolateGroupItem?.isolateCodeGroup
+        ? [
+            ...isolateGroupItem?.isolateCodeGroup,
+            sampleData.isolateCode,
+            isolateGroupItem.isolateCode,
+          ]
+        : [sampleData.isolateCode, isolateGroupItem.isolateCode]
+      : "";
+    const newIsolateCodeGroupUnique = newIsolateCodeGroup
+      ? [...new Set(newIsolateCodeGroup)]
+      : "";
+
     writeExtractionData({
       ...sampleData,
       ngul: sampleData.ngul ? parseFloat(sampleData.ngul) : "",
-      isolateCodeGroup: isolateGroup
-        ? isolateGroup?.isolateCodeGroup || isolateGroup?.isolateCode
-        : "",
+      isolateCodeGroup: newIsolateCodeGroupUnique,
     });
-    if (
-      sampleData.isolateCodeGroup &&
-      isolateGroup &&
-      isolateGroup.key &&
-      !isolateGroup.isolateCodeGroup
-    ) {
-      update(ref(db, "extractions/" + isolateGroup.key), {
-        isolateCodeGroup: isolateGroup.isolateCode,
-      });
+
+    const groupKeys = extractions
+      .filter((i) => newIsolateCodeGroupUnique.includes(i.isolateCode))
+      .map((i) => i.key);
+
+    if (newIsolateCodeGroupUnique.length) {
+      groupKeys.forEach((i) =>
+        update(ref(db, EXTRACTIONS + i), {
+          isolateCodeGroup: newIsolateCodeGroupUnique,
+        })
+      );
     }
-    sessionStorage.removeItem("isolateGroup");
+    sessionStorage.removeItem("isolateGroupItem");
     sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Sample was added successfully");
   };
@@ -94,6 +118,9 @@ const NewSampleForm: React.FC = () => {
           "YYYY-MM-DD"
         ),
         isolateCode: i.isolateCode.toString(),
+        isolateCodeGroup: i.isolateCodeGroup
+          ? i.isolateCodeGroup.split(";")
+          : "",
         ngul: parseFloat(i.ngul) || "",
       });
     });
@@ -270,7 +297,9 @@ const NewSampleForm: React.FC = () => {
             shouldValidate: true,
           });
           setValue("isolateCodeGroup", i.isolateCode);
-          sessionStorage.setItem("isolateGroup", JSON.stringify(i));
+
+          /* do isolateGroup v sessionstorage nastaví celej zdrojovej vzorek */
+          sessionStorage.setItem("isolateGroupItem", JSON.stringify(i));
           clearErrors("country");
           clearErrors("localityName");
           clearErrors("collector");
@@ -286,6 +315,7 @@ const NewSampleForm: React.FC = () => {
   const isCodes = extractions.map((i) => i.isolateCode);
 
   React.useEffect(() => {
+    /* uklada kompletni data z formu do sessionstorage */
     const subscription = watch((value) =>
       sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(value))
     );
@@ -341,7 +371,7 @@ const NewSampleForm: React.FC = () => {
               onChange={(e: any) => {
                 onChange(e?.value);
                 setValue("isolateCodeGroup", "");
-                sessionStorage.removeItem("isolateGroup");
+                sessionStorage.removeItem("isolateGroupItem");
               }}
               label="Species (original det.)"
               error={errors.speciesOrig?.message}
@@ -461,7 +491,7 @@ const NewSampleForm: React.FC = () => {
                   setValue("dateCollection", e.dateCollection);
                   setValue("collector", e.collector);
                   setValue("isolateCodeGroup", "");
-                  sessionStorage.removeItem("isolateGroup");
+                  sessionStorage.removeItem("isolateGroupItem");
                   clearErrors("country");
                   clearErrors("localityName");
                   clearErrors("collector");
@@ -508,7 +538,7 @@ const NewSampleForm: React.FC = () => {
                 if (e?.value !== getValues("country")) {
                   onChange(e?.value);
                   setValue("isolateCodeGroup", "");
-                  sessionStorage.removeItem("isolateGroup");
+                  sessionStorage.removeItem("isolateGroupItem");
                 }
               }}
               label="Country"
@@ -531,7 +561,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={(e: any) => {
             if (e.target.value !== getValues("latitude")) {
               setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroup");
+              sessionStorage.removeItem("isolateGroupItem");
             }
           }}
           disabled={isDisabled}
@@ -544,7 +574,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={(e: any) => {
             if (e.target.value !== getValues("longitude")) {
               setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroup");
+              sessionStorage.removeItem("isolateGroupItem");
             }
           }}
           disabled={isDisabled}
@@ -559,7 +589,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={(e: any) => {
             if (e.target.value !== getValues("altitude")) {
               setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroup");
+              sessionStorage.removeItem("isolateGroupItem");
             }
           }}
           disabled={isDisabled}
@@ -572,7 +602,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={(e: any) => {
             if (e.target.value !== getValues("state")) {
               setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroup");
+              sessionStorage.removeItem("isolateGroupItem");
             }
           }}
           disabled={isDisabled}
@@ -589,7 +619,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={(e: any) => {
             if (e.target.value !== getValues("localityName")) {
               setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroup");
+              sessionStorage.removeItem("isolateGroupItem");
             }
           }}
         />
@@ -601,7 +631,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={(e: any) => {
             if (e.target.value !== getValues("habitat")) {
               setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroup");
+              sessionStorage.removeItem("isolateGroupItem");
             }
           }}
           disabled={isDisabled}
@@ -618,7 +648,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={(e: any) => {
             if (e.target.value !== getValues("dateCollection")) {
               setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroup");
+              sessionStorage.removeItem("isolateGroupItem");
             }
           }}
         />
@@ -632,7 +662,7 @@ const NewSampleForm: React.FC = () => {
           onBlur={(e: any) => {
             if (e.target.value !== getValues("collector")) {
               setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroup");
+              sessionStorage.removeItem("isolateGroupItem");
             }
           }}
         />
@@ -642,13 +672,13 @@ const NewSampleForm: React.FC = () => {
         Save
       </button>
 
-      {/*       <button
+      <button
         className="submit-btn"
         type="button"
         onClick={() => addItemsBackup()}
       >
         Backup
-      </button> */}
+      </button>
     </form>
   );
 };

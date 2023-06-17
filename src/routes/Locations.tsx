@@ -15,6 +15,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
+import { EXTRACTIONS } from "../constants";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 
@@ -35,7 +36,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
       });
 
       groupItems.forEach((i) =>
-        update(ref(db, "extractions/" + i.key), {
+        update(ref(db, EXTRACTIONS + i.key), {
           [id]: newValue,
         })
       );

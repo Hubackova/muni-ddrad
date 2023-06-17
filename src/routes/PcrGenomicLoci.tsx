@@ -3,24 +3,24 @@ import { getDatabase, ref, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-  useFilters,
-  useGlobalFilter,
-  useRowSelect,
-  useSortBy,
-  useTable,
+    useFilters,
+    useGlobalFilter,
+    useRowSelect,
+    useSortBy,
+    useTable,
 } from "react-table";
 import { toast } from "react-toastify";
 import {
-  DateCell,
-  EditableCell,
-  EditableNoConfirmCell,
-  SelectCell,
-  customComparator,
-  customLocalityComparator,
+    DateCell,
+    EditableCell,
+    EditableNoConfirmCell,
+    SelectCell,
+    customComparator,
+    customLocalityComparator,
 } from "../components/Cell";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
-import { legend } from "../constants";
+import { EXTRACTIONS, legend } from "../constants";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { ReactComponent as InfoIcon } from "../images/info.svg";
 import { DnaExtractionsType, StorageType } from "../types";
@@ -39,6 +39,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
   const [full, setFull] = useState(false);
   const [last, setLast] = useState(false);
   const db = getDatabase();
+  const [showModalCode, setShowModalCode] = useState(false);
 
   const tableData = React.useMemo(
     () =>
@@ -67,7 +68,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
   const addColumn = (name) => {
     const obj = tableData?.length ? tableData[0] : null;
     if (!obj) return null;
-    update(ref(db, "extractions/" + obj.key), {
+    update(ref(db, EXTRACTIONS + obj.key), {
       [name]: "",
     });
     toast.success("Column was added successfully");
@@ -75,7 +76,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      update(ref(db, "extractions/" + key), {
+      update(ref(db, EXTRACTIONS + key), {
         [id]: newValue,
       });
     },
@@ -105,7 +106,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
   );
 
   const handleRevert = () => {
-    update(ref(db, "extractions/" + last.rowKey), {
+    update(ref(db, EXTRACTIONS + last.rowKey), {
       [last.cellId]: last.initialValue,
     });
     last.setValue &&
@@ -422,8 +423,78 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
     prepareRow,
   } = tableInstance;
   const rowsShow = full ? rows : rows.slice(0, 100);
+
+  const handleIsolateClick = (currentItemId) => {
+    setShowModalCode(currentItemId);
+  };
+
+  const codeItems = !showModalCode
+    ? []
+    : Object.values(
+        extractions.reduce(
+          (acc, cur) => Object.assign(acc, { [cur.isolateCode]: cur }),
+          {}
+        )
+      )
+        .sort((a: any, b: any) => a.isolateCode?.localeCompare(b.isolateCode))
+        .map((i: any, index) => {
+          const currentItem = extractions.find((i) => i.key === showModalCode);
+          if (
+            currentItem?.isolateCodeGroup.includes(i.isolateCode) ||
+            currentItem?.isolateCode === i.isolateCode
+          )
+            return null;
+          return (
+            <div
+              key={index}
+              className="item"
+              onClick={() => {
+                update(ref(db, EXTRACTIONS + showModalCode), {
+                  isolateCodeGroup: [
+                    ...i.isolateCodeGroup,
+                    currentItem?.isolateCode,
+                  ],
+                });
+                const groupKeys = extractions
+                  .filter((i) => i.isolateCodeGroup && i.isolateCodeGroup.includes(i.isolateCode))
+                  .map((i) => i.key);
+                groupKeys.forEach((groupKey) =>
+                  update(ref(db, EXTRACTIONS + groupKey), {
+                    isolateCodeGroup: [
+                      ...new Set([
+                        ...i.isolateCodeGroup,
+                        ...currentItem?.isolateCodeGroup,
+                        currentItem?.isolateCode,
+                      ]),
+                    ],
+                  })
+                );
+                setShowModalCode(false);
+              }}
+            >
+              {i.isolateCode}
+            </div>
+          );
+        });
+
   return (
     <>
+      {showModalCode && (
+        <div className="side-panel">
+          <div className="body">
+            <h5>Isolate codes</h5>
+            <div className="items">{codeItems}</div>
+
+            <button
+              className="btn cancel-btn"
+              type="button"
+              onClick={() => setShowModalCode(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <div
         className="table-container"
         style={{
@@ -466,14 +537,8 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
             {rowsShow.map((row) => {
               prepareRow(row);
 
-              const isolateCodeGroup = row.original.isolateCodeGroup
-                ? extractions
-
-                    .filter(
-                      (i) =>
-                        i.isolateCodeGroup === row.original.isolateCodeGroup
-                    )
-                    .map((i) => i.isolateCode)
+              const isolateCodeGroup = row.original.isolateCodeGroup && Array.isArray(row.original.isolateCodeGroup)
+                ? row.original.isolateCodeGroup.map((i) => i)
                 : [];
 
               return (
@@ -494,6 +559,12 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
                         {i}
                       </span>
                     ))}
+                    <span
+                      className="sample add"
+                      onClick={() => handleIsolateClick(row.original.key)}
+                    >
+                      + Add
+                    </span>
                   </td>
                 </tr>
               );

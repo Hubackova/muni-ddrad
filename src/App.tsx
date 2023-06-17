@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.scss";
 import TopBar from "./components/TopBar";
+import { EXTRACTIONS } from "./constants";
 import routes from "./routes";
 import All from "./routes/All";
 import DnaExtractions from "./routes/DnaExtractions";
@@ -25,7 +26,7 @@ const App: React.FC = () => {
   const db = getDatabase();
 
   useEffect(() => {
-    onValue(ref(db, "extractions/"), (snapshot) => {
+    onValue(ref(db, EXTRACTIONS), (snapshot) => {
       const items: DnaExtractionsType[] = [];
       snapshot.forEach((child) => {
         let childItem = child.val();
@@ -44,9 +45,11 @@ const App: React.FC = () => {
       setStorage(items);
     });
   }, [db]);
+
   const sortedExtractions = extractions.sort((a, b) => {
     return new Date(b.dateIsolation) - new Date(a.dateIsolation);
   });
+
   return (
     <div>
       <TopBar />
@@ -63,7 +66,7 @@ const App: React.FC = () => {
                   extractions={sortedExtractions}
                 />
               ) : (
-                <div> no data</div>
+                <div> loading (or no data)</div>
               )
             }
           />
@@ -76,7 +79,7 @@ const App: React.FC = () => {
                   extractions={sortedExtractions}
                 />
               ) : (
-                <div> no data</div>
+                <div> loading (or no data)</div>
               )
             }
           />
@@ -86,7 +89,7 @@ const App: React.FC = () => {
               extractions?.length > 0 && storage?.length > 0 ? (
                 <Locations extractions={extractions} />
               ) : (
-                <div> no data</div>
+                <div> loading (or no data)</div>
               )
             }
           />
@@ -96,7 +99,7 @@ const App: React.FC = () => {
               extractions?.length > 0 && storage?.length > 0 ? (
                 <Storage storage={storage} extractions={extractions} />
               ) : (
-                <div> no data</div>
+                <div> loading (or no data)</div>
               )
             }
           />
@@ -106,7 +109,7 @@ const App: React.FC = () => {
               extractions?.length > 0 && storage?.length > 0 ? (
                 <All storage={storage} extractions={sortedExtractions} />
               ) : (
-                <div> no data</div>
+                <div> loading (or no data)</div>
               )
             }
           />

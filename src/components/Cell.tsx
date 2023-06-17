@@ -3,6 +3,7 @@
 import { getDatabase, ref, update } from "firebase/database";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import { EXTRACTIONS } from "../constants";
 import ConfirmModal from "./ConfirmModal";
 import CreatableSelectInput from "./CreatableSelectInput";
 import SelectInput from "./SelectInput";
@@ -63,7 +64,7 @@ export const DateCell: React.FC<any> = ({
         initialValue,
         setValue,
         callback: () => {
-          update(ref(db, "extractions/" + row.original.key), {
+          update(ref(db, EXTRACTIONS + row.original.key), {
             [cell.column.id]: e.target.value,
           });
           saveLast({
@@ -114,7 +115,7 @@ export const EditableCell: React.FC<any> = ({
   cell,
   disabled = false,
   maxChars = 22,
-  dbName = "extractions/",
+  dbName = EXTRACTIONS,
   saveLast = () => {},
   ...props
 }) => {
@@ -223,7 +224,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
   row,
   cell,
   disabled = false,
-  dbName = "extractions/",
+  dbName = EXTRACTIONS,
   saveLast = () => {},
   maxChars = 22,
   ...props
@@ -302,7 +303,7 @@ export const SelectCell: React.FC<any> = ({
         initialValue,
         setValue,
         callback: () => {
-          update(ref(db, "extractions/" + row.original.key), {
+          update(ref(db, EXTRACTIONS + row.original.key), {
             [cell.column.id]: value.value,
           });
           saveLast({
@@ -360,7 +361,7 @@ export const CreatableSelectCell: React.FC<any> = ({
   row,
   cell,
   options,
-  dbName = "extractions/",
+  dbName = EXTRACTIONS,
   saveLast = () => {},
   maxChars = 22,
 }) => {

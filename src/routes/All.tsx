@@ -22,6 +22,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import SelectInput from "../components/SelectInput";
+import { EXTRACTIONS } from "../constants";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 
@@ -38,7 +39,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      update(ref(db, "extractions/" + key), {
+      update(ref(db, EXTRACTIONS + key), {
         [id]: newValue,
       });
     },
@@ -54,7 +55,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     [storage]
   );
   const handleRevert = () => {
-    update(ref(db, "extractions/" + last.rowKey), {
+    update(ref(db, EXTRACTIONS + last.rowKey), {
       [last.cellId]: last.initialValue,
     });
     last.setValue &&
@@ -577,12 +578,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               prepareRow(row);
 
               const isolateCodeGroup = row.original.isolateCodeGroup
-                ? extractions
-                    .filter(
-                      (i) =>
-                        i.isolateCodeGroup === row.original.isolateCodeGroup
-                    )
-                    .map((i) => i.isolateCode)
+                ? row.original.isolateCodeGroup.map((i) => i)
                 : [];
 
               return (

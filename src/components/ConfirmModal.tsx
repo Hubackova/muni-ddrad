@@ -65,7 +65,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <button
             className="btn btn-primary"
             onClick={handleConfirm}
-            disabled={needPassword && password !== "malclam"}
+            /* todo disabled={needPassword && password !== "malclam"} */
           >
             {confirmBtnLabel}
           </button>
