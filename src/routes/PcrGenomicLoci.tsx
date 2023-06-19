@@ -450,6 +450,9 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
             currentItem?.state !== item.state ||
             currentItem?.localityName !== item.localityName ||
             currentItem?.dateCollection !== item.dateCollection ||
+            currentItem?.collector !== item.collector ||
+            currentItem?.habitat !== item.habitat ||
+            currentItem?.speciesOrig !== item.speciesOrig ||
             currentItem?.altitude !== item.altitude
           )
             return null;
