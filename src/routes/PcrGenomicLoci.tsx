@@ -443,7 +443,14 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
           );
           if (
             currentItem?.isolateCodeGroup.includes(item.isolateCode) ||
-            currentItem?.isolateCode === item.isolateCode
+            currentItem?.isolateCode === item.isolateCode ||
+            currentItem?.country !== item.country ||
+            currentItem?.latitude !== item.latitude ||
+            currentItem?.longitude !== item.longitude ||
+            currentItem?.state !== item.state ||
+            currentItem?.localityName !== item.localityName ||
+            currentItem?.dateCollection !== item.dateCollection ||
+            currentItem?.altitude !== item.altitude
           )
             return null;
 
