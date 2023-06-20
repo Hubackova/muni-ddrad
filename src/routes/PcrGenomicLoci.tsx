@@ -39,7 +39,27 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
   const [full, setFull] = useState(false);
   const [last, setLast] = useState(false);
   const db = getDatabase();
-  const [showModalCode, setShowModalCode] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(false);
+
+  const removeIsolateFromGroup = (isolateCode) => {
+    const group = extractions.filter(
+      (i) => i.isolateCodeGroup && i.isolateCodeGroup.includes(isolateCode)
+    );
+
+    const removedItem = extractions.find((i) => i.isolateCode === isolateCode);
+
+    group.forEach((groupItem) =>
+      update(ref(db, EXTRACTIONS + groupItem.key), {
+        isolateCodeGroup: groupItem.isolateCodeGroup.filter(
+          (i) => i !== isolateCode
+        ),
+      })
+    );
+
+    update(ref(db, EXTRACTIONS + removedItem.key), {
+      isolateCodeGroup: "",
+    });
+  };
 
   const tableData = React.useMemo(
     () =>
@@ -424,85 +444,88 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
   } = tableInstance;
   const rowsShow = full ? rows : rows.slice(0, 100);
 
-  const handleIsolateClick = (currentItemId) => {
-    setShowModalCode(currentItemId);
+  const handleIsolateClick = (selectedItemAttr) => {
+    setSelectedItem(selectedItemAttr);
   };
 
-  const codeItems = !showModalCode
+  const handleIsolateCodeClick = (selectedItem, isolateCodeItem) => {
+    let newIsolateCodeGroup = [
+      selectedItem.isolateCode,
+      isolateCodeItem.isolateCode,
+    ];
+    if (!!isolateCodeItem?.isolateCodeGroup?.length) {
+      newIsolateCodeGroup.push(...isolateCodeItem?.isolateCodeGroup);
+    }
+    if (!!selectedItem?.isolateCodeGroup?.length) {
+      newIsolateCodeGroup.push(...selectedItem?.isolateCodeGroup);
+    }
+
+    const newIsolateCodeGroupUnique = newIsolateCodeGroup
+      ? [...new Set(newIsolateCodeGroup)]
+      : "";
+
+    const groupKeys = extractions
+      .filter((i) => newIsolateCodeGroupUnique.includes(i.isolateCode))
+      .map((i) => i.key);
+
+    groupKeys.forEach((groupKey) =>
+      update(ref(db, EXTRACTIONS + groupKey), {
+        isolateCodeGroup: newIsolateCodeGroupUnique,
+      })
+    );
+    setSelectedItem(false);
+  };
+
+  const codeItems = !selectedItem
     ? []
     : Object.values(
+        /* todo, razeni az nakonec */
         extractions.reduce(
           (acc, cur) => Object.assign(acc, { [cur.isolateCode]: cur }),
           {}
         )
       )
         .sort((a: any, b: any) => a.isolateCode?.localeCompare(b.isolateCode))
-        .map((item: any, index) => {
+        .map((extractionItem: any, index) => {
+          /* todo:not neccessary */
           const currentItem = extractions.find(
-            (extraction) => extraction.key === showModalCode
+            (extraction) => extraction.key === selectedItem.key
           );
           if (
-            currentItem?.isolateCodeGroup.includes(item.isolateCode) ||
-            currentItem?.isolateCode === item.isolateCode ||
-            currentItem?.country !== item.country ||
-            currentItem?.latitude !== item.latitude ||
-            currentItem?.longitude !== item.longitude ||
-            currentItem?.state !== item.state ||
-            currentItem?.localityName !== item.localityName ||
-            currentItem?.dateCollection !== item.dateCollection ||
-            currentItem?.collector !== item.collector ||
-            currentItem?.habitat !== item.habitat ||
-            currentItem?.speciesOrig !== item.speciesOrig ||
-            currentItem?.altitude !== item.altitude
+            (currentItem?.isolateCodeGroup &&
+              currentItem?.isolateCodeGroup.includes(
+                extractionItem.isolateCode
+              )) ||
+            currentItem?.isolateCode === extractionItem.isolateCode ||
+            currentItem?.country !== extractionItem.country ||
+            currentItem?.latitude !== extractionItem.latitude ||
+            currentItem?.longitude !== extractionItem.longitude ||
+            currentItem?.state !== extractionItem.state ||
+            currentItem?.localityName !== extractionItem.localityName ||
+            currentItem?.dateCollection !== extractionItem.dateCollection ||
+            currentItem?.collector !== extractionItem.collector ||
+            currentItem?.habitat !== extractionItem.habitat ||
+            currentItem?.speciesOrig !== extractionItem.speciesOrig ||
+            currentItem?.altitude !== extractionItem.altitude
           )
             return null;
-
-          const newIsolateCodeGroup = item?.isolateCodeGroup
-            ? [
-                ...item?.isolateCodeGroup,
-                currentItem.isolateCode,
-                item.isolateCode,
-              ]
-            : [currentItem.isolateCode, item.isolateCode];
-
-          const newIsolateCodeGroupUnique = newIsolateCodeGroup
-            ? [...new Set(newIsolateCodeGroup)]
-            : "";
 
           return (
             <div
               key={index}
               className="item"
-              onClick={() => {
-                update(ref(db, EXTRACTIONS + showModalCode), {
-                  isolateCodeGroup: newIsolateCodeGroupUnique,
-                });
-                const groupKeys = extractions
-                  .filter(
-                    (extraction) =>
-                      (extraction.isolateCodeGroup &&
-                        extraction.isolateCodeGroup.includes(
-                          item.isolateCode
-                        )) ||
-                      extraction.isolateCode === item.isolateCode
-                  )
-                  .map((i) => i.key);
-                groupKeys.forEach((groupKey) =>
-                  update(ref(db, EXTRACTIONS + groupKey), {
-                    isolateCodeGroup: newIsolateCodeGroupUnique,
-                  })
-                );
-                setShowModalCode(false);
-              }}
+              onClick={() =>
+                handleIsolateCodeClick(currentItem, extractionItem)
+              }
             >
-              {item.isolateCode}
+              {extractionItem.isolateCode}
             </div>
           );
         });
 
   return (
     <>
-      {showModalCode && (
+      {selectedItem && (
         <div className="side-panel">
           <div className="body">
             <h5>Isolate codes</h5>
@@ -511,7 +534,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
             <button
               className="btn cancel-btn"
               type="button"
-              onClick={() => setShowModalCode(false)}
+              onClick={() => setSelectedItem(false)}
             >
               Close
             </button>
@@ -579,14 +602,20 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
                     );
                   })}
                   <td className="sample-list">
-                    {isolateCodeGroup.map((i) => (
-                      <span key={i} className="sample">
-                        {i}
+                    {isolateCodeGroup.map((isolateCode) => (
+                      <span key={isolateCode} className="sample">
+                        {isolateCode}
+
+                        <button
+                          onClick={() => removeIsolateFromGroup(isolateCode)}
+                        >
+                          X
+                        </button>
                       </span>
                     ))}
                     <span
                       className="sample add"
-                      onClick={() => handleIsolateClick(row.original.key)}
+                      onClick={() => handleIsolateClick(row.original)}
                     >
                       + Add
                     </span>

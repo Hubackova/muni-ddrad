@@ -70,15 +70,17 @@ const NewSampleForm: React.FC = () => {
       }
     }
 
-    const newIsolateCodeGroup = isolateGroupItem
-      ? isolateGroupItem?.isolateCodeGroup
-        ? [
-            ...isolateGroupItem?.isolateCodeGroup,
-            sampleData.isolateCode,
-            isolateGroupItem.isolateCode,
-          ]
-        : [sampleData.isolateCode, isolateGroupItem.isolateCode]
+    let newIsolateCodeGroup = isolateGroupItem
+      ? [isolateGroupItem.isolateCode, sampleData.isolateCode]
       : "";
+
+    if (!!isolateGroupItem?.isolateCodeGroup?.length) {
+      newIsolateCodeGroup.push(...isolateGroupItem?.isolateCodeGroup);
+    }
+    if (!!sampleData?.isolateCodeGroup?.length) {
+      newIsolateCodeGroup.push(...sampleData?.isolateCodeGroup);
+    }
+
     const newIsolateCodeGroupUnique = newIsolateCodeGroup
       ? [...new Set(newIsolateCodeGroup)]
       : "";
@@ -93,7 +95,7 @@ const NewSampleForm: React.FC = () => {
       .filter((i) => newIsolateCodeGroupUnique.includes(i.isolateCode))
       .map((i) => i.key);
 
-    if (newIsolateCodeGroupUnique.length) {
+    if (!!newIsolateCodeGroupUnique.length) {
       groupKeys.forEach((i) =>
         update(ref(db, EXTRACTIONS + i), {
           isolateCodeGroup: newIsolateCodeGroupUnique,
