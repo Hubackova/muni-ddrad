@@ -18,6 +18,7 @@ import {
   customComparator,
   customLocalityComparator,
 } from "../components/Cell";
+import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { EXTRACTIONS, legend } from "../constants";
@@ -40,6 +41,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
   const [last, setLast] = useState(false);
   const db = getDatabase();
   const [selectedItem, setSelectedItem] = useState(false);
+  const [showGroupModal, setShowGroupModal] = useState(null);
 
   const removeIsolateFromGroup = (isolateCode) => {
     const group = extractions.filter(
@@ -514,9 +516,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
             <div
               key={index}
               className="item"
-              onClick={() =>
-                handleIsolateCodeClick(currentItem, extractionItem)
-              }
+              onClick={() => setShowGroupModal({ currentItem, extractionItem })}
             >
               {extractionItem.isolateCode}
             </div>
@@ -548,6 +548,21 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
           overflow: "auto",
         }}
       >
+        {showGroupModal && (
+          <ConfirmModal
+            title="Do you want to continue?"
+            description={`Do you want to add ${showGroupModal.extractionItem.isolateCode} to ${showGroupModal.currentItem.isolateCode}?`}
+            onConfirm={() => {
+              handleIsolateCodeClick(
+                showGroupModal.currentItem,
+                showGroupModal.extractionItem
+              );
+              setShowGroupModal(null);
+              toast.success("Group was modified successfully");
+            }}
+            onHide={() => setShowGroupModal(null)}
+          />
+        )}
         <table className="table" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
