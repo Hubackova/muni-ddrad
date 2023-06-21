@@ -5,19 +5,13 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: center;
+  }
 
-    .form-column {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .form-wrapper {
-      border: 1px solid lightblue;
-      border-radius: 24px;
-      padding: 16px;
-      height: max-content;
-    }
+  .form-wrapper {
+    border: 1px solid lightblue;
+    border-radius: 24px;
+    padding: 16px;
+    height: max-content;
+    margin-bottom: 30px;
   }
 }

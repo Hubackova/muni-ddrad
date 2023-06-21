@@ -602,17 +602,18 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
                     );
                   })}
                   <td className="sample-list">
-                    {isolateCodeGroup.map((isolateCode) => (
-                      <span key={isolateCode} className="sample">
-                        {isolateCode}
+                    {isolateCodeGroup.length > 1 &&
+                      isolateCodeGroup.map((isolateCode) => (
+                        <span key={isolateCode} className="sample">
+                          {isolateCode}
 
-                        <button
-                          onClick={() => removeIsolateFromGroup(isolateCode)}
-                        >
-                          X
-                        </button>
-                      </span>
-                    ))}
+                          <button
+                            onClick={() => removeIsolateFromGroup(isolateCode)}
+                          >
+                            X
+                          </button>
+                        </span>
+                      ))}
                     <span
                       className="sample add"
                       onClick={() => handleIsolateClick(row.original)}

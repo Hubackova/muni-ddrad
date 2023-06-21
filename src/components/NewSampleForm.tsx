@@ -13,6 +13,7 @@ import { DnaExtractionsType, StorageType } from "../types";
 import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
+
 const FORM_DATA_KEY = "app_form_local_data";
 
 const NewSampleForm: React.FC = () => {
@@ -74,10 +75,16 @@ const NewSampleForm: React.FC = () => {
       ? [isolateGroupItem.isolateCode, sampleData.isolateCode]
       : "";
 
-    if (!!isolateGroupItem?.isolateCodeGroup?.length) {
+    if (
+      !!isolateGroupItem?.isolateCodeGroup?.length &&
+      Array.isArray(isolateGroupItem?.isolateCodeGroup)
+    ) {
       newIsolateCodeGroup.push(...isolateGroupItem?.isolateCodeGroup);
     }
-    if (!!sampleData?.isolateCodeGroup?.length) {
+    if (
+      !!sampleData?.isolateCodeGroup?.length &&
+      Array.isArray(sampleData?.isolateCodeGroup)
+    ) {
       newIsolateCodeGroup.push(...sampleData?.isolateCodeGroup);
     }
 
@@ -340,7 +347,11 @@ const NewSampleForm: React.FC = () => {
             }
           />
           <div>
-            <button type="button" onClick={() => setShowModalCode(true)}>
+            <button
+              type="button"
+              onClick={() => setShowModalCode(true)}
+              className="form-btn"
+            >
               Show isolate codes
             </button>
             {watch("isolateCodeGroup") && (
@@ -510,7 +521,11 @@ const NewSampleForm: React.FC = () => {
             name="localityCode"
           />
           <div>
-            <button type="button" onClick={() => setShowModalLoc(true)}>
+            <button
+              type="button"
+              onClick={() => setShowModalLoc(true)}
+              className="form-btn"
+            >
               Show localities
             </button>
             {showModalLoc && (

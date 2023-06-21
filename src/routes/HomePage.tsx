@@ -13,16 +13,16 @@ const HomePage: React.FC = () => {
         <div className="form-wrapper">
           <NewSampleForm />
         </div>
-        <div className="form-column">
-          <div className="form-wrapper">
-            <NewPcrProgramsForm />
-          </div>
-          <div className="form-wrapper">
-            <NewStorageForm />
-          </div>
+      </div>
+      <div className="form-grid">
+        <div className="form-wrapper">
+          <NewPcrProgramsForm />
         </div>
         <div className="form-wrapper">
           <NewPrimerForm />
+        </div>
+        <div className="form-wrapper">
+          <NewStorageForm />
         </div>
       </div>
     </div>
