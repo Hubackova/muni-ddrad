@@ -2,11 +2,21 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 600px;
+  max-width: 980px;
 
   .row {
     display: flex;
     flex-direction: column;
+
+    .subrow {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .select {
+      min-width: 200px;
+    }
   }
 
   .form-btn {
@@ -73,12 +83,31 @@
     }
   }
 
-  @media (min-width: 756px) {
+  @media (min-width: 576px) {
+    .row {
+      .subrow {
+        flex-direction: row;
+        gap: 20px;
+      }
+
+      .select {
+        min-width: 200px;
+      }
+    }
+  }
+
+  @media (min-width: 920px) {
     .row {
       flex-direction: row;
+      .subrow {
+        gap: 20px;
+      }
 
-      > div {
-        width: 50%;
+      .input {
+        min-width: 200px;
+      }
+      .select {
+        min-width: 225px;
       }
     }
   }
