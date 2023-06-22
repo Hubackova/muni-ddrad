@@ -42,6 +42,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
   const db = getDatabase();
   const [selectedItem, setSelectedItem] = useState(false);
   const [showGroupModal, setShowGroupModal] = useState(null);
+  const [showRemoveModal, setShowRemoveModal] = useState(null);
 
   const removeIsolateFromGroup = (isolateCode) => {
     const group = extractions.filter(
@@ -548,6 +549,17 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
           overflow: "auto",
         }}
       >
+        {showRemoveModal && (
+          <ConfirmModal
+            title={`Do you want to continue? ${showRemoveModal} will be removed from group`}
+            onConfirm={() => {
+              removeIsolateFromGroup(showRemoveModal);
+              toast.success("Remove was successful");
+              setShowRemoveModal(null);
+            }}
+            onHide={() => setShowRemoveModal(null)}
+          />
+        )}
         {showGroupModal && (
           <ConfirmModal
             title="Do you want to continue?"
@@ -623,7 +635,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
                           {isolateCode}
 
                           <button
-                            onClick={() => removeIsolateFromGroup(isolateCode)}
+                            onClick={() => setShowRemoveModal(isolateCode)}
                           >
                             X
                           </button>
