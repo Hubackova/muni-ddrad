@@ -24,14 +24,14 @@ const NewSampleForm: React.FC = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const db = getDatabase();
 
-  useEffect(() => {
+/*   useEffect(() => {
     if (sessionStorage.getItem("alert") !== "true") {
       alert(
-        "v databazi probihaji upravy a probiha testovaci provoz, prosim, nedelejte zadne zmeny dokud toto varovani nezmizi"
+        "the database is undergoing construction and testing, please do not make any changes until this warning disappears"
       );
       sessionStorage.setItem("alert", "true");
     }
-  }, []);
+  }, []); */
 
   useEffect(() => {
     onValue(ref(db, EXTRACTIONS), (snapshot) => {
