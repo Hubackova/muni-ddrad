@@ -66,6 +66,48 @@
     }
   }
 
+  &.all,
+  &.pcrgen {
+    tr > td,
+    tr > th {
+      &:nth-of-type(3) {
+        left: 132px;
+        position: sticky;
+        z-index: 99991;
+        background-color: white;
+      }
+    }
+    tr > th {
+      &:nth-of-type(3) {
+        z-index: 99999;
+      }
+    }
+  }
+
+  &.dna {
+    tr > td,
+    tr > th {
+      &:nth-of-type(3) {
+        left: 40px;
+        position: sticky;
+        z-index: 99991;
+        background-color: white;
+      }
+      &:nth-of-type(4) {
+        left: 140px;
+        position: sticky;
+        z-index: 99991;
+        background-color: white;
+      }
+    }
+    tr > th {
+      &:nth-of-type(4),
+      &:nth-of-type(3) {
+        z-index: 99999;
+      }
+    }
+  }
+
   tr > th {
     &:nth-of-type(1) {
       z-index: 99999;

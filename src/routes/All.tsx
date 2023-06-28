@@ -118,6 +118,17 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
+        Header: "Species (original det.)",
+        accessor: "speciesOrig",
+        Cell: React.memo<React.FC<any>>(
+          ({ row: { original } }) => <span>{original.speciesOrig}</span>,
+          customComparator
+        ),
+
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
         Header: "Locality code",
         accessor: "localityCode",
         Cell: React.memo<React.FC<any>>(
@@ -207,17 +218,6 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           },
           customComparator
         ),
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Species (original det.)",
-        accessor: "speciesOrig",
-        Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => <span>{original.speciesOrig}</span>,
-          customComparator
-        ),
-
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -546,7 +546,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           overflow: "auto",
         }}
       >
-        <table className="table" {...getTableProps()}>
+        <table className="table all" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={index}>

@@ -81,7 +81,7 @@ const NewPrimerForm: React.FC = () => {
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new primer:</h5>
-      <div className="row">
+      <div className="form-grid">
         <TextInput
           label="Name"
           name="name"
@@ -98,8 +98,6 @@ const NewPrimerForm: React.FC = () => {
           error={errors.marker?.message}
           register={register}
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Specificity"
           name="specificity"
@@ -113,8 +111,6 @@ const NewPrimerForm: React.FC = () => {
           register={register}
           required="This field is required"
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Author"
           name="author"
@@ -127,8 +123,6 @@ const NewPrimerForm: React.FC = () => {
           error={errors.anneal?.message}
           register={register}
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Length of PCR product"
           name="lengthPCR"
@@ -141,8 +135,6 @@ const NewPrimerForm: React.FC = () => {
           error={errors.work?.message}
           register={register}
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Note on use"
           name="noteOnUse"

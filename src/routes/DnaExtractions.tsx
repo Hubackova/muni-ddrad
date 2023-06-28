@@ -3,20 +3,20 @@ import { getDatabase, ref, remove, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-    Column,
-    useFilters,
-    useGlobalFilter,
-    useRowSelect,
-    useSortBy,
-    useTable,
+  Column,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
 } from "react-table";
 import { toast } from "react-toastify";
 import {
-    DateCell,
-    EditableCell,
-    SelectCell,
-    customComparator,
-    customLocalityComparator,
+  DateCell,
+  EditableCell,
+  SelectCell,
+  customComparator,
+  customLocalityComparator,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
@@ -400,7 +400,8 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
               const currentItem = extractions.find((i) => i.key === showModal);
               const group = extractions.filter(
                 (i) =>
-                i.isolateCodeGroup && i.isolateCodeGroup.includes(i.isolateCode) &&
+                  i.isolateCodeGroup &&
+                  i.isolateCodeGroup.includes(i.isolateCode) &&
                   i.key !== showModal
               );
 
@@ -417,7 +418,7 @@ const DnaExtractions: React.FC<DnaExtractionsProps> = ({
             onHide={() => setShowModal(null)}
           />
         )}
-        <table className="table" {...getTableProps()}>
+        <table className="table dna" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={index}>

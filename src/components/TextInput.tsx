@@ -30,7 +30,7 @@ const TextInput = ({
   type = "text",
   step,
 }: InputProps) => (
-  <div className="container">
+  <div className="input-container">
     <label className="label">{label}</label>
 
     <input

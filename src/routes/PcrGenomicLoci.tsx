@@ -575,7 +575,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
             onHide={() => setShowGroupModal(null)}
           />
         )}
-        <table className="table" {...getTableProps()}>
+        <table className="table pcrgen" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={index}>

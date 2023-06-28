@@ -84,7 +84,7 @@ const NewPcrProgramsForm: React.FC = () => {
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
       <h5>Add new pcr program:</h5>
-      <div className="row">
+      <div className="form-grid">
         <TextInput
           label="Name"
           name="name"
@@ -102,8 +102,6 @@ const NewPcrProgramsForm: React.FC = () => {
           register={register}
           required="This field is required"
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Denaturation"
           name="denaturation"
@@ -118,8 +116,6 @@ const NewPcrProgramsForm: React.FC = () => {
           register={register}
           required="This field is required"
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Extension"
           name="extension"
@@ -134,8 +130,6 @@ const NewPcrProgramsForm: React.FC = () => {
           register={register}
           required="This field is required"
         />
-      </div>
-      <div className="row">
         <TextInput
           label="Final Extension"
           name="finalExtension"
@@ -150,8 +144,6 @@ const NewPcrProgramsForm: React.FC = () => {
           register={register}
           required="This field is required"
         />
-      </div>
-      <div className="row">
         <TextInput
           label="PCR product size"
           name="pcrProductSize"
