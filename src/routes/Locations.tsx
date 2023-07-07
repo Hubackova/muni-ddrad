@@ -3,18 +3,17 @@ import { getDatabase, ref, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-  Column,
-  useFilters,
-  useGlobalFilter,
-  useRowSelect,
-  useSortBy,
-  useTable,
+    Column,
+    useFilters,
+    useGlobalFilter,
+    useRowSelect,
+    useSortBy,
+    useTable,
 } from "react-table";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
-import SelectInput from "../components/SelectInput";
 import { EXTRACTIONS } from "../constants";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
@@ -79,22 +78,32 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         Header: "Locality code",
         accessor: "localityCode",
         Cell: React.memo<React.FC<any>>(
-          ({ row: { original } }) => (
-            <SelectInput
-              options={localityOptions}
-              value={
-                original.localityCode
-                  ? {
-                      value: original.localityCode,
-                      label: original.localityCode,
-                    }
-                  : null
-              }
-              isSearchable
-              className="narrow"
-              isDisabled
-            />
-          ),
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    const localityCodes = localityOptions.map((i) => i.value.toLowerCase());
+                    if (localityCodes.includes(e.target.value.toLowerCase())) return toast.error("Locality code already exists");
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+                className="semi-narrow"
+              ></input>
+            );
+          },
           customComparator
         ),
         Filter: Multi,
