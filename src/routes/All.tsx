@@ -21,7 +21,7 @@ import {
 import ConfirmModal from "../components/ConfirmModal";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
-import SelectInput from "../components/SelectInput";
+import CreatableSelectInput from "../components/CreatableSelectInput";
 import { EXTRACTIONS } from "../constants";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
@@ -58,18 +58,12 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     update(ref(db, EXTRACTIONS + last.rowKey), {
       [last.cellId]: last.initialValue,
     });
-    last.setValue &&
-      last.setValue({ value: last.initialValue, label: last.initialValue });
+    last.setValue && last.setValue({ value: last.initialValue, label: last.initialValue });
     setLast(false);
   };
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
-      <EditableCell
-        initialValue={value}
-        row={row}
-        cell={cell}
-        saveLast={setLast}
-      />
+      <EditableCell initialValue={value} row={row} cell={cell} saveLast={setLast} />
     ),
     customComparator
   );
@@ -89,12 +83,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
 
   const NoConfirmCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
-      <EditableNoConfirmCell
-        initialValue={value}
-        row={row}
-        cell={cell}
-        saveLast={setLast}
-      />
+      <EditableNoConfirmCell initialValue={value} row={row} cell={cell} saveLast={setLast} />
     ),
     customComparator
   );
@@ -106,11 +95,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         accessor: "isolateCode",
         Cell: React.memo<React.FC<any>>(
           ({ row: { original } }) => (
-            <input
-              defaultValue={[original.isolateCode] || ""}
-              disabled
-              className="narrow"
-            ></input>
+            <input defaultValue={[original.isolateCode] || ""} disabled className="narrow"></input>
           ),
           customComparator
         ),
@@ -131,93 +116,81 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "Locality code",
         accessor: "localityCode",
-        Cell: React.memo<React.FC<any>>(
-          ({ value: initialValue, row, cell, row: { original } }) => {
-            const [showEditModal, setShowEditModal] = useState(null);
-            const [value, setValue] = React.useState(
-              original.localityCode
-                ? {
-                    value: original.localityCode,
-                    label: original.localityCode,
-                  }
-                : null
-            );
-            const onChange = (value: any) => {
-              setValue({
-                value: value.value,
-                label: value.value,
+        Cell: React.memo<React.FC<any>>(({ value: initialValue, row, cell, row: { original } }) => {
+          const [showEditModal, setShowEditModal] = useState(null);
+          const [value, setValue] = React.useState(
+            original.localityCode
+              ? {
+                  value: original.localityCode,
+                  label: original.localityCode,
+                }
+              : null
+          );
+          const onChange = (value: any) => {
+            setValue({
+              value: value.value,
+              label: value.value,
+            });
+            if (initialValue !== value.value) {
+              setShowEditModal({
+                row,
+                newValue: value.value,
+                id: cell.column.id,
+                initialValue,
+                setValue: (value) =>
+                  setValue({
+                    value: value,
+                    label: value,
+                  }),
+                callback: () => {
+                  editItem(original.key, value.value, "localityCode");
+                  editItem(original.key, value.country || "", "country");
+                  editItem(original.key, value.state || "", "state");
+                  editItem(original.key, value.localityName || "", "localityName");
+                  editItem(original.key, value.latitude || "", "latitude");
+                  editItem(original.key, value.longitude || "", "longitude");
+                  editItem(original.key, value.altitude || "", "altitude");
+                  editItem(original.key, value.habitat || "", "habitat");
+                  editItem(original.key, value.dateCollection || "", "dateCollection");
+                  editItem(original.key, value.collector || "", "collector");
+                  setLast({
+                    rowKey: row.original.key,
+                    cellId: cell.column.id,
+                    initialValue,
+                  });
+                },
               });
-              if (initialValue !== value.value) {
-                setShowEditModal({
-                  row,
-                  newValue: value.value,
-                  id: cell.column.id,
-                  initialValue,
-                  setValue: (value) =>
-                    setValue({
-                      value: value,
-                      label: value,
-                    }),
-                  callback: () => {
-                    editItem(original.key, value.value, "localityCode");
-                    editItem(original.key, value.country || "", "country");
-                    editItem(original.key, value.state || "", "state");
-                    editItem(
-                      original.key,
-                      value.localityName || "",
-                      "localityName"
-                    );
-                    editItem(original.key, value.latitude || "", "latitude");
-                    editItem(original.key, value.longitude || "", "longitude");
-                    editItem(original.key, value.altitude || "", "altitude");
-                    editItem(original.key, value.habitat || "", "habitat");
-                    editItem(
-                      original.key,
-                      value.dateCollection || "",
-                      "dateCollection"
-                    );
-                    editItem(original.key, value.collector || "", "collector");
-                    setLast({
-                      rowKey: row.original.key,
-                      cellId: cell.column.id,
-                      initialValue,
-                    });
-                  },
-                });
-              }
-            };
+            }
+          };
 
-            return (
-              <>
-                <SelectInput
-                  options={localityOptions}
-                  value={value}
-                  onChange={onChange}
-                  isSearchable
-                  className="narrow"
+          return (
+            <>
+              <CreatableSelectInput
+                options={localityOptions}
+                value={value}
+                onChange={onChange}
+                isSearchable
+                className="narrow"
+              />
+              {showEditModal?.row.id === cell.row.id && showEditModal.id === cell.column.id && (
+                <ConfirmModal
+                  title={`Do you want to change value from ${
+                    showEditModal.initialValue || "<empty>"
+                  } to ${showEditModal.newValue} ?`}
+                  onConfirm={async () => {
+                    await showEditModal.callback();
+                    setShowEditModal(null);
+                    toast.success("Field was edited successfully");
+                  }}
+                  onCancel={() => {
+                    showEditModal.setValue(showEditModal.initialValue);
+                  }}
+                  onHide={() => setShowEditModal(null)}
                 />
-                {showEditModal?.row.id === cell.row.id &&
-                  showEditModal.id === cell.column.id && (
-                    <ConfirmModal
-                      title={`Do you want to change value from ${
-                        showEditModal.initialValue || "<empty>"
-                      } to ${showEditModal.newValue} ?`}
-                      onConfirm={async () => {
-                        await showEditModal.callback();
-                        setShowEditModal(null);
-                        toast.success("Field was edited successfully");
-                      }}
-                      onCancel={() => {
-                        showEditModal.setValue(showEditModal.initialValue);
-                      }}
-                      onHide={() => setShowEditModal(null)}
-                    />
-                  )}
-              </>
-            );
-          },
-          customComparator
-        ),
+              )}
+            </>
+          );
+        }, customComparator),
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -302,12 +275,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         accessor: "dateIsolation",
         Cell: React.memo<React.FC<any>>(
           ({ value: initialValue, row, cell }) => (
-            <DateCell
-              initialValue={initialValue}
-              row={row}
-              cell={cell}
-              saveLast={setLast}
-            />
+            <DateCell initialValue={initialValue} row={row} cell={cell} saveLast={setLast} />
           ),
           customComparator
         ),
@@ -466,9 +434,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const getColumnsAccessor = useCallback(
     (tableData) => {
       if (!tableData || !tableData.length) return [];
-      const customKeys = [...customColumns, ...customColumns2].map(
-        (i) => i.accessor
-      );
+      const customKeys = [...customColumns, ...customColumns2].map((i) => i.accessor);
       const tableDataKeys = Object.keys(tableData[0]);
       return tableDataKeys
         .filter((i) => i !== "isolateCodeGroup")
@@ -487,11 +453,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   );
 
   const columns = React.useMemo(
-    () => [
-      ...customColumns,
-      ...getColumnsAccessor(tableData),
-      ...customColumns2,
-    ],
+    () => [...customColumns, ...getColumnsAccessor(tableData), ...customColumns2],
     [customColumns, customColumns2, getColumnsAccessor, tableData]
   );
 
@@ -552,17 +514,9 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               <tr {...headerGroup.getHeaderGroupProps()} key={index}>
                 {headerGroup.headers.map((column) => (
                   <th key={column.id}>
-                    <span
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
-                    >
+                    <span {...column.getHeaderProps(column.getSortByToggleProps())}>
                       {column.render("Header")}
-                      <span>
-                        {column.isSorted
-                          ? column.isSortedDesc
-                            ? " ⬇️"
-                            : " ⬆️"
-                          : ""}
-                      </span>
+                      <span>{column.isSorted ? (column.isSortedDesc ? " ⬇️" : " ⬆️") : ""}</span>
                     </span>
 
                     {column.canFilter ? column.render("Filter") : null}
@@ -585,10 +539,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                 <tr {...row.getRowProps()} key={row.id}>
                   {row.cells.map((cell) => {
                     return (
-                      <td
-                        key={row.id + cell.column.id}
-                        {...cell.getCellProps()}
-                      >
+                      <td key={row.id + cell.column.id} {...cell.getCellProps()}>
                         {cell.render("Cell")}
                       </td>
                     );
@@ -608,10 +559,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       </div>
       <div className="controls">
         <div className="download">
-          <CSVLink
-            data={selectedFlatRows.map((i) => i.values)}
-            filename="db-mollusca-all.csv"
-          >
+          <CSVLink data={selectedFlatRows.map((i) => i.values)} filename="db-mollusca-all.csv">
             <div className="export">
               <ExportIcon />
               export CSV
@@ -630,9 +578,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         )}
         {rows.length > 100 && (
           <button onClick={() => setFull(!full)}>
-            {full
-              ? "show less"
-              : `show more -  ${rows.length - 100} items left`}
+            {full ? "show less" : `show more -  ${rows.length - 100} items left`}
           </button>
         )}
       </div>
