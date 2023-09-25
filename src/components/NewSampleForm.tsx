@@ -486,24 +486,29 @@ const NewSampleForm: React.FC = () => {
                 value={value ? { value, label: value } : null}
                 onChange={(e: any) => {
                   onChange(e?.value);
-                  setValue("country", e.country);
-                  setValue("state", e.state);
-                  setValue("localityName", e.localityName);
-                  setValue("latitude", e.latitude);
-                  setValue("longitude", e.longitude);
-                  setValue("altitude", e.altitude);
-                  setValue("habitat", e.habitat);
-                  setValue("dateCollection", e.dateCollection);
-                  setValue("collector", e.collector);
-                  setValue("isolateCodeGroup", "");
-                  sessionStorage.removeItem("isolateGroupItem");
-                  clearErrors("country");
-                  clearErrors("localityName");
-                  clearErrors("collector");
-                  e?.value &&
-                  !!localityOptions.find((i: any) => i.value === e?.value)
-                    ? setIsDisabled(true)
-                    : setIsDisabled(false);
+
+                  if (
+                    e?.value &&
+                    !!localityOptions.find((i: any) => i.value === e?.value)
+                  ) {
+                    setValue("country", e.country);
+                    setValue("state", e.state);
+                    setValue("localityName", e.localityName);
+                    setValue("latitude", e.latitude);
+                    setValue("longitude", e.longitude);
+                    setValue("altitude", e.altitude);
+                    setValue("habitat", e.habitat);
+                    setValue("dateCollection", e.dateCollection);
+                    setValue("collector", e.collector);
+                    setValue("isolateCodeGroup", "");
+                    sessionStorage.removeItem("isolateGroupItem");
+                    clearErrors("country");
+                    clearErrors("localityName");
+                    clearErrors("collector");
+                    setIsDisabled(true);
+                  } else {
+                    setIsDisabled(false);
+                  }
                 }}
                 label="Locality code"
                 error={errors.localityCode?.message}
@@ -657,19 +662,27 @@ const NewSampleForm: React.FC = () => {
             }
           }}
         />
-        <TextInput
-          label="Collector"
+        <Controller
+          render={({ field: { onChange, value } }) => (
+            <CreatableSelectInput
+              options={getOptions("collector")}
+              value={value ? { value, label: value } : null}
+              onChange={(e: any) => {
+                if (e?.value !== getValues("collector")) {
+                  onChange(e?.value);
+                  setValue("isolateCodeGroup", "");
+                  sessionStorage.removeItem("isolateGroupItem");
+                }
+              }}
+              label="Collector"
+              error={errors.collector?.message}
+              isSearchable
+              required="This field is required"
+              isDisabled={isDisabled}
+            />
+          )}
+          control={control}
           name="collector"
-          error={errors.collector?.message}
-          register={register}
-          disabled={isDisabled}
-          required="This field is required"
-          onBlur={(e: any) => {
-            if (e.target.value !== getValues("collector")) {
-              setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroupItem");
-            }
-          }}
         />
       </div>
       <button className="submit-btn" type="submit">

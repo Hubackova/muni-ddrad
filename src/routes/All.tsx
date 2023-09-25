@@ -430,7 +430,11 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       }),
     [extractions, storage]
   );
-
+  console.log(
+    extractions.filter(
+      (i) => i.isolateCode === "SUC032"
+    ) /* ["-NY2jZVHoqX9aH3xxD16"] */
+  );
   const getColumnsAccessor = useCallback(
     (tableData) => {
       if (!tableData || !tableData.length) return [];

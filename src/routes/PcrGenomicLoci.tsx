@@ -353,7 +353,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
         filter: multiSelectFilter,
       },
       {
-        Header: "General nte",
+        Header: "General note",
         accessor: "noteGeneral",
         Cell: NoConfirmCell,
         Filter: Multi,
