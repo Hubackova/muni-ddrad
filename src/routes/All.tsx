@@ -3,25 +3,25 @@ import { getDatabase, ref, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-  Column,
-  useFilters,
-  useGlobalFilter,
-  useRowSelect,
-  useSortBy,
-  useTable,
+    Column,
+    useFilters,
+    useGlobalFilter,
+    useRowSelect,
+    useSortBy,
+    useTable,
 } from "react-table";
 import {
-  DateCell,
-  EditableCell,
-  EditableNoConfirmCell,
-  SelectCell,
-  customComparator,
-  customLocalityComparator,
+    DateCell,
+    EditableCell,
+    EditableNoConfirmCell,
+    SelectCell,
+    customComparator,
+    customLocalityComparator,
 } from "../components/Cell";
 import ConfirmModal from "../components/ConfirmModal";
+import CreatableSelectInput from "../components/CreatableSelectInput";
 import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
-import CreatableSelectInput from "../components/CreatableSelectInput";
 import { EXTRACTIONS } from "../constants";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
@@ -110,6 +110,12 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           customComparator
         ),
 
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Species, updated name",
+        accessor: "speciesUpdated",
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -255,12 +261,6 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         Header: "Collector",
         accessor: "collector",
         Cell: LocalityCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Species, updated name",
-        accessor: "speciesUpdated",
         Filter: Multi,
         filter: multiSelectFilter,
       },
