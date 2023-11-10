@@ -46,9 +46,7 @@ const App: React.FC = () => {
     });
   }, [db]);
 
-  const sortedExtractions = extractions.sort((a, b) => {
-    return new Date(b.dateIsolation) - new Date(a.dateIsolation);
-  });
+  const sortedExtractions = extractions;
 
   return (
     <div>
