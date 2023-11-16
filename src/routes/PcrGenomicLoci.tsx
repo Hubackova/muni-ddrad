@@ -116,6 +116,11 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
     [storage]
   );
 
+  const boxOptionsWithEmpty = useMemo(
+    () => [{ value: "", label: "-- empty --", storageSite: "" }, ...boxOptions],
+    [boxOptions]
+  );
+
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
       <EditableCell
@@ -243,7 +248,7 @@ const PcrGenomicLoci: React.FC<PcrGenomicLociProps> = ({
               initialKey={storageData?.key}
               row={row}
               cell={cell}
-              options={boxOptions}
+              options={boxOptionsWithEmpty}
               saveLast={setLast}
             />
           );
