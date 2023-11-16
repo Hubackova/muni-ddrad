@@ -47,11 +47,21 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   );
   const boxOptions = useMemo(
     () =>
-      storage.map((i) => ({
-        value: i.key,
-        label: i.box,
-        storageSite: i.storageSite,
-      })),
+      storage
+        .map((i) => ({
+          value: i.key,
+          label: i.box,
+          storageSite: i.storageSite,
+        }))
+        .sort(function (a, b) {
+          if (a.label < b.label) {
+            return -1;
+          }
+          if (a.label > b.label) {
+            return 1;
+          }
+          return 0;
+        }),
     [storage]
   );
 
