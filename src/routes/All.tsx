@@ -462,6 +462,22 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         Filter: Multi,
         filter: multiSelectFilter,
       },
+      {
+        Header: "Box name",
+        accessor: "box2",
+        Cell: ({ row: { original } }) => {
+          return <span>{original?.box}</span>;
+        },
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Position",
+        accessor: "position",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
     ],
     []
   );

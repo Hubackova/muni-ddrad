@@ -262,7 +262,9 @@ export const EditableNoConfirmCell: React.FC<any> = ({
     "ITS1",
     "ITS2",
     "ELAV",
+    "position",
   ].includes(cell.column.id);
+
   return (
     <input
       value={value}
@@ -273,6 +275,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
       ref={inputRef}
       title={isOverflow ? value : ""}
       className={isNarrow ? "narrow" : ""}
+      maxlength={cell.column.id === "position" ? "3" : undefined}
     />
   );
 };
