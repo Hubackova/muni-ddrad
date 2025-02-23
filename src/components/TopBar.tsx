@@ -45,15 +45,7 @@ const TopBar: React.FC = () => {
           isActive ? "topbar-item active" : "topbar-item"
         }
       >
-        DNA extractions
-      </NavLink>
-      <NavLink
-        to={routes.pcrGenomicLoci}
-        className={({ isActive }) =>
-          isActive ? "topbar-item active" : "topbar-item"
-        }
-      >
-        PCR Genomic Loci
+        ddRAD isolates
       </NavLink>
       <NavLink
         to={routes.storage}
@@ -62,30 +54,6 @@ const TopBar: React.FC = () => {
         }
       >
         Storage
-      </NavLink>
-      <NavLink
-        to={routes.all}
-        className={({ isActive }) =>
-          isActive ? "topbar-item active" : "topbar-item"
-        }
-      >
-        All
-      </NavLink>
-      <NavLink
-        to={routes.primers}
-        className={({ isActive }) =>
-          isActive ? "topbar-item active" : "topbar-item"
-        }
-      >
-        Primers
-      </NavLink>
-      <NavLink
-        to={routes.pcrPrograms}
-        className={({ isActive }) =>
-          isActive ? "topbar-item active" : "topbar-item"
-        }
-      >
-        PCR programs
       </NavLink>
       <NavLink
         to={routes.locations}

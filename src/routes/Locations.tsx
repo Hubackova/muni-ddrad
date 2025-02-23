@@ -3,12 +3,12 @@ import { getDatabase, ref, update } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
-    Column,
-    useFilters,
-    useGlobalFilter,
-    useRowSelect,
-    useSortBy,
-    useTable,
+  Column,
+  useFilters,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
 } from "react-table";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/ConfirmModal";
@@ -87,8 +87,11 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
               <input
                 onBlur={(e) => {
                   if (initialValue != e.target.value) {
-                    const localityCodes = localityOptions.map((i) => i.value.toLowerCase());
-                    if (localityCodes.includes(e.target.value.toLowerCase())) return toast.error("Locality code already exists");
+                    const localityCodes = localityOptions.map((i) =>
+                      i.value.toLowerCase()
+                    );
+                    if (localityCodes.includes(e.target.value.toLowerCase()))
+                      return toast.error("Locality code already exists");
                     setShowEditModal({
                       row,
                       newValue: e.target.value,
@@ -112,6 +115,39 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
       {
         Header: "Country",
         accessor: "country",
+        Cell: React.memo<React.FC<any>>(
+          ({ value: initialValue, row, cell }) => {
+            const [value, setValue] = React.useState(initialValue);
+            const onChange = (e: any) => {
+              setValue(e.target.value);
+            };
+            return (
+              <input
+                onBlur={(e) => {
+                  if (initialValue != e.target.value) {
+                    setShowEditModal({
+                      row,
+                      newValue: e.target.value,
+                      id: cell.column.id,
+                      initialValue,
+                      setValue,
+                    });
+                  }
+                }}
+                onChange={onChange}
+                value={value}
+                className="semi-narrow"
+              ></input>
+            );
+          },
+          customComparator
+        ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "State/province",
+        accessor: "state",
         Cell: React.memo<React.FC<any>>(
           ({ value: initialValue, row, cell }) => {
             const [value, setValue] = React.useState(initialValue);
@@ -209,8 +245,8 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "State/province",
-        accessor: "state",
+        Header: "Altitude [m a.s.l.]",
+        accessor: "altitude",
         Cell: React.memo<React.FC<any>>(
           ({ value: initialValue, row, cell }) => {
             const [value, setValue] = React.useState(initialValue);
@@ -232,7 +268,6 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
                 }}
                 onChange={onChange}
                 value={value}
-                className="semi-narrow"
               ></input>
             );
           },
@@ -277,38 +312,6 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
       {
         Header: "Habitat",
         accessor: "habitat",
-        Cell: React.memo<React.FC<any>>(
-          ({ value: initialValue, row, cell }) => {
-            const [value, setValue] = React.useState(initialValue);
-            const onChange = (e: any) => {
-              setValue(e.target.value);
-            };
-            return (
-              <input
-                onBlur={(e) => {
-                  if (initialValue != e.target.value) {
-                    setShowEditModal({
-                      row,
-                      newValue: e.target.value,
-                      id: cell.column.id,
-                      initialValue,
-                      setValue,
-                    });
-                  }
-                }}
-                onChange={onChange}
-                value={value}
-              ></input>
-            );
-          },
-          customComparator
-        ),
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Altitude [m a.s.l.]",
-        accessor: "altitude",
         Cell: React.memo<React.FC<any>>(
           ({ value: initialValue, row, cell }) => {
             const [value, setValue] = React.useState(initialValue);
@@ -400,6 +403,12 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
           },
           customComparator
         ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Note",
+        accessor: "note",
         Filter: Multi,
         filter: multiSelectFilter,
       },

@@ -1,6 +1,4 @@
 import React from "react";
-import NewPcrProgramsForm from "../components/NewPcrProgramsForm";
-import NewPrimerForm from "../components/NewPrimerForm";
 import NewSampleForm from "../components/NewSampleForm";
 import NewStorageForm from "../components/NewStorageForm";
 import "./HomePage.scss";
@@ -15,12 +13,6 @@ const HomePage: React.FC = () => {
         </div>
       </div>
       <div className="form-grid">
-        <div className="form-wrapper">
-          <NewPcrProgramsForm />
-        </div>
-        <div className="form-wrapper">
-          <NewPrimerForm />
-        </div>
         <div className="form-wrapper">
           <NewStorageForm />
         </div>

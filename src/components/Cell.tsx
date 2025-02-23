@@ -275,7 +275,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
       ref={inputRef}
       title={isOverflow ? value : ""}
       className={isNarrow ? "narrow" : ""}
-      maxlength={cell.column.id === "position" ? "3" : undefined}
+      maxLength={cell.column.id === "position" ? "3" : undefined}
     />
   );
 };

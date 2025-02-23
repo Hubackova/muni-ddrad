@@ -25,6 +25,7 @@ import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { EXTRACTIONS } from "../constants";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
+import { getOptions } from "../components/NewSampleForm";
 
 interface DnaExtractionsProps {
   storage: StorageType[];
@@ -68,6 +69,18 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const boxOptionsWithEmpty = useMemo(
     () => [{ value: "", label: "-- empty --", storageSite: "" }, ...boxOptions],
     [boxOptions]
+  );
+
+  const organismOptionsAll = [
+    { value: "plant", label: "plant" },
+    { value: "snail", label: "snail" },
+    { value: "moss", label: "moss" },
+    { value: "", label: "-- empty --" },
+    ...getOptions(extractions, "organism"),
+  ];
+
+  const organismOptions = Array.from(
+    new Map(organismOptionsAll.map((item) => [item.value, item])).values()
   );
 
   const handleRevert = () => {
@@ -145,8 +158,94 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Species, updated name",
-        accessor: "speciesUpdated",
+        Header: "Organism",
+        accessor: "organism",
+        Cell: ({ value, row, cell }) => {
+          const organismData = organismOptions.find((i) => i.box === value);
+          return (
+            <SelectCell
+              initialValue={value}
+              initialKey={organismData?.key}
+              row={row}
+              cell={cell}
+              options={organismOptions}
+              saveLast={setLast}
+            />
+          );
+        },
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Isolation date",
+        accessor: "dateIsolation",
+        Cell: React.memo<React.FC<any>>(
+          ({ value: initialValue, row, cell }) => (
+            <DateCell
+              initialValue={initialValue}
+              row={row}
+              cell={cell}
+              saveLast={setLast}
+            />
+          ),
+          customComparator
+        ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "ng/ul",
+        accessor: "ngul",
+        Cell: React.memo<React.FC<any>>(
+          ({ value, row, cell }) => (
+            <EditableCell
+              initialValue={value}
+              row={row}
+              cell={cell}
+              type="number"
+              step=".00001"
+              saveLast={setLast}
+            />
+          ),
+          customComparator
+        ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Box name",
+        accessor: "box",
+        Cell: ({ value, row, cell }) => {
+          const storageData = storage.find((i) => i.box === value);
+          return (
+            <SelectCell
+              initialValue={value}
+              initialKey={storageData?.key}
+              row={row}
+              cell={cell}
+              options={boxOptionsWithEmpty}
+              saveLast={setLast}
+            />
+          );
+        },
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Storage site",
+        accessor: "storageSite",
+        Cell: ({ row: { original } }) => {
+          return <span>{original?.storageSite}</span>;
+        },
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Kit",
+        accessor: "kit",
+        Cell: ({ row: { original } }) => {
+          return <span>{original?.kit}</span>;
+        },
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -251,21 +350,6 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Latitude [°N]",
-        accessor: "latitude",
-
-        Cell: LocalityCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Longitude [°E]",
-        accessor: "longitude",
-        Cell: LocalityCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
         Header: "State/province",
         accessor: "state",
         Cell: LocalityCell,
@@ -280,151 +364,8 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Habitat",
-        accessor: "habitat",
-        Cell: LocalityCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Altitude [m a.s.l.]",
-        accessor: "altitude",
-        Cell: LocalityCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Date collection",
-        accessor: "dateCollection",
-        Cell: LocalityCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Collector",
-        accessor: "collector",
-        Cell: LocalityCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Project",
-        accessor: "project",
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Isolation date",
-        accessor: "dateIsolation",
-        Cell: React.memo<React.FC<any>>(
-          ({ value: initialValue, row, cell }) => (
-            <DateCell
-              initialValue={initialValue}
-              row={row}
-              cell={cell}
-              saveLast={setLast}
-            />
-          ),
-          customComparator
-        ),
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "ng/ul",
-        accessor: "ngul",
-        Cell: React.memo<React.FC<any>>(
-          ({ value, row, cell }) => (
-            <EditableCell
-              initialValue={value}
-              row={row}
-              cell={cell}
-              type="number"
-              step=".00001"
-              saveLast={setLast}
-            />
-          ),
-          customComparator
-        ),
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Box name",
-        accessor: "box",
-        Cell: ({ value, row, cell }) => {
-          const storageData = storage.find((i) => i.box === value);
-          return (
-            <SelectCell
-              initialValue={value}
-              initialKey={storageData?.key}
-              row={row}
-              cell={cell}
-              options={boxOptionsWithEmpty}
-              saveLast={setLast}
-            />
-          );
-        },
-
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Storage site",
-        accessor: "storageSite",
-        Cell: ({ row: { original } }) => {
-          return <span>{original?.storageSite}</span>;
-        },
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "cytB",
-        accessor: "cytB",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "16S",
-        accessor: "16S",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "COI",
-        accessor: "COI",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "COII",
-        accessor: "COII",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-
-      {
-        Header: "ITS1",
-        accessor: "ITS1",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "ITS2",
-        accessor: "ITS2",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "ELAV",
-        accessor: "ELAV",
-        Cell: NoConfirmCell,
+        Header: "Note",
+        accessor: "note",
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -435,45 +376,8 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const customColumns2: Column<any>[] = useMemo(
     () => [
       {
-        Header: "Note on PCR",
-        accessor: "notePCR",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Note on sequencing",
-        accessor: "noteSequencing",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "General note",
-        accessor: "noteGeneral",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
         Header: "Status",
         accessor: "status",
-        Cell: NoConfirmCell,
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Box name",
-        accessor: "box2",
-        Cell: ({ row: { original } }) => {
-          return <span>{original?.box}</span>;
-        },
-        Filter: Multi,
-        filter: multiSelectFilter,
-      },
-      {
-        Header: "Position",
-        accessor: "position",
         Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
@@ -519,12 +423,8 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   );
 
   const columns = React.useMemo(
-    () => [
-      ...customColumns,
-      ...getColumnsAccessor(tableData),
-      ...customColumns2,
-    ],
-    [customColumns, customColumns2, getColumnsAccessor, tableData]
+    () => [...customColumns, ...customColumns2],
+    [customColumns, customColumns2]
   );
 
   const tableInstance = useTable(

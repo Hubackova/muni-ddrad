@@ -9,14 +9,10 @@ import "./App.scss";
 import TopBar from "./components/TopBar";
 import { EXTRACTIONS } from "./constants";
 import routes from "./routes";
-import All from "./routes/All";
-import DnaExtractions from "./routes/DnaExtractions";
+import DdRadIsolates from "./routes/DdRadIsolates";
 import Error404 from "./routes/Error404";
 import HomePage from "./routes/HomePage";
 import Locations from "./routes/Locations";
-import PcrGenomicLoci from "./routes/PcrGenomicLoci";
-import PcrPrograms from "./routes/PcrPrograms";
-import Primers from "./routes/Primers";
 import Storage from "./routes/Storage";
 import { DnaExtractionsType, StorageType } from "./types";
 
@@ -59,20 +55,7 @@ const App: React.FC = () => {
             path={routes.dnaExtractions}
             element={
               extractions?.length > 0 && storage?.length > 0 ? (
-                <DnaExtractions
-                  storage={storage}
-                  extractions={sortedExtractions}
-                />
-              ) : (
-                <div> loading (or no data)</div>
-              )
-            }
-          />
-          <Route
-            path={routes.pcrGenomicLoci}
-            element={
-              extractions?.length > 0 && storage?.length > 0 ? (
-                <PcrGenomicLoci
+                <DdRadIsolates
                   storage={storage}
                   extractions={sortedExtractions}
                 />
@@ -101,18 +84,6 @@ const App: React.FC = () => {
               )
             }
           />
-          <Route
-            path={routes.all}
-            element={
-              extractions?.length > 0 && storage?.length > 0 ? (
-                <All storage={storage} extractions={sortedExtractions} />
-              ) : (
-                <div> loading (or no data)</div>
-              )
-            }
-          />
-          <Route path={routes.primers} element={<Primers />} />
-          <Route path={routes.pcrPrograms} element={<PcrPrograms />} />
           <Route element={<Error404 returnUrl={routes.home} />} />
         </Routes>
       </div>

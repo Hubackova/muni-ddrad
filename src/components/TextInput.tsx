@@ -15,6 +15,7 @@ type InputProps = {
   validate?: any;
   maxLength?: any;
   step?: any;
+  style?: any;
 };
 
 const TextInput = ({
@@ -27,10 +28,11 @@ const TextInput = ({
   error,
   onBlur,
   maxLength,
+  style,
   type = "text",
   step,
 }: InputProps) => (
-  <div className="input-container">
+  <div className="input-container" style={style}>
     <label className="label">{label}</label>
 
     <input

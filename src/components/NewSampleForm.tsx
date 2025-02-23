@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { getDatabase, onValue, ref, update } from "firebase/database";
-import moment from "moment";
+import moment, { min } from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -16,6 +16,28 @@ import TextInput from "./TextInput";
 
 const FORM_DATA_KEY = "app_form_local_data";
 
+export const getOptions = (data: any, key: string) =>
+  Object.values(
+    data.reduce(
+      /* @ts-ignore */
+      (acc, cur) => Object.assign(acc, { [cur[key]]: cur }),
+      {}
+    )
+  )
+    .map((i: any) => ({
+      value: i[key],
+      label: i[key],
+    }))
+    .sort(function (a, b) {
+      if (a.label < b.label) {
+        return -1;
+      }
+      if (a.label > b.label) {
+        return 1;
+      }
+      return 0;
+    });
+
 const NewSampleForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
   const [extractions, setExtractions] = useState<DnaExtractionsType[]>([]);
@@ -23,15 +45,6 @@ const NewSampleForm: React.FC = () => {
   const [showModalCode, setShowModalCode] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const db = getDatabase();
-
-  /*   useEffect(() => {
-    if (sessionStorage.getItem("alert") !== "true") {
-      alert(
-        "the database is undergoing construction and testing, please do not make any changes until this warning disappears"
-      );
-      sessionStorage.setItem("alert", "true");
-    }
-  }, []); */
 
   useEffect(() => {
     onValue(ref(db, EXTRACTIONS), (snapshot) => {
@@ -149,7 +162,6 @@ const NewSampleForm: React.FC = () => {
     return {
       isolateCode: "",
       speciesOrig: "",
-      speciesUpdated: "",
       project: "",
       dateIsolation: "",
       ngul: "",
@@ -167,6 +179,7 @@ const NewSampleForm: React.FC = () => {
       dateCollection: "",
       collector: "",
       isolateCodeGroup: "",
+      note: "",
     };
   }, []);
 
@@ -231,6 +244,7 @@ const NewSampleForm: React.FC = () => {
               setValue("habitat", i.habitat);
               setValue("dateCollection", i.dateCollection);
               setValue("collector", i.collector);
+              setValue("note", i.note);
               clearErrors("country");
               clearErrors("localityName");
               clearErrors("collector");
@@ -243,31 +257,18 @@ const NewSampleForm: React.FC = () => {
     [clearErrors, localityOptions, setValue]
   );
 
-  const getOptions = React.useCallback(
-    (key: string) =>
-      Object.values(
-        extractions.reduce(
-          /* @ts-ignore */
-          (acc, cur) => Object.assign(acc, { [cur[key]]: cur }),
-          {}
-        )
-      )
-        .map((i: any) => ({
-          value: i[key],
-          label: i[key],
-        }))
-        .sort(function (a, b) {
-          if (a.label < b.label) {
-            return -1;
-          }
-          if (a.label > b.label) {
-            return 1;
-          }
-          return 0;
-        }),
-    [extractions]
+  const speciesOptions = getOptions(extractions, "speciesOrig");
+
+  const organismOptionsAll = [
+    { value: "plant", label: "plant" },
+    { value: "snail", label: "snail" },
+    { value: "moss", label: "moss" },
+    ...getOptions(extractions, "organism"),
+  ];
+
+  const organismOptions = Array.from(
+    new Map(organismOptionsAll.map((item) => [item.value, item])).values()
   );
-  const speciesOptions = getOptions("speciesOrig");
 
   const codeItems = Object.values(
     extractions.reduce(
@@ -284,6 +285,7 @@ const NewSampleForm: React.FC = () => {
           setValue("speciesOrig", i.speciesOrig, {
             shouldValidate: true,
           });
+          setValue("organism", i.organism);
           setValue("project", i.project);
           setValue("habitat", i.habitat);
           setValue("dateCollection", i.dateCollection);
@@ -305,7 +307,7 @@ const NewSampleForm: React.FC = () => {
             shouldValidate: true,
           });
           setValue("isolateCodeGroup", i.isolateCode);
-
+          setValue("note", i.note);
           /* do isolateGroup v sessionstorage nastaví celej zdrojovej vzorek */
           sessionStorage.setItem("isolateGroupItem", JSON.stringify(i));
           clearErrors("country");
@@ -397,7 +399,24 @@ const NewSampleForm: React.FC = () => {
         <Controller
           render={({ field: { onChange, value } }) => (
             <CreatableSelectInput
-              options={getOptions("project")}
+              options={organismOptions}
+              value={value ? { value, label: value } : null}
+              onChange={(e: any) => {
+                onChange(e?.value);
+              }}
+              label="Organism"
+              error={errors.organism?.message}
+              isSearchable
+              required="This field is required"
+            />
+          )}
+          control={control}
+          name="organism"
+        />
+        <Controller
+          render={({ field: { onChange, value } }) => (
+            <CreatableSelectInput
+              options={getOptions(extractions, "project")}
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
                 onChange(e?.value);
@@ -430,7 +449,7 @@ const NewSampleForm: React.FC = () => {
         <Controller
           render={({ field: { onChange, value } }) => (
             <CreatableSelectInput
-              options={getOptions("kit")}
+              options={getOptions(extractions, "kit")}
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
                 onChange(e?.value);
@@ -546,7 +565,7 @@ const NewSampleForm: React.FC = () => {
         <Controller
           render={({ field: { onChange, value } }) => (
             <CreatableSelectInput
-              options={getOptions("country")}
+              options={getOptions(extractions, "country")}
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
                 if (e?.value !== getValues("country")) {
@@ -665,7 +684,7 @@ const NewSampleForm: React.FC = () => {
         <Controller
           render={({ field: { onChange, value } }) => (
             <CreatableSelectInput
-              options={getOptions("collector")}
+              options={getOptions(extractions, "collector")}
               value={value ? { value, label: value } : null}
               onChange={(e: any) => {
                 if (e?.value !== getValues("collector")) {
@@ -683,6 +702,13 @@ const NewSampleForm: React.FC = () => {
           )}
           control={control}
           name="collector"
+        />
+        <TextInput
+          label="Note"
+          name="note"
+          error={errors.note?.message}
+          register={register}
+          style={{ minWidth: "100%" }}
         />
       </div>
       <button className="submit-btn" type="submit">
