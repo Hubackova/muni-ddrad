@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { getDatabase, onValue, ref, update } from "firebase/database";
-import moment, { min } from "moment";
+import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -596,6 +596,11 @@ const NewSampleForm: React.FC = () => {
               sessionStorage.removeItem("isolateGroupItem");
             }
           }}
+          validate={(value) =>
+            /^-?\d*\.?\d{0,5}$/.test(value) ||
+            value === "na" ||
+            "Only numbers or dots or na + max 5 decimal places"
+          }
           disabled={isDisabled}
         />
         <TextInput
@@ -609,6 +614,11 @@ const NewSampleForm: React.FC = () => {
               sessionStorage.removeItem("isolateGroupItem");
             }
           }}
+          validate={(value) =>
+            /^-?\d*\.?\d{0,5}$/.test(value) ||
+            value === "na" ||
+            "Only numbers or dots or na + max 5 decimal places"
+          }
           disabled={isDisabled}
         />
 

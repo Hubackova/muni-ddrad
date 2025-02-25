@@ -243,9 +243,6 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "Kit",
         accessor: "kit",
-        Cell: ({ row: { original } }) => {
-          return <span>{original?.kit}</span>;
-        },
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -357,8 +354,50 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
+        Header: "Latitude [°N]",
+        accessor: "latitude",
+        Cell: LocalityCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Longitude [°E]",
+        accessor: "longitude",
+        Cell: LocalityCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Altitude [m a.s.l.]",
+        accessor: "altitude",
+        Cell: LocalityCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
         Header: "Locality name",
         accessor: "localityName",
+        Cell: LocalityCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Habitat",
+        accessor: "habitat",
+        Cell: LocalityCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Date collection",
+        accessor: "dateCollection",
+        Cell: LocalityCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Collector",
+        accessor: "collector",
         Cell: LocalityCell,
         Filter: Multi,
         filter: multiSelectFilter,

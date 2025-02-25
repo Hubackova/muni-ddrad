@@ -191,6 +191,10 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
               <input
                 onBlur={(e) => {
                   if (initialValue != e.target.value) {
+                    if (!/^-?\d*\.?\d{0,5}$/.test(value) && value !== "na") {
+                      setValue(initialValue);
+                      return toast.error("Invalid value");
+                    }
                     setShowEditModal({
                       row,
                       newValue: e.target.value,
@@ -224,6 +228,10 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
               <input
                 onBlur={(e) => {
                   if (initialValue != e.target.value) {
+                    if (!/^-?\d*\.?\d{0,5}$/.test(value) && value !== "na") {
+                      setValue(initialValue);
+                      return toast.error("Invalid value");
+                    }
                     setShowEditModal({
                       row,
                       newValue: e.target.value,

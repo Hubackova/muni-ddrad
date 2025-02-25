@@ -127,6 +127,12 @@ export const EditableCell: React.FC<any> = ({
   };
   const onBlur = (e: any) => {
     if (
+      (cell.column.id === "latitude" || cell.column.id === "longitude") &&
+      !/^-?\d*\.?\d{0,5}$/.test(value) &&
+      value !== "na"
+    ) {
+      toast.error("Invalid value");
+    } else if (
       (initialValue?.toString() || "") !== (e.target.value?.toString() || "")
     ) {
       setShowEditModal({
