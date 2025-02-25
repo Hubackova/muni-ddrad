@@ -127,7 +127,9 @@ export const EditableCell: React.FC<any> = ({
   };
   const onBlur = (e: any) => {
     if (
-      (cell.column.id === "latitude" || cell.column.id === "longitude") &&
+      (cell.column.id === "latitude" ||
+        cell.column.id === "longitude" ||
+        cell.column.id === "altitude") &&
       !/^-?\d*\.?\d{0,5}$/.test(value) &&
       value !== "na"
     ) {

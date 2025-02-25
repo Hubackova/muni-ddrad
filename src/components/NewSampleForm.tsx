@@ -633,6 +633,11 @@ const NewSampleForm: React.FC = () => {
               sessionStorage.removeItem("isolateGroupItem");
             }
           }}
+          validate={(value) =>
+            /^-?\d*\.?\d{0,5}$/.test(value) ||
+            value === "na" ||
+            "Only numbers or dots or na + max 5 decimal places"
+          }
           disabled={isDisabled}
         />
         <TextInput
