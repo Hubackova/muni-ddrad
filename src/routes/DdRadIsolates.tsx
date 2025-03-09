@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getDatabase, ref, update } from "firebase/database";
+import { getDatabase, ref, update, remove } from "firebase/database";
 import React, { useCallback, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
@@ -26,6 +26,7 @@ import { EXTRACTIONS } from "../constants";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { getOptions } from "../components/NewSampleForm";
+import { toast } from "react-toastify";
 
 interface DnaExtractionsProps {
   storage: StorageType[];
@@ -37,6 +38,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
   const [full, setFull] = useState(false);
   const [last, setLast] = useState(false);
+  const [showModal, setShowModal] = useState(null);
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
@@ -91,6 +93,11 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       last.setValue({ value: last.initialValue, label: last.initialValue });
     setLast(false);
   };
+
+  const removeItem = useCallback((id: string) => {
+    setShowModal(id);
+  }, []);
+
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
       <EditableCell
@@ -517,10 +524,37 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           overflow: "auto",
         }}
       >
-        <table className="table all" {...getTableProps()}>
+        {showModal && (
+          <ConfirmModal
+            title="Do you really want to delete the sample?"
+            onConfirm={() => {
+              setShowModal(null);
+              remove(ref(db, EXTRACTIONS + showModal));
+              const currentItem = extractions.find((i) => i.key === showModal);
+              const group = extractions.filter(
+                (i) =>
+                  i.isolateCodeGroup &&
+                  i.isolateCodeGroup.includes(i.isolateCode) &&
+                  i.key !== showModal
+              );
+
+              group.forEach((group) =>
+                update(ref(db, EXTRACTIONS + group.key), {
+                  isolateCodeGroup: group.isolateCodeGroup.filter(
+                    (i) => i !== currentItem.isolateCode
+                  ),
+                })
+              );
+              toast.success("Sample was removed successfully");
+            }}
+            onHide={() => setShowModal(null)}
+          />
+        )}
+        <table className="table ddrad" {...getTableProps()}>
           <thead>
             {headerGroups.map((headerGroup, index) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                <th></th>
                 {headerGroup.headers.map((column) => (
                   <th key={column.id}>
                     <span
@@ -553,7 +587,12 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                 : [];
 
               return (
-                <tr {...row.getRowProps()} key={row.id}>
+                <tr {...row.getRowProps()} key={row.original.key}>
+                  <td role="cell" className="remove">
+                    <button onClick={() => removeItem(row.original.key)}>
+                      X
+                    </button>
+                  </td>
                   {row.cells.map((cell) => {
                     return (
                       <td

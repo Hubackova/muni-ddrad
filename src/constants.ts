@@ -12,4 +12,4 @@ export const legend = [
   "D = done and put to Habay alignments",
 ];
 
-export const EXTRACTIONS = "testextractions/";
+export const EXTRACTIONS = "extractions/";
