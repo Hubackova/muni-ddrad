@@ -184,6 +184,13 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
+        Header: "Voucher",
+        accessor: "voucher",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
         Header: "Isolation date",
         accessor: "dateIsolation",
         Cell: React.memo<React.FC<any>>(
@@ -201,7 +208,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "ng/ul",
+        Header: "Pre_ng/ul DNA",
         accessor: "ngul",
         Cell: React.memo<React.FC<any>>(
           ({ value, row, cell }) => (
@@ -216,6 +223,69 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           ),
           customComparator
         ),
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Quib_ng/ul DNA",
+        accessor: "quibngul",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Gel",
+        accessor: "gel",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Purification",
+        accessor: "purification",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Post_ng/ul DNA",
+        accessor: "postngul",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "P1",
+        accessor: "p1",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "P2",
+        accessor: "p2",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "RAD_library",
+        accessor: "radlibrary",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "Reads_no",
+        accessor: "readsno",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
+        Header: "ddRAD_note",
+        accessor: "ddradNote",
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -410,7 +480,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Note",
+        Header: "Note_sample",
         accessor: "note",
         Filter: Multi,
         filter: multiSelectFilter,
@@ -421,6 +491,13 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
 
   const customColumns2: Column<any>[] = useMemo(
     () => [
+      {
+        Header: "Note_isolate",
+        accessor: "noteIsolate",
+        Cell: NoConfirmCell,
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
       {
         Header: "Status",
         accessor: "status",
