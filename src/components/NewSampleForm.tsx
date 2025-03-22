@@ -439,7 +439,7 @@ const NewSampleForm: React.FC = () => {
         />
 
         <TextInput
-          label="ng/ul"
+          label="Pre_ng/ul DNA"
           name="ngul"
           error={errors.ngul?.message}
           register={register}
@@ -719,7 +719,7 @@ const NewSampleForm: React.FC = () => {
           name="collector"
         />
         <TextInput
-          label="Note"
+          label="Note_sample"
           name="note"
           error={errors.note?.message}
           register={register}
