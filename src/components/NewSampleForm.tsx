@@ -16,8 +16,8 @@ import TextInput from "./TextInput";
 
 const FORM_DATA_KEY = "app_form_local_data";
 
-export const getOptions = (data: any, key: string) =>
-  Object.values(
+export const getOptions = (data: any, key: string) => {
+  const options = Object.values(
     data.reduce(
       /* @ts-ignore */
       (acc, cur) => Object.assign(acc, { [cur[key]]: cur }),
@@ -37,6 +37,8 @@ export const getOptions = (data: any, key: string) =>
       }
       return 0;
     });
+  return [{ value: "", label: "-- empty --" }, ...options];
+};
 
 const NewSampleForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
@@ -214,6 +216,11 @@ const NewSampleForm: React.FC = () => {
       }
       return 0;
     });
+
+  const boxOptionsWithEmpty = useMemo(
+    () => [{ value: "", label: "-- empty --", storageSite: "" }, ...boxOptions],
+    [boxOptions]
+  );
 
   const localityOptions = getLocalityOptions(extractions).sort(function (a, b) {
     if (a.label < b.label) {
@@ -467,12 +474,14 @@ const NewSampleForm: React.FC = () => {
           render={({ field: { onChange, value } }) => {
             return (
               <SelectInput
-                options={boxOptions}
+                options={boxOptionsWithEmpty}
                 value={
                   value
                     ? {
                         value,
-                        label: boxOptions.find((i) => i.value === value)?.label,
+                        label: boxOptionsWithEmpty.find(
+                          (i) => i.value === value
+                        )?.label,
                       }
                     : null
                 }
