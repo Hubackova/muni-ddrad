@@ -11,6 +11,7 @@ import {
   useTable,
 } from "react-table";
 import {
+  CreatableSelectCell,
   DateCell,
   EditableCell,
   EditableNoConfirmCell,
@@ -171,11 +172,9 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         Header: "Organism",
         accessor: "organism",
         Cell: ({ value, row, cell }) => {
-          const organismData = organismOptions.find((i) => i.box === value);
           return (
             <SelectCell
               initialValue={value}
-              initialKey={organismData?.key}
               row={row}
               cell={cell}
               options={organismOptions}
@@ -323,6 +322,17 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "Kit",
         accessor: "kit",
+        Cell: ({ value, row, cell }) => {
+          return (
+            <CreatableSelectCell
+              initialValue={value}
+              row={row}
+              cell={cell}
+              options={getOptions(extractions, "kit")}
+              saveLast={setLast}
+            />
+          );
+        },
         Filter: Multi,
         filter: multiSelectFilter,
       },
