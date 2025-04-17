@@ -47,6 +47,7 @@ export const DateCell: React.FC<any> = ({
   cell,
   saveLast = () => {},
   maxChars = 22,
+  noConfirm = false,
 }) => {
   const db = getDatabase();
   const [showEditModal, setShowEditModal] = useState(null);
@@ -57,23 +58,33 @@ export const DateCell: React.FC<any> = ({
     if (
       (initialValue?.toString() || "") !== (e.target.value?.toString() || "")
     ) {
-      setShowEditModal({
-        row,
-        newValue: e.target.value,
-        id: cell.column.id,
-        initialValue,
-        setValue,
-        callback: () => {
-          update(ref(db, EXTRACTIONS + row.original.key), {
-            [cell.column.id]: e.target.value,
-          });
-          saveLast({
-            rowKey: row.original.key,
-            cellId: cell.column.id,
-            initialValue,
-          });
-        },
-      });
+      if (noConfirm) {
+        update(ref(db, EXTRACTIONS + row.original.key), {
+          [cell.column.id]: e.target.value,
+        });
+        saveLast({
+          rowKey: row.original.key,
+          cellId: cell.column.id,
+          initialValue,
+        });
+      } else
+        setShowEditModal({
+          row,
+          newValue: e.target.value,
+          id: cell.column.id,
+          initialValue,
+          setValue,
+          callback: () => {
+            update(ref(db, EXTRACTIONS + row.original.key), {
+              [cell.column.id]: e.target.value,
+            });
+            saveLast({
+              rowKey: row.original.key,
+              cellId: cell.column.id,
+              initialValue,
+            });
+          },
+        });
     }
   };
   React.useEffect(() => {
@@ -295,6 +306,7 @@ export const SelectCell: React.FC<any> = ({
   options,
   saveLast = () => {},
   initialKey,
+  noConfirm = false,
 }) => {
   const db = getDatabase();
   const { original } = row;
@@ -307,25 +319,37 @@ export const SelectCell: React.FC<any> = ({
   const onChange = (value: any) => {
     setValue({ value: value.value, label: value.label });
     if ((initialValue?.toString() || "") !== (value.value?.toString() || "")) {
-      setShowEditModal({
-        row,
-        newValue: value.value,
-        id: cell.column.id,
-        initialValue,
-        setValue,
-        callback: () => {
-          update(ref(db, EXTRACTIONS + row.original.key), {
-            [cell.column.id]: value.value,
-          });
-          saveLast({
-            rowKey: row.original.key,
-            cellId: cell.column.id,
-            initialValue: initialKey || initialValue,
-            setValue: () =>
-              setValue({ value: initialValue, label: initialValue }),
-          });
-        },
-      });
+      if (noConfirm) {
+        update(ref(db, EXTRACTIONS + row.original.key), {
+          [cell.column.id]: value.value,
+        });
+        saveLast({
+          rowKey: row.original.key,
+          cellId: cell.column.id,
+          initialValue: initialKey || initialValue,
+          setValue: () =>
+            setValue({ value: initialValue, label: initialValue }),
+        });
+      } else
+        setShowEditModal({
+          row,
+          newValue: value.value,
+          id: cell.column.id,
+          initialValue,
+          setValue,
+          callback: () => {
+            update(ref(db, EXTRACTIONS + row.original.key), {
+              [cell.column.id]: value.value,
+            });
+            saveLast({
+              rowKey: row.original.key,
+              cellId: cell.column.id,
+              initialValue: initialKey || initialValue,
+              setValue: () =>
+                setValue({ value: initialValue, label: initialValue }),
+            });
+          },
+        });
     }
   };
 
@@ -375,6 +399,7 @@ export const CreatableSelectCell: React.FC<any> = ({
   dbName = EXTRACTIONS,
   saveLast = () => {},
   maxChars = 22,
+  noConfirm = false,
 }) => {
   const db = getDatabase();
   const { original } = row;
@@ -387,23 +412,33 @@ export const CreatableSelectCell: React.FC<any> = ({
   const onChange = (value: any) => {
     setValue({ value: value.value, label: value.label });
     if ((initialValue?.toString() || "") !== (value.value?.toString() || "")) {
-      setShowEditModal({
-        row,
-        newValue: value.value,
-        id: cell.column.id,
-        initialValue,
-        setValue,
-        callback: () => {
-          update(ref(db, dbName + row.original.key), {
-            [cell.column.id]: value.value,
-          });
-          saveLast({
-            rowKey: row.original.key,
-            cellId: cell.column.id,
-            initialValue,
-          });
-        },
-      });
+      if (noConfirm) {
+        update(ref(db, dbName + row.original.key), {
+          [cell.column.id]: value.value,
+        });
+        saveLast({
+          rowKey: row.original.key,
+          cellId: cell.column.id,
+          initialValue,
+        });
+      } else
+        setShowEditModal({
+          row,
+          newValue: value.value,
+          id: cell.column.id,
+          initialValue,
+          setValue,
+          callback: () => {
+            update(ref(db, dbName + row.original.key), {
+              [cell.column.id]: value.value,
+            });
+            saveLast({
+              rowKey: row.original.key,
+              cellId: cell.column.id,
+              initialValue,
+            });
+          },
+        });
     }
   };
   const inputRef = React.useRef();

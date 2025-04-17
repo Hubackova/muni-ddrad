@@ -128,12 +128,14 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   );
 
   const NoConfirmCell = React.memo<React.FC<any>>(
-    ({ value, row, cell }) => (
+    ({ value, row, cell, type, step }) => (
       <EditableNoConfirmCell
         initialValue={value}
         row={row}
         cell={cell}
         saveLast={setLast}
+        type={type}
+        step={step}
       />
     ),
     customComparator
@@ -179,6 +181,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               cell={cell}
               options={organismOptions}
               saveLast={setLast}
+              noConfirm
             />
           );
         },
@@ -202,6 +205,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               row={row}
               cell={cell}
               saveLast={setLast}
+              noConfirm
             />
           ),
           customComparator
@@ -214,7 +218,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         accessor: "ngul",
         Cell: React.memo<React.FC<any>>(
           ({ value, row, cell }) => (
-            <EditableCell
+            <NoConfirmCell
               initialValue={value}
               row={row}
               cell={cell}
@@ -304,6 +308,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               cell={cell}
               options={boxOptionsWithEmpty}
               saveLast={setLast}
+              noConfirm
             />
           );
         },
@@ -330,6 +335,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
               cell={cell}
               options={getOptions(extractions, "kit")}
               saveLast={setLast}
+              noConfirm
             />
           );
         },
