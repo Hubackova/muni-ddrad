@@ -1,12 +1,10 @@
 // @ts-nocheck
 import { getDatabase, onValue, ref, update } from "firebase/database";
-import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import CreatableSelectInput from "../components/CreatableSelectInput";
 import { EXTRACTIONS } from "../constants";
-import { backup } from "../content/all";
 import { writeExtractionData } from "../firebase/firebase";
 import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { DnaExtractionsType, StorageType } from "../types";
@@ -127,28 +125,6 @@ const NewSampleForm: React.FC = () => {
     sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Sample was added successfully");
   };
-  const addItemsBackup = () => {
-    backup.forEach((i: any) => {
-      const storageData = storage.find((storage) => storage.box === i.box);
-
-      writeExtractionData({
-        ...i,
-        box: storageData?.key || "",
-        dateCollection: moment(i.dateCollection, "DD.MM.YYYY").format(
-          "YYYY-MM-DD"
-        ),
-        dateIsolation: moment(i.dateIsolation, "DD.MM.YYYY").format(
-          "YYYY-MM-DD"
-        ),
-        isolateCode: i.isolateCode.toString(),
-        isolateCodeGroup: i.isolateCodeGroup
-          ? i.isolateCodeGroup.split(";")
-          : "",
-        ngul: parseFloat(i.ngul) || "",
-      });
-    });
-    toast.success("ok");
-  };
 
   const getSavedData = React.useCallback(() => {
     let data = sessionStorage.getItem(FORM_DATA_KEY);
@@ -164,26 +140,47 @@ const NewSampleForm: React.FC = () => {
     return {
       isolateCode: "",
       speciesOrig: "",
+      organism: "",
       project: "",
-      dateIsolation: "",
       ngul: "",
-      box: "",
-      storageSite: "",
+      habitat: "",
+      dateCollection: "",
+      collector: "",
       localityCode: "",
       country: "",
       state: "",
-      kit: "",
       localityName: "",
       latitude: "",
       longitude: "",
       altitude: "",
-      habitat: "",
-      dateCollection: "",
-      collector: "",
       isolateCodeGroup: "",
       note: "",
     };
   }, []);
+
+  const handleReset = () => {
+    sessionStorage.removeItem(FORM_DATA_KEY);
+    setValue("isolateCode", "");
+    setValue("speciesOrig", "");
+    setValue("organism", "");
+    setValue("project", "");
+    setValue("ngul", "");
+    setValue("habitat", "");
+    setValue("dateCollection", "");
+    setValue("collector", "");
+    setValue("localityCode", "");
+    setValue("country", "");
+    setValue("state", "");
+    setValue("localityName", "");
+    setValue("latitude", "");
+    setValue("longitude", "");
+    setValue("altitude", "");
+    setValue("habitat", "");
+    setValue("dateCollection", "");
+    setValue("collector", "");
+    setValue("isolateCodeGroup", "");
+    setValue("note", "");
+  };
 
   const {
     register,
@@ -294,9 +291,8 @@ const NewSampleForm: React.FC = () => {
           });
           setValue("organism", i.organism);
           setValue("project", i.project);
-          setValue("habitat", i.habitat);
           setValue("dateCollection", i.dateCollection);
-          setValue("collector", i.collector);
+          setValue("ngul", i.ngul);
           setValue("localityCode", i.localityCode);
           setValue("country", i.country, {
             shouldValidate: true,
@@ -309,7 +305,6 @@ const NewSampleForm: React.FC = () => {
           setValue("longitude", i.longitude);
           setValue("altitude", i.altitude);
           setValue("habitat", i.habitat);
-          setValue("dateCollection", i.dateCollection);
           setValue("collector", i.collector, {
             shouldValidate: true,
           });
@@ -341,7 +336,13 @@ const NewSampleForm: React.FC = () => {
 
   return (
     <form className="form" onSubmit={handleSubmit(addItem)}>
-      <h5>Add new sample:</h5>
+      <div className="newformMenu">
+        <h5>Add new sample:</h5>
+        <button className="resetBtn" onClick={handleReset}>
+          reset form
+        </button>
+      </div>
+
       <div className="form-grid">
         <div>
           <TextInput
