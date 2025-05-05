@@ -3,6 +3,7 @@
 import { initializeApp } from "firebase/app";
 import { child, getDatabase, push, ref, set } from "firebase/database";
 import { EXTRACTIONS } from "../constants";
+import { getAuth } from "firebase/auth";
 import { DnaExtractionsType, StorageType } from "../types";
 // TODO: Add SDKs for Firebase products that you want to use
 
@@ -25,7 +26,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 const extractions = ref(db, EXTRACTIONS);
 const storage = ref(db, "storage/");
@@ -59,7 +60,10 @@ function writePcrProgramsData(primer: any) {
   set(ref(db, "pcrPrograms/" + newKey), primer);
 }
 
+const auth = getAuth(app);
+
 export {
+  auth,
   extractions,
   locations,
   storage,

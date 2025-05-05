@@ -5,6 +5,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import routes from "../routes";
 import "./TopBar.scss";
+import SignInButton from "./SignInButton";
 
 const TopBar: React.FC = () => {
   const db = getDatabase();
@@ -66,6 +67,7 @@ const TopBar: React.FC = () => {
       <button className="export" onClick={() => handleDownload()}>
         Export all
       </button>
+      <SignInButton />
     </div>
   );
 };
