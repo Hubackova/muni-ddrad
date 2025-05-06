@@ -48,7 +48,7 @@ const SignInButton = () => {
     );
   }
 
-  return <button onClick={signInWithGoogle}>Přihlásit se pomocí Google</button>;
+  return <button onClick={signInWithGoogle}>Log in</button>;
 };
 
 export default SignInButton;

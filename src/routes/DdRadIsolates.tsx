@@ -220,6 +220,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
           ({ value, row, cell }) => (
             <NoConfirmCell
               initialValue={value}
+              value={value}
               row={row}
               cell={cell}
               type="number"

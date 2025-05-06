@@ -163,11 +163,13 @@ const NewSampleForm: React.FC = () => {
     setValue("isolateCode", "");
     setValue("speciesOrig", "");
     setValue("organism", "");
+    setValue("dateIsolation", "");
+    setValue("kit", "");
+    setValue("box", "");
+    setValue("storageSite", "");
     setValue("project", "");
     setValue("ngul", "");
-    setValue("habitat", "");
     setValue("dateCollection", "");
-    setValue("collector", "");
     setValue("localityCode", "");
     setValue("country", "");
     setValue("state", "");
@@ -176,7 +178,6 @@ const NewSampleForm: React.FC = () => {
     setValue("longitude", "");
     setValue("altitude", "");
     setValue("habitat", "");
-    setValue("dateCollection", "");
     setValue("collector", "");
     setValue("isolateCodeGroup", "");
     setValue("note", "");
