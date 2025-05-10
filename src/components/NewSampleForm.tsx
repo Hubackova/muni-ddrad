@@ -44,6 +44,7 @@ const NewSampleForm: React.FC = () => {
   const [showModalLoc, setShowModalLoc] = useState(false);
   const [showModalCode, setShowModalCode] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [alternative, setAlternative] = useState("full");
   const db = getDatabase();
 
   useEffect(() => {
@@ -693,20 +694,85 @@ const NewSampleForm: React.FC = () => {
           disabled={isDisabled}
         />
 
-        <TextInput
-          label="Date collection"
-          name="dateCollection"
-          error={errors.dateCollection?.message}
-          register={register}
-          type="date"
-          disabled={isDisabled}
-          onBlur={(e: any) => {
-            if (e.target.value !== getValues("dateCollection")) {
-              setValue("isolateCodeGroup", "");
-              sessionStorage.removeItem("isolateGroupItem");
-            }
-          }}
-        />
+        <div>
+          <div className="date-switcher">
+            <div
+              className="date-btn-switch"
+              onClick={() => {
+                clearErrors("dateCollection");
+                setValue("dateCollection", "");
+                return setAlternative("full");
+              }}
+            >
+              YYYY-MM-DD
+            </div>
+            <div
+              className="date-btn-switch"
+              onClick={() => {
+                clearErrors("dateCollection");
+                setValue("dateCollection", "");
+                return setAlternative("month");
+              }}
+            >
+              YYYY-MM
+            </div>
+            <div
+              className="date-btn-switch"
+              onClick={() => {
+                clearErrors("dateCollection");
+                setValue("dateCollection", "");
+                return setAlternative("year");
+              }}
+            >
+              YYYY
+            </div>
+          </div>
+          {alternative === "full" && (
+            <TextInput
+              label="Date collection"
+              name="dateCollection"
+              error={errors.dateCollection?.message}
+              register={register}
+              required="This field is required"
+              type="date"
+            />
+          )}
+          {alternative === "month" && (
+            <TextInput
+              label="Date collection"
+              name="dateCollection"
+              error={errors.dateCollection?.message}
+              register={register}
+              type="month"
+              placeholder="YYYY-MM or na"
+              required="This field is required"
+              validate={(value) =>
+                /^(\d{4}-\d{2}|na)$/i.test(value) ||
+                "Date should be in YYYY-MM format (or na)"
+              }
+            />
+          )}
+          {alternative === "year" && (
+            <TextInput
+              label="Date collection"
+              name="dateCollection"
+              error={errors.dateCollection?.message}
+              register={register}
+              required="This field is required"
+              placeholder="YYYY or na"
+              validate={(value) =>
+                /^(\d{4}|na)$/i.test(value) ||
+                "Date should be in YYYY format (or na)"
+              }
+              onBlur={(e: any) => {
+                if (e.target.value !== getValues("dateCollection")) {
+                  setValue("isolateCodeGroup", "");
+                  sessionStorage.removeItem("isolateGroupItem");
+                }
+              }}
+            />
+          )}
+        </div>
         <Controller
           render={({ field: { onChange, value } }) => (
             <CreatableSelectInput

@@ -22,6 +22,25 @@
     }
   }
 
+  .date-switcher {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+    font-size: 0.6em;
+    text-align: left;
+    color: darkblue;
+
+    .date-btn-switch {
+      cursor: pointer;
+      padding: 2px 4px;
+      border: 1px solid darkblue;
+
+      &.hidden {
+        opacity: 0;
+      }
+    }
+  }
+
   .select,
   .input-container {
     min-width: 225px;
