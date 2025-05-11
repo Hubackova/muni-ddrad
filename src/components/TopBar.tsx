@@ -19,7 +19,7 @@ const TopBar: React.FC = () => {
         "href",
         "data:text/plain;charset=utf-8," + encodeURIComponent(data)
       );
-      link.setAttribute("download", "db-mollusca-backup.json");
+      link.setAttribute("download", "db-ddrad-backup.json");
       link.style.display = "none";
 
       document.body.appendChild(link);

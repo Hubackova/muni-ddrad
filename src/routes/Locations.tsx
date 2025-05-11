@@ -27,7 +27,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions, user }) => {
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
   const [full, setFull] = useState(false);
   const [showEditModal, setShowEditModal] = useState(null);
-
+  console.log(extractions);
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
       if (!user) return alert("Please log in first");
@@ -420,8 +420,8 @@ const Locations: React.FC<LocationsProps> = ({ extractions, user }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Note",
-        accessor: "note",
+        Header: "Note - Locality",
+        accessor: "noteLocality",
         Filter: Multi,
         filter: multiSelectFilter,
       },
@@ -445,6 +445,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions, user }) => {
             altitude: ex.altitude,
             dateCollection: ex.dateCollection,
             collector: ex.collector,
+            noteLocality: ex.noteLocality,
             key: ex.key,
           };
         }),
@@ -603,7 +604,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions, user }) => {
         <div className="download">
           <CSVLink
             data={selectedFlatRows.map((i) => i.values)}
-            filename="db-mollusca-all.csv"
+            filename="db-ddrad.csv"
           >
             <div className="export">
               <ExportIcon />

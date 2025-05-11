@@ -861,7 +861,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         <div className="download">
           <CSVLink
             data={selectedFlatRows.map((i) => i.values)}
-            filename="db-mollusca-all.csv"
+            filename="db-ddrad.csv"
           >
             <div className="export">
               <ExportIcon />

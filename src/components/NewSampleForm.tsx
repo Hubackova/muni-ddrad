@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import React, { useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, set, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import CreatableSelectInput from "../components/CreatableSelectInput";
 import { EXTRACTIONS } from "../constants";
@@ -146,6 +146,7 @@ const NewSampleForm: React.FC = () => {
       isolateCode: "",
       speciesOrig: "",
       organism: "",
+      voucher: "",
       project: "",
       ngul: "",
       habitat: "",
@@ -160,6 +161,7 @@ const NewSampleForm: React.FC = () => {
       altitude: "",
       isolateCodeGroup: "",
       note: "",
+      noteLocality: "",
     };
   }, []);
 
@@ -168,6 +170,7 @@ const NewSampleForm: React.FC = () => {
     setValue("isolateCode", "");
     setValue("speciesOrig", "");
     setValue("organism", "");
+    setValue("voucher", "");
     setValue("dateIsolation", "");
     setValue("kit", "");
     setValue("box", "");
@@ -186,6 +189,7 @@ const NewSampleForm: React.FC = () => {
     setValue("collector", "");
     setValue("isolateCodeGroup", "");
     setValue("note", "");
+    setValue("noteLocality", "");
   };
 
   const {
@@ -253,6 +257,7 @@ const NewSampleForm: React.FC = () => {
               setValue("altitude", i.altitude);
               setValue("habitat", i.habitat);
               setValue("dateCollection", i.dateCollection);
+              setValue("noteLocality", i.noteLocality);
               setValue("collector", i.collector);
               setValue("note", i.note);
               clearErrors("country");
@@ -296,8 +301,10 @@ const NewSampleForm: React.FC = () => {
             shouldValidate: true,
           });
           setValue("organism", i.organism);
+          setValue("voucher", i.voucher);
           setValue("project", i.project);
           setValue("dateCollection", i.dateCollection);
+          setValue("noteLocality", i.noteLocality);
           setValue("ngul", i.ngul);
           setValue("localityCode", i.localityCode);
           setValue("country", i.country, {
@@ -427,6 +434,12 @@ const NewSampleForm: React.FC = () => {
           control={control}
           name="organism"
         />
+        <TextInput
+          label="Voucher"
+          name="voucher"
+          error={errors.voucher?.message}
+          register={register}
+        />
         <Controller
           render={({ field: { onChange, value } }) => (
             <CreatableSelectInput
@@ -535,6 +548,7 @@ const NewSampleForm: React.FC = () => {
                     setValue("habitat", e.habitat);
                     setValue("dateCollection", e.dateCollection);
                     setValue("collector", e.collector);
+                    setValue("noteLocality", e.noteLocality);
                     setValue("isolateCodeGroup", "");
                     sessionStorage.removeItem("isolateGroupItem");
                     clearErrors("country");
@@ -800,7 +814,14 @@ const NewSampleForm: React.FC = () => {
           name="collector"
         />
         <TextInput
-          label="Note_sample"
+          label="Note - locality"
+          name="noteLocality"
+          error={errors.noteLocality?.message}
+          register={register}
+          style={{ minWidth: "100%" }}
+        />
+        <TextInput
+          label="Note - sample"
           name="note"
           error={errors.note?.message}
           register={register}
