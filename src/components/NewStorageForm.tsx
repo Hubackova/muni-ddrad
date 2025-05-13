@@ -7,14 +7,12 @@ import TextInput from "../components/TextInput";
 import { backup } from "../content/storage";
 import { writeStorageData } from "../firebase/firebase";
 import { StorageType } from "../types";
-import { useAuth } from "../AuthContext";
 
 const FORM_DATA_KEY = "storage";
 
 const NewStorageForm: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
   const db = getDatabase();
-  const { user } = useAuth();
 
   useEffect(() => {
     onValue(ref(db, "storage/"), (snapshot) => {
@@ -43,7 +41,6 @@ const NewStorageForm: React.FC = () => {
   );
 
   const addItem = (data: any) => {
-    if (!user) return alert("Please log in to add a box");
     writeStorageData(data);
     sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Box was added successfully");

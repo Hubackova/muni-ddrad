@@ -28,7 +28,6 @@ import { getLocalityOptions } from "../helpers/getLocalityOptions";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { getOptions } from "../components/NewSampleForm";
 import { toast } from "react-toastify";
-import { useAuth } from "../AuthContext";
 
 interface DnaExtractionsProps {
   storage: StorageType[];
@@ -44,16 +43,14 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const [showRemoveModal, setShowRemoveModal] = useState(null);
   const [selectedItem, setSelectedItem] = useState(false);
   const [showGroupModal, setShowGroupModal] = useState(null);
-  const { user } = useAuth();
 
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      if (!user) return alert("Please log in first");
       update(ref(db, EXTRACTIONS + key), {
         [id]: newValue,
       });
     },
-    [db, user]
+    [db]
   );
   const boxOptions = useMemo(
     () =>
@@ -101,13 +98,9 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     setLast(false);
   };
 
-  const removeItem = useCallback(
-    (id: string) => {
-      if (!user) return alert("Please log in first");
-      setShowModal(id);
-    },
-    [user]
-  );
+  const removeItem = useCallback((id: string) => {
+    setShowModal(id);
+  }, []);
 
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (
@@ -760,13 +753,13 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                   i.key !== showModal
               );
 
-              group.forEach((group) => {
+              group.forEach((group) =>
                 update(ref(db, EXTRACTIONS + group.key), {
                   isolateCodeGroup: group.isolateCodeGroup.filter(
                     (i) => i !== currentItem.isolateCode
                   ),
-                });
-              });
+                })
+              );
               toast.success("Sample was removed successfully");
             }}
             onHide={() => setShowModal(null)}
@@ -832,10 +825,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                           {isolateCode}
 
                           <button
-                            onClick={() => {
-                              if (!user) return alert("Please log in first");
-                              setShowRemoveModal(isolateCode);
-                            }}
+                            onClick={() => setShowRemoveModal(isolateCode)}
                           >
                             X
                           </button>
@@ -843,10 +833,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                       ))}
                     <span
                       className="sample add"
-                      onClick={() => {
-                        if (!user) return alert("Please log in first");
-                        handleIsolateClick(row.original);
-                      }}
+                      onClick={() => handleIsolateClick(row.original)}
                     >
                       + Add
                     </span>

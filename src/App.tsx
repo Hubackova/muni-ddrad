@@ -15,7 +15,6 @@ import HomePage from "./routes/HomePage";
 import Locations from "./routes/Locations";
 import Storage from "./routes/Storage";
 import { DnaExtractionsType, StorageType } from "./types";
-import { AuthProvider } from "./AuthContext";
 
 const App: React.FC = () => {
   const [storage, setStorage] = useState<StorageType[]>([]);
@@ -46,51 +45,49 @@ const App: React.FC = () => {
   const sortedExtractions = extractions;
 
   return (
-    <AuthProvider>
-      <div>
-        <TopBar />
-        <ToastContainer />
-        <div className="app-container">
-          <Routes>
-            <Route path={routes.home} element={<HomePage />} />
-            <Route
-              path={routes.dnaExtractions}
-              element={
-                extractions?.length > 0 && storage?.length > 0 ? (
-                  <DdRadIsolates
-                    storage={storage}
-                    extractions={sortedExtractions}
-                  />
-                ) : (
-                  <div> loading (or no data)</div>
-                )
-              }
-            />
-            <Route
-              path={routes.locations}
-              element={
-                extractions?.length > 0 && storage?.length > 0 ? (
-                  <Locations extractions={extractions} />
-                ) : (
-                  <div> loading (or no data)</div>
-                )
-              }
-            />
-            <Route
-              path={routes.storage}
-              element={
-                extractions?.length > 0 && storage?.length > 0 ? (
-                  <Storage storage={storage} extractions={extractions} />
-                ) : (
-                  <div> loading (or no data)</div>
-                )
-              }
-            />
-            <Route element={<Error404 returnUrl={routes.home} />} />
-          </Routes>
-        </div>
+    <div>
+      <TopBar />
+      <ToastContainer />
+      <div className="app-container">
+        <Routes>
+          <Route path={routes.home} element={<HomePage />} />
+          <Route
+            path={routes.dnaExtractions}
+            element={
+              extractions?.length > 0 && storage?.length > 0 ? (
+                <DdRadIsolates
+                  storage={storage}
+                  extractions={sortedExtractions}
+                />
+              ) : (
+                <div> loading (or no data)</div>
+              )
+            }
+          />
+          <Route
+            path={routes.locations}
+            element={
+              extractions?.length > 0 && storage?.length > 0 ? (
+                <Locations extractions={extractions} />
+              ) : (
+                <div> loading (or no data)</div>
+              )
+            }
+          />
+          <Route
+            path={routes.storage}
+            element={
+              extractions?.length > 0 && storage?.length > 0 ? (
+                <Storage storage={storage} extractions={extractions} />
+              ) : (
+                <div> loading (or no data)</div>
+              )
+            }
+          />
+          <Route element={<Error404 returnUrl={routes.home} />} />
+        </Routes>
       </div>
-    </AuthProvider>
+    </div>
   );
 };
 

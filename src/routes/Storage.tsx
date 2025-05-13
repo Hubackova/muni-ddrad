@@ -22,7 +22,6 @@ import { GlobalFilter, Multi, multiSelectFilter } from "../components/Filter";
 import IndeterminateCheckbox from "../components/IndeterminateCheckbox";
 import { ReactComponent as ExportIcon } from "../images/export.svg";
 import { DnaExtractionsType, StorageType } from "../types";
-import { useAuth } from "../AuthContext";
 
 interface DnaExtractionsProps {
   storage: StorageType[];
@@ -33,16 +32,13 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
   const db = getDatabase();
   const [showModal, setShowModal] = useState(null);
   const [last, setLast] = useState(false);
-  const { user } = useAuth();
-
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      if (!user) return alert("Please log in first");
       update(ref(db, "storage/" + key), {
         [id]: newValue,
       });
     },
-    [db, user]
+    [db]
   );
   const storageOptions = useMemo(
     () =>
@@ -66,13 +62,9 @@ const Storage: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
     setLast(false);
   };
 
-  const removeItem = useCallback(
-    (id: string) => {
-      if (!user) return alert("Please log in first");
-      setShowModal(id);
-    },
-    [user]
-  );
+  const removeItem = useCallback((id: string) => {
+    setShowModal(id);
+  }, []);
 
   const DefaultCell = React.memo<React.FC<any>>(
     ({ value, row, cell }) => (

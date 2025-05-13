@@ -22,7 +22,7 @@ interface LocationsProps {
   extractions: DnaExtractionsType[];
 }
 
-const Locations: React.FC<LocationsProps> = ({ extractions, user }) => {
+const Locations: React.FC<LocationsProps> = ({ extractions }) => {
   const db = getDatabase();
   const localityOptions = useMemo(() => getLocalityOptions(extractions), []);
   const [full, setFull] = useState(false);
@@ -30,7 +30,6 @@ const Locations: React.FC<LocationsProps> = ({ extractions, user }) => {
   console.log(extractions);
   const editItem = useCallback(
     (key: string, newValue: string, id: string) => {
-      if (!user) return alert("Please log in first");
       const groupItems = extractions.filter((i) => {
         return i.localityCode === key;
       });
@@ -41,7 +40,7 @@ const Locations: React.FC<LocationsProps> = ({ extractions, user }) => {
         })
       );
     },
-    [db, extractions, user]
+    [db, extractions]
   );
 
   const customComparator = (prevProps, nextProps) => {

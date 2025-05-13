@@ -11,7 +11,6 @@ import { DnaExtractionsType, StorageType } from "../types";
 import "./NewSampleForm.scss";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
-import { useAuth } from "../AuthContext";
 
 const FORM_DATA_KEY = "app_form_local_data";
 
@@ -47,7 +46,6 @@ const NewSampleForm: React.FC = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [alternative, setAlternative] = useState("full");
   const db = getDatabase();
-  const { user } = useAuth();
 
   useEffect(() => {
     onValue(ref(db, EXTRACTIONS), (snapshot) => {
@@ -71,7 +69,6 @@ const NewSampleForm: React.FC = () => {
   }, [db]);
 
   const addItem = (data: any) => {
-    if (!user) return alert("Please log in to add new sample");
     const { storageSite, ...sampleData } = data;
     Object.keys(sampleData).forEach((key) => {
       if (sampleData[key] === undefined) {
@@ -120,12 +117,11 @@ const NewSampleForm: React.FC = () => {
       .map((i) => i.key);
 
     if (!!newIsolateCodeGroupUnique.length) {
-      groupKeys.forEach((i) => {
-        if (!user) return alert("Please log in to add new sample");
+      groupKeys.forEach((i) =>
         update(ref(db, EXTRACTIONS + i), {
           isolateCodeGroup: newIsolateCodeGroupUnique,
-        });
-      });
+        })
+      );
     }
     sessionStorage.removeItem(FORM_DATA_KEY);
     toast.success("Sample was added successfully");
@@ -713,6 +709,38 @@ const NewSampleForm: React.FC = () => {
         />
 
         <div>
+          <div className="date-switcher">
+            <div
+              className="date-btn-switch"
+              onClick={() => {
+                clearErrors("dateCollection");
+                setValue("dateCollection", "");
+                return setAlternative("full");
+              }}
+            >
+              YYYY-MM-DD
+            </div>
+            <div
+              className="date-btn-switch"
+              onClick={() => {
+                clearErrors("dateCollection");
+                setValue("dateCollection", "");
+                return setAlternative("month");
+              }}
+            >
+              YYYY-MM
+            </div>
+            <div
+              className="date-btn-switch"
+              onClick={() => {
+                clearErrors("dateCollection");
+                setValue("dateCollection", "");
+                return setAlternative("year");
+              }}
+            >
+              YYYY
+            </div>
+          </div>
           {alternative === "full" && (
             <TextInput
               label="Date collection"
@@ -758,38 +786,6 @@ const NewSampleForm: React.FC = () => {
               }}
             />
           )}
-          <div className="date-switcher">
-            <div
-              className="date-btn-switch"
-              onClick={() => {
-                clearErrors("dateCollection");
-                setValue("dateCollection", "");
-                return setAlternative("full");
-              }}
-            >
-              YYYY-MM-DD
-            </div>
-            <div
-              className="date-btn-switch"
-              onClick={() => {
-                clearErrors("dateCollection");
-                setValue("dateCollection", "");
-                return setAlternative("month");
-              }}
-            >
-              YYYY-MM
-            </div>
-            <div
-              className="date-btn-switch"
-              onClick={() => {
-                clearErrors("dateCollection");
-                setValue("dateCollection", "");
-                return setAlternative("year");
-              }}
-            >
-              YYYY
-            </div>
-          </div>
         </div>
         <Controller
           render={({ field: { onChange, value } }) => (

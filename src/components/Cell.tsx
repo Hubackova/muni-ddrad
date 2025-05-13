@@ -7,7 +7,6 @@ import { EXTRACTIONS } from "../constants";
 import ConfirmModal from "./ConfirmModal";
 import CreatableSelectInput from "./CreatableSelectInput";
 import SelectInput from "./SelectInput";
-import { useAuth } from "../AuthContext";
 
 export const useIsOverflow = (ref, callback) => {
   const [isOverflow, setIsOverflow] = React.useState(undefined);
@@ -53,10 +52,8 @@ export const DateCell: React.FC<any> = ({
   const db = getDatabase();
   const [showEditModal, setShowEditModal] = useState(null);
   const [value, setValue] = React.useState(initialValue);
-  const { user } = useAuth();
 
   const onChange = (e: any) => {
-    if (!user) return alert("Please log in first");
     setValue(e.target.value);
     if (
       (initialValue?.toString() || "") !== (e.target.value?.toString() || "")
@@ -136,10 +133,7 @@ export const EditableCell: React.FC<any> = ({
   const db = getDatabase();
   const [showEditModal, setShowEditModal] = useState(null);
   const [value, setValue] = useState(initialValue);
-  const { user } = useAuth();
-
   const onChange = (e: any) => {
-    if (!user) return alert("Please log in first");
     setValue(e.target.value);
   };
   const onBlur = (e: any) => {
@@ -256,9 +250,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
 }) => {
   const db = getDatabase();
   const [value, setValue] = useState(initialValue);
-  const { user } = useAuth();
   const onChange = (e: any) => {
-    if (!user) return alert("Please log in first");
     setValue(e.target.value);
   };
   const onBlur = (e: any) => {
@@ -324,10 +316,7 @@ export const SelectCell: React.FC<any> = ({
       ? { value: initialValue, label: initialValue }
       : null
   );
-  const { user } = useAuth();
-
   const onChange = (value: any) => {
-    if (!user) return alert("Please log in first");
     setValue({ value: value.value, label: value.label });
     if ((initialValue?.toString() || "") !== (value.value?.toString() || "")) {
       if (noConfirm) {
@@ -413,7 +402,6 @@ export const CreatableSelectCell: React.FC<any> = ({
   noConfirm = false,
 }) => {
   const db = getDatabase();
-  const { user } = useAuth();
   const { original } = row;
   const [showEditModal, setShowEditModal] = useState(null);
   const [value, setValue] = React.useState(
@@ -422,7 +410,6 @@ export const CreatableSelectCell: React.FC<any> = ({
       : null
   );
   const onChange = (value: any) => {
-    if (!user) return alert("Please log in first");
     setValue({ value: value.value, label: value.label });
     if ((initialValue?.toString() || "") !== (value.value?.toString() || "")) {
       if (noConfirm) {

@@ -1,10 +1,25 @@
-import React from "react";
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+// @ts-nocheck
+import React, { useEffect, useState } from "react";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+
 import { auth } from "../firebase/firebase";
-import { useAuth } from "../AuthContext";
 
 const SignInButton = () => {
-  const { user } = useAuth();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Sleduje stav přihlášení
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe(); // Odpojení listeneru při unmountu
+  }, []);
 
   const signInWithGoogle = () => {
     const provider = new GoogleAuthProvider();
