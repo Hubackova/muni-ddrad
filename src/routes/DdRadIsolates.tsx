@@ -214,7 +214,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Pre_ng/ul DNA",
+        Header: "Pre_ng/ul",
         accessor: "ngul",
         Cell: React.memo<React.FC<any>>(
           ({ value, row, cell }) => (
@@ -234,7 +234,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Quib_ng/ul DNA",
+        Header: "Quib_ng/ul",
         accessor: "quibngul",
         Cell: NoConfirmCell,
         Filter: Multi,
@@ -255,7 +255,7 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
-        Header: "Post_ng/ul DNA",
+        Header: "Post_ng/ul",
         accessor: "postngul",
         Cell: NoConfirmCell,
         Filter: Multi,

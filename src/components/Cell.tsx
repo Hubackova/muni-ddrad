@@ -177,7 +177,6 @@ export const EditableCell: React.FC<any> = ({
 
   const isNarrow = [
     "isolateCodeGroup",
-    "ngul",
     "isolateCode",
     "kit",
     "status",
@@ -273,6 +272,15 @@ export const EditableNoConfirmCell: React.FC<any> = ({
 
   const inputRef = React.useRef();
   const isOverflow = useIsOverflow(inputRef);
+  const ultraNarrow = [
+    "ngul",
+    "quibngul",
+    "postngul",
+    "p1",
+    "p2",
+    "radlibrary",
+  ].includes(cell.column.id);
+
   const isNarrow = [
     "cytB",
     "16S",
@@ -293,7 +301,7 @@ export const EditableNoConfirmCell: React.FC<any> = ({
       {...props}
       ref={inputRef}
       title={isOverflow ? value : ""}
-      className={isNarrow ? "narrow" : ""}
+      className={ultraNarrow ? "ultra-narrow" : isNarrow ? "narrow" : ""}
       maxLength={cell.column.id === "position" ? "3" : undefined}
     />
   );

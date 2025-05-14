@@ -29,24 +29,24 @@
 
 .filter-wrapper {
   z-index: 99999999;
-  display: inline;
+  display: inline-flex;
   text-align: left;
   font-weight: 400;
-  margin-bottom: -5px;
 
   .filter-btn {
     border: none;
     background-color: inherit;
     cursor: pointer;
-    margin-left: 2px;
+    padding: 0;
+    max-height: max-content;
+    width: 18px;
+    position: absolute;
+    bottom: 2px;
+    margin-left: 1px;
 
     &.active {
       background-color: rgb(238, 239, 236);
       border: 1px solid greenyellow;
-    }
-
-    svg {
-      width: 18px;
     }
   }
 

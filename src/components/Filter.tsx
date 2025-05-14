@@ -153,14 +153,13 @@ export function Multi({
   // UI for Multi-Select box
   return (
     <div className="filter-wrapper">
-      <button
+      <FilterIcon
         onClick={() => setOpened(!opened)}
         className={cx("filter-btn", {
           active: filterValue && filterValue.length,
         })}
-      >
-        <FilterIcon />
-      </button>
+      />
+
       {opened && (
         <div className="filter-content" ref={wrapperRef}>
           <div

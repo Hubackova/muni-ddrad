@@ -13,8 +13,8 @@
     border-radius: 4px;
   }
 
-  * {
-    font-size: 13px;
+  th {
+    font-size: 11px;
   }
 
   thead {
@@ -104,6 +104,9 @@
         color: black;
       }
 
+      &.ultra-narrow {
+        max-width: 90px;
+      }
       &.narrow {
         max-width: 105px;
       }
@@ -295,5 +298,10 @@ form {
       position: absolute;
       bottom: 30px;
     }
+  }
+
+  th > span {
+    font-size: 8px !important;
+    border: 1px solid red !important;
   }
 }
