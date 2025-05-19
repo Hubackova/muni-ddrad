@@ -468,6 +468,14 @@ const Locations: React.FC<LocationsProps> = ({ extractions }) => {
       data: reducedData,
       defaultColumn: { Cell: EditableCell, Filter: () => {} },
       autoResetFilters: false,
+      initialState: {
+        sortBy: [
+          {
+            id: "localityCode",
+            desc: false,
+          },
+        ],
+      },
     },
     useGlobalFilter,
     useFilters,
