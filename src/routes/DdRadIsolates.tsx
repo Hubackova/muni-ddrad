@@ -196,6 +196,24 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
         filter: multiSelectFilter,
       },
       {
+        Header: "Project",
+        accessor: "project",
+        Cell: ({ value, row, cell }) => {
+          return (
+            <CreatableSelectCell
+              initialValue={value}
+              row={row}
+              cell={cell}
+              options={getOptions(extractions, "project")}
+              saveLast={setLast}
+              noConfirm
+            />
+          );
+        },
+        Filter: Multi,
+        filter: multiSelectFilter,
+      },
+      {
         Header: "Isolation date",
         accessor: "dateIsolation",
         Cell: React.memo<React.FC<any>>(
