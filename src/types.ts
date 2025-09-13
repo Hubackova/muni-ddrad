@@ -36,8 +36,6 @@ export interface LocationType {
   state: string;
   localityName: string;
   habitat: string;
-  dateCollection: string;
-  collector: string;
   key: string;
 }
 

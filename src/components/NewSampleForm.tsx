@@ -252,13 +252,10 @@ const NewSampleForm: React.FC = () => {
               setValue("longitude", i.longitude);
               setValue("altitude", i.altitude);
               setValue("habitat", i.habitat);
-              setValue("dateCollection", i.dateCollection);
               setValue("noteLocality", i.noteLocality);
-              setValue("collector", i.collector);
               setValue("note", i.note);
               clearErrors("country");
               clearErrors("localityName");
-              clearErrors("collector");
             }}
           >
             {i.value}
@@ -542,14 +539,11 @@ const NewSampleForm: React.FC = () => {
                     setValue("longitude", e.longitude);
                     setValue("altitude", e.altitude);
                     setValue("habitat", e.habitat);
-                    setValue("dateCollection", e.dateCollection);
-                    setValue("collector", e.collector);
                     setValue("noteLocality", e.noteLocality);
                     setValue("isolateCodeGroup", "");
                     sessionStorage.removeItem("isolateGroupItem");
                     clearErrors("country");
                     clearErrors("localityName");
-                    clearErrors("collector");
                     setIsDisabled(true);
                   } else {
                     setIsDisabled(false);
@@ -803,7 +797,6 @@ const NewSampleForm: React.FC = () => {
               error={errors.collector?.message}
               isSearchable
               required="This field is required"
-              isDisabled={isDisabled}
             />
           )}
           control={control}

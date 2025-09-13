@@ -26,8 +26,6 @@ export const getLocalityOptions = (extractions: DnaExtractionsType[]) => {
           longitude: i.longitude,
           altitude: i.altitude,
           habitat: i.habitat,
-          dateCollection: i.dateCollection,
-          collector: i.collector,
         }))
         .filter((i) => !!i.value);
 
@@ -42,8 +40,6 @@ export const getLocalityOptions = (extractions: DnaExtractionsType[]) => {
       longitude: "",
       altitude: "",
       habitat: "",
-      dateCollection: "",
-      collector: "",
     },
     ...localityOpt,
   ];

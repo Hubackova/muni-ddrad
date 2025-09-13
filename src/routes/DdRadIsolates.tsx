@@ -404,12 +404,6 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
                     editItem(original.key, value.longitude || "", "longitude");
                     editItem(original.key, value.altitude || "", "altitude");
                     editItem(original.key, value.habitat || "", "habitat");
-                    editItem(
-                      original.key,
-                      value.dateCollection || "",
-                      "dateCollection"
-                    );
-                    editItem(original.key, value.collector || "", "collector");
                     setLast({
                       rowKey: row.original.key,
                       cellId: cell.column.id,
@@ -506,14 +500,14 @@ const All: React.FC<DnaExtractionsProps> = ({ storage, extractions }) => {
       {
         Header: "Date collection",
         accessor: "dateCollection",
-        Cell: LocalityCell,
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
       {
         Header: "Collector",
         accessor: "collector",
-        Cell: LocalityCell,
+        Cell: NoConfirmCell,
         Filter: Multi,
         filter: multiSelectFilter,
       },
